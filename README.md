@@ -28,6 +28,8 @@ yarn run server
 yarn run client
 ```
 
+Before each commit, lint your files with `yarn run lint` which will run ESLint over all your files.
+
 ## Testing production
 In production the react app will be bundled into client/build using the script `yarn build`.  To test this locally, run
 ```
