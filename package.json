@@ -9,7 +9,7 @@
     "server": "node ./server/bin/www",
     "client": "cd client && yarn start",
     "lint": "./node_modules/.bin/eslint --fix ./server/**/*.js ./client/src/**/*.js",
-    "heroku-postbuild": "cd client && yarn run build"
+    "heroku-postbuild": "cd client && yarn install && yarn run build"
   },
   "dependencies": {
     "body-parser": "~1.18.2",
