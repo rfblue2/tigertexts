@@ -1,4 +1,4 @@
-# Find My Books [WIP]
+# Tiger Texts [WIP]
 _COS333 Project Spring 2018_
 
 A web application to help Princeton students find their coursebooks.
