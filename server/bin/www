@@ -1,9 +1,11 @@
 #!/usr/bin/env node
+require('@babel/register');
+require('@babel/polyfill');
+process.env.NODE_CONFIG_DIR = "./server/config";
 
 /**
  * Module dependencies.
  */
-
 var app = require('../app');
 var debug = require('debug')('react-backend:server');
 var http = require('http');

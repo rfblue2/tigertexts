@@ -28,7 +28,10 @@ yarn run server
 yarn run client
 ```
 
-Before each commit, lint your files with `yarn run lint` which will run ESLint over all your files.
+### Testing and Linting
+This project uses ESLint to lint the javascript files.  To run ESLint to automatically correct or report styling issues, run `yarn run lint`.
+
+Mocha is used in conjunction with chai to test the API.  Run this with `yarn run test`.
 
 ## Testing production
 In production the react app will be bundled into client/build using the script `yarn build`.  To test this locally, run

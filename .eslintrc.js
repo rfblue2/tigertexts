@@ -4,7 +4,7 @@ module.exports = {
   "env": {
     "browser": true,
     "node": true,
-    "jasmine": true,
+    "mocha": true,
   },
   "rules": {
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
