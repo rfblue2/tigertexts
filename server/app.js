@@ -30,7 +30,7 @@ if(config.util.getEnv('NODE_ENV') !== 'test') {
   app.use(logger('dev'));
 }
 
-mongoose.connect(config.DBHost);
+mongoose.connect(process.env.MONGODB_URI || config.DBHost);
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 
