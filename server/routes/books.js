@@ -47,7 +47,7 @@ router.route('/:id/listings')
 
   .get(wrap(async (req, res) => {
     const listings = await Listing.find({ book: req.params.id });
-    if (!listings) throw new APIError('No listings associated with book')
+    if (!listings) throw new APIError('No listings associated with book');
     res.json(ListingSerializer.serialize(listings));
   }));
 

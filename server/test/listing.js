@@ -30,7 +30,7 @@ describe('Listings', () => {
     price_type: 'new',
   };
 
-  let testListing2 = {
+  const testListing2 = {
     kind: 'facebook',
     title: 'buy my book',
     price: 100,
@@ -112,5 +112,4 @@ describe('Listings', () => {
       expect(res.body.data[0]).to.have.property('relationships').eql(testListingReq1.data.relationships);
     });
   });
-
 });

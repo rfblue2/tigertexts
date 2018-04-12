@@ -13,6 +13,11 @@
     "heroku-postbuild": "cd client && yarn install && yarn run build"
   },
   "dependencies": {
+    "@babel/core": "^7.0.0-beta.44",
+    "@babel/polyfill": "^7.0.0-beta.44",
+    "@babel/preset-env": "^7.0.0-beta.44",
+    "@babel/preset-stage-0": "^7.0.0-beta.44",
+    "@babel/register": "^7.0.0-beta.44",
     "body-parser": "~1.18.2",
     "config": "^1.30.0",
     "cookie-parser": "~1.4.3",
@@ -26,11 +31,6 @@
     "serve-favicon": "~2.4.5"
   },
   "devDependencies": {
-    "@babel/core": "^7.0.0-beta.44",
-    "@babel/polyfill": "^7.0.0-beta.44",
-    "@babel/preset-env": "^7.0.0-beta.44",
-    "@babel/preset-stage-0": "^7.0.0-beta.44",
-    "@babel/register": "^7.0.0-beta.44",
     "babel-eslint": "^8.2.2",
     "chai": "^4.1.2",
     "chai-http": "^4.0.0",
