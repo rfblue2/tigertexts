@@ -8,7 +8,15 @@ process.env.NODE_CONFIG_DIR = "./server/config";
  */
 var app = require('../app');
 var debug = require('debug')('react-backend:server');
-var http = require('http');
+// var http = require('http');
+var https = require('https');
+var fs = require('fs');
+
+var sslOptions = {
+  key: fs.readFileSync('key.pem'),
+  cert: fs.readFileSync('cert.pem'),
+  passphrase: 'pass',
+};
 
 /**
  * Get port from environment and store in Express.
@@ -21,7 +29,8 @@ app.set('port', port);
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
+//var server = http.createServer(app);
+var server = https.createServer(sslOptions, app);
 
 /**
  * Listen on provided port, on all network interfaces.
