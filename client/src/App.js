@@ -12,6 +12,7 @@ import Button from 'material-ui/Button';
 import HomeIcon from '@material-ui/icons/Home';
 import FacebookLogin from 'react-facebook-login';
 import Login from './Login';
+import Dashboard from './dashboard/Dashboard';
 import Home from './home/Home';
 import Book from './book/Book';
 
@@ -66,6 +67,7 @@ class App extends Component {
             </Toolbar>
           </AppBar>
           <Route exact path="/" component={Home} />
+          <Route path="/dashboard" component={Dashboard} />
           <Route path="/login" component={Login} />
           <Route path="/book/:bookId" component={Book} />
         </div>
