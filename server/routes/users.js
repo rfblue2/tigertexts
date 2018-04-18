@@ -1,5 +1,7 @@
 import express from 'express';
 import fetch from 'isomorphic-fetch';
+import jwt from 'jsonwebtoken';
+import expressJwt from 'express-jwt';
 import { TransactionSerializer } from '../utils/serializers/transactionSerializer';
 import {
   UserDeserializer,
@@ -43,37 +45,72 @@ router.get('/login', wrap(async (req, res) => {
     return;
   }
 
-  console.log("Token verified");
-
   const longLivedToken = await fetchLongAccessToken(token);
 
-  console.log("Obtained long access token: " + longLivedToken);
+  // console.log(`Obtained long access token: ${longLivedToken}`);
 
   let user = await User.findOne({ facebook_id: userId });
-  let returnedUser;
+  let savedUser;
 
   // Create a new user
   if (!user) {
     user = new User({
       name,
       email,
-      long_lived_token: longLivedToken,
-      facebook_id: userId,
+      facebookProvider: {
+        token: longLivedToken,
+        id: userId,
+      },
       role: 'Member',
     });
-    returnedUser = await user.save();
+    savedUser = await user.save();
   } else {
-    returnedUser = await User.findOneAndUpdate({
+    savedUser = await User.findOneAndUpdate({
       _id: user._id,
     }, { long_lived_token: longLivedToken }, { new: true });
   }
 
-  // TODO hide longlivedtoken (mongoose has option for this) and pass jwt instead
+  // JWT token payload
+  const auth = {
+    id: savedUser._id, facebook_id: userId, name, email,
+  };
 
-  console.log("Returning user: " + JSON.stringify(returnedUser, null, 2));
+  // generate JWT
+  req.token = jwt.sign(auth, 'my-secret', { expiresIn: 60 * 120 });
 
-  res.json(UserSerializer.serialize(returnedUser));
+  // return JWT
+  res.setHeader('x-auth-token', req.token);
+  res.status(200).send(auth);
 }));
+
+const authenticate = expressJwt({
+  secret: 'my-secret',
+  requestProperty: 'auth',
+  getToken: (req) => {
+    if (req.headers['x-auth-token']) {
+      return req.headers['x-auth-token'];
+    }
+    return null;
+  },
+});
+
+const getCurrentUser = function (req, res, next) {
+  User.findById(req.auth.id, (err, user) => {
+    if (err) {
+      next(err);
+    } else {
+      req.user = user;
+      next();
+    }
+  });
+};
+
+const getOne = (req, res) => {
+  res.json(UserSerializer.serialize(req.user));
+};
+
+router.route('/me')
+  .get(authenticate, getCurrentUser, getOne);
 
 /**
  * API Routes

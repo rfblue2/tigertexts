@@ -30,7 +30,9 @@ class Dashboard extends Component {
       { id: 'b232', title: 'book3' },
     ],
     activity: [
-      { id: '45672', book: '15514', seller: 'someone', buyer: 'someone else', price: 10 },
+      {
+        id: '45672', book: '15514', seller: 'someone', buyer: 'someone else', price: 10,
+      },
     ],
     user: {
       name: 'roland',
@@ -42,8 +44,9 @@ class Dashboard extends Component {
   }
 
   render() {
-
-    const { classes, user, selling, favorites, activity } = this.props;
+    const {
+      classes, user, selling, favorites, activity,
+    } = this.props;
 
     return (
       <div className={classes.dash}>

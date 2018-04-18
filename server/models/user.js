@@ -5,8 +5,13 @@ const UserSchema = new mongoose.Schema({
   updatedAt: Date,
   name: String,
   email: String,
-  facebook_id: { type: String, required: true },
-  long_lived_token: String,
+  facebookProvider: {
+    type: {
+      id: String,
+      token: String,
+    },
+    select: false,
+  },
   role: {
     type: String,
     enum: ['Member', 'Admin'],
