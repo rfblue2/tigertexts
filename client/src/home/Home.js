@@ -6,7 +6,6 @@ import SearchBar from './SearchBar';
 import ResultList from './ResultList';
 import { BookDeserializer } from '../serializers/bookSerializer';
 import { ClassDeserializer } from '../serializers/classSerializer';
-import IntegrationDownshift from './AutoComplete';
 
 class Home extends Component {
   state = {
@@ -27,6 +26,7 @@ class Home extends Component {
       const res = await fetch('/api/classes');
       const resjson = await res.json();
       const courses = await ClassDeserializer.deserialize(resjson);
+
       this.setState({ courses });
     } catch (e) {
       console.error(`error: ${e}`);
@@ -38,29 +38,29 @@ class Home extends Component {
     this.setState({ redirect: true, redirectBookId: id });
   }
 
-  // execute search, selectedItem is a list of course numbers
-  async _executeSearch(selectedItem) {
+  // execute search
+  async _executeSearch(e) {
+    e.persist();
     const fmtCourse = c => c.replace(/\s+/g, '').toLowerCase();
-    try {
-      // TODO replace this with an actual query that returns only the query
-      // results and not the entire book list!
-      const res = await fetch('/api/books');
-      const resjson = await res.json();
-      const books = await BookDeserializer.deserialize(resjson);
-      // gets the unique course ids for all classes specified in the inpput
-      const courses = this.state.courses
-          .filter(c => c.numbers.map(fmtCourse).some(v => selectedItem.map(fmtCourse).includes(v)));
-      var course_ids = courses.map(c => c.id)
 
+    if (e.key === 'Enter') {
+      try {
+        // TODO replace this with an actual query that returns only the query
+        // results and not the entire book list!
+        const res = await fetch('/api/books');
+        const resjson = await res.json();
+        const books = await BookDeserializer.deserialize(resjson);
+        const course = this.state.courses
+          .filter(c => c.numbers.map(fmtCourse).includes(fmtCourse(e.target.value)))[0];
+        if (!course) return;
+        const results = books.filter(b => b.classes.includes(course.id));
 
-      if (!courses) return;
-      const results = books.filter(b => b.classes.some(v => course_ids.includes(v)));
-
-      this.setState({
-        queryResults: results,
-      });
-    } catch (err) {
-      console.error(`error: ${err}`);
+        this.setState({
+          queryResults: results,
+        });
+      } catch (err) {
+        console.error(`error: ${err}`);
+      }
     }
   }
 
@@ -68,7 +68,6 @@ class Home extends Component {
     const {
       queryResults,
       redirectBookId,
-      courses,
     } = this.state;
     const { classes } = this.props;
 
@@ -78,13 +77,10 @@ class Home extends Component {
       <div className={classes.home}>
         <h1>Textbooks</h1>
         <div>Enter Course Number:</div>
-        <div>
-          <IntegrationDownshift 
-            executeSearch={this.executeSearch}
-            classlist={[].concat.apply([], courses.map(c => c.numbers))}
-          />
-        </div>
-
+        <SearchBar
+          className={classes.searchBar}
+          executeSearch={this.executeSearch}
+        />
         <ResultList
           books={queryResults}
           onResultClick={this.goToBook}
