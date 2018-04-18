@@ -6,7 +6,7 @@
     "start": "node ./server/bin/www",
     "dev": "concurrently \"yarn run server\" \"yarn run client\"",
     "prod": "yarn run heroku-postbuild && yarn start",
-    "server": "./node_modules/.bin/nodemon ./server/bin/www",
+    "server": "NODE_ENV='development' ./node_modules/.bin/nodemon ./server/bin/www",
     "client": "cd client && yarn start",
     "lint": "./node_modules/.bin/eslint --fix ./server/**/*.js ./client/src/**/*.js",
     "test": "NODE_ENV='test' NODE_CONFIG_DIR='./server/config' mocha --require @babel/register 'server/test/**/*.js'",

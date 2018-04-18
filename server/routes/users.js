@@ -36,7 +36,7 @@ router.get('/login', wrap(async (req, res) => {
     return;
   }
 
-  const longLivedToken = fetchLongAccessToken(token);
+  const longLivedToken = await fetchLongAccessToken(token);
 
   let user = await User.findOne({ facebook_id: userId });
 
