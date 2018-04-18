@@ -43,6 +43,12 @@ app.use('/api/classes', Classes);
 app.use('/api/books', Books);
 app.use('/api/listings', Listings);
 
+// Serve Certbot verification file
+app.get("/.well-known/acme-challenge/nAriI6kygwGaTilVGQDDZrI7wmqObASCVao0n3lMaDk", 
+  function(req, res){
+    res.send("nAriI6kygwGaTilVGQDDZrI7wmqObASCVao0n3lMaDk.3zfUE1TNUplOFdcH21FW7h2-PBqjrWYIpHTqXCEc2Ck");
+  });
+
 // render react app for anything else
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/build/index.html'));
