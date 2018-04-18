@@ -17,6 +17,8 @@ This determines what information the json output wll have.
 labyrinth.py is the where the scraping logic is.
 
 ### Running the scraper
+WHEN RUNNING THE SCRAPER YOU MUST BE IN THE SAME FOLDER AS THE "scrapy.cfg" FILE
+
 To send json to one file and the debugging output to another file, use a command like
 ```
 scrapy crawl labyrinth -o results.json -t json 2 > error.txt
