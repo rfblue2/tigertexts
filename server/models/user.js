@@ -12,9 +12,8 @@ const UserSchema = new mongoose.Schema({
     enum: ['Member', 'Admin'],
     default: 'Member',
   },
-  books_favorite: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Book' }],
-  books_selling: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Book' }],
-  activity: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Transaction' }],
+  favorite: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Book' }],
+  selling: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Book' }],
 });
 
 // Note: Do not use arrow function due to scoping requirements
