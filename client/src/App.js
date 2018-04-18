@@ -28,7 +28,7 @@ class App extends Component {
 
   async responseFacebook(res) {
     try {
-      // console.log(JSON.stringify(res));
+      console.log(JSON.stringify(res));
       const loginRes = await fetch(`/api/users/login?token=${res.accessToken}&email=${res.email}&name=${res.name}&userId=${res.id}`);
       if (loginRes.ok) {
         this.setState({ isLoggedIn: true, userId: res.id });
