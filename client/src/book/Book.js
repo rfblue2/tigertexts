@@ -48,7 +48,7 @@ class Book extends Component {
     /* TODO: Add link to each Amazon and Labyrinth Page */
 
     return (
-      <div className="Book">
+      <div className={classes.book}>
         <h1 className={classes.bookTitle} >{book.title}</h1>
         <div className={classes.bookDesc} > {book.description} </div>
         <div className={classes.bookAuthors} > {book.authors ? book.authors.map(a => <p key={a}>{a}</p>) : ''} </div>
@@ -64,6 +64,9 @@ class Book extends Component {
 }
 
 const styles = {
+  book: {
+    margin: '30px',
+  },
   bookTitle: {
     margin: '10px',
   },

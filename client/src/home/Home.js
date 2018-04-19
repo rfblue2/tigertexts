@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
+import Typography from 'material-ui/Typography';
 import { Redirect } from 'react-router-dom';
 import ResultList from './ResultList';
 import { BookDeserializer } from '../serializers/bookSerializer';
@@ -27,10 +28,13 @@ class Home extends Component {
     try {
       // TODO replace this with an actual query that returns only the query
       // results and not the entire book list!
-      const res = await fetch('/api/classes');
-      const resjson = await res.json();
-      const courses = await ClassDeserializer.deserialize(resjson);
-      this.setState({ courses });
+      const cres = await fetch('/api/classes');
+      const cresjson = await cres.json();
+      const courses = await ClassDeserializer.deserialize(cresjson);
+      const bres = await fetch('/api/books');
+      const bresjson = await bres.json();
+      const books = await BookDeserializer.deserialize(bresjson);
+      this.setState({ courses, books });
     } catch (e) {
       console.error(`error: ${e}`);
     }
@@ -47,17 +51,13 @@ class Home extends Component {
     try {
       // TODO replace this with an actual query that returns only the query
       // results and not the entire book list!
-      const res = await fetch('/api/books');
-      const resjson = await res.json();
-      const books = await BookDeserializer.deserialize(resjson);
       // gets the unique course ids for all classes specified in the inpput
       const courses = this.state.courses
         .filter(c => c.numbers.map(fmtCourse).some(v => selectedItem.map(fmtCourse).includes(v)));
       const courseIds = courses.map(c => c.id);
 
-
       if (!courses) return;
-      const results = books.filter(b => b.classes.some(v => courseIds.includes(v)));
+      const results = this.state.books.filter(b => b.classes.some(v => courseIds.includes(v)));
 
       this.setState({
         queryResults: results,
@@ -79,8 +79,9 @@ class Home extends Component {
 
     return (
       <div className={classes.home}>
-        <h1>Textbooks</h1>
-        <div>Enter Course Number:</div>
+        <h1>TigerTexts</h1>
+        <Typography variant="subheading">A One Stop Shop for Coursebooks</Typography>
+        <br/>
         <div>
           <AutoComplete
             executeSearch={this.executeSearch}
@@ -99,7 +100,7 @@ class Home extends Component {
 
 const styles = {
   home: {
-    margin: '20px',
+    margin: '30px',
   },
 };
 

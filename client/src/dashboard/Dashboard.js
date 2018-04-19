@@ -226,7 +226,7 @@ const styles = {
     margin: '20px',
   },
   dash: {
-    margin: '20px',
+    margin: '30px',
   },
   grid: {
     flexGrow: 1,

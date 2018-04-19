@@ -30,14 +30,14 @@ class App extends Component {
     try {
       // Fetch User information
       const res = await fetch('/api/users/me', {
-        headers: {'x-auth-token': token},
+        headers: { 'x-auth-token': token },
       });
       // token probably expired
       if (res.status === 401) {
         localStorage.removeItem('jwtToken');
         return;
       }
-    } catch(e) {
+    } catch (e) {
       console.log(`error: ${e}`);
     }
     // TODO this is a good place for dispatching redux to fetch user data
@@ -69,7 +69,7 @@ class App extends Component {
     const { classes } = this.props;
     return (
       <Router>
-        <div>
+        <div className={classes.root}>
           <AppBar position="static">
             <Toolbar>
               <IconButton
@@ -81,24 +81,28 @@ class App extends Component {
                 <HomeIcon />
               </IconButton>
               {
-                isLoggedIn ?
-                  <Button
-                    color="inherit"
-                    onClick={this.handleLogout.bind(this)}
-                  >Logout</Button> :
-                  <FacebookLogin
-                    appId="1949273201750772"
-                    callback={this.responseFacebook.bind(this)}
-                    fields="name,email,picture"
-                    icon="fa-facebook"
-                  />
-              }
-              {
                 isLoggedIn ? (
                   <Button color="inherit" component={Link} to="/dashboard">
                     Dashboard
                   </Button>
                 ) : ''
+              }
+              <div className={classes.flex} />
+              {
+                isLoggedIn ?
+                  <Button
+                    color="inherit"
+                    onClick={this.handleLogout.bind(this)}
+                    className={classes.logoutButton}
+                  >Logout
+                  </Button> :
+                  <FacebookLogin
+                    appId="1949273201750772"
+                    callback={this.responseFacebook.bind(this)}
+                    fields="name,email,picture"
+                    icon="fa-facebook"
+                    className={classes.loginButton}
+                  />
               }
             </Toolbar>
           </AppBar>
@@ -113,9 +117,21 @@ class App extends Component {
 }
 
 const styles = {
+  root: {
+    flexGrow: 1,
+  },
+  flex: {
+    flex: 1,
+  },
   homeButton: {
     marginLeft: -12,
     marginRight: 20,
+  },
+  logoutButton: {
+    textAlign: 'right',
+  },
+  loginButton: {
+    textAlign: 'right',
   },
 };
 
