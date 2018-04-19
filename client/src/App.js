@@ -23,18 +23,18 @@ class App extends Component {
 
   async componentWillMount() {
     // check if user already logged in
-    let token = localStorage.getItem('jwtToken');
+    const token = localStorage.getItem('jwtToken');
     console.log(token);
     if (!token || token === '') return;
     // get user from token
     try {
-      const res = await fetch(`/api/users/me`, {
+      const res = await fetch('/api/users/me', {
         headers: { 'x-auth-token': token },
       });
       const user = await res.json();
-      //console.log(`user info: ${JSON.stringify(user, null, 2)}`);
+      // console.log(`user info: ${JSON.stringify(user, null, 2)}`);
       this.setState({ isLoggedIn: true, jwt: token });
-    } catch(e) {
+    } catch (e) {
       console.log(`error: ${e}`);
     }
   }
@@ -77,13 +77,23 @@ class App extends Component {
               </IconButton>
               {
                 isLoggedIn ?
-                  <Button onClick={this.handleLogout.bind(this)}>Logout</Button> :
+                  <Button
+                    color="inherit"
+                    onClick={this.handleLogout.bind(this)}
+                  >Logout</Button> :
                   <FacebookLogin
                     appId="1949273201750772"
                     callback={this.responseFacebook.bind(this)}
                     fields="name,email,picture"
                     icon="fa-facebook"
                   />
+              }
+              {
+                isLoggedIn ? (
+                  <Button color="inherit" component={Link} to="/dashboard">
+                    Dashboard
+                  </Button>
+                ) : ''
               }
             </Toolbar>
           </AppBar>
