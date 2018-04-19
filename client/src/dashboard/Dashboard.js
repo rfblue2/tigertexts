@@ -29,6 +29,11 @@ class Dashboard extends Component {
       const res = await fetch('/api/users/me', {
         headers: { 'x-auth-token': token },
       });
+
+      // token probably expired, logout
+      if (res.status === 401) {
+        localStorage.removeItem('jwtToken');
+      }
       let user = await res.json();
       user = await UserDeserializer.deserialize(user);
 

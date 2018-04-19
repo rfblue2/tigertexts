@@ -7,10 +7,6 @@ import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import { Error } from 'jsonapi-serializer';
 
-import passport from 'passport';
-import FacebookTokenStrategy from 'passport-facebook-token';
-import User from './models/user';
-
 import config from 'config';
 import Users from './routes/users';
 import Classes from './routes/classes';
@@ -38,19 +34,6 @@ if (config.util.getEnv('NODE_ENV') !== 'test') {
 mongoose.connect(process.env.MONGODB_URI || config.DBHost);
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-
-// Auth
-const APP_ID = '1949273201750772';
-const APP_SECRET = process.env.FACEBOOK_APP_SECRET;
-passport.use(new FacebookTokenStrategy(
-  {
-    clientID: APP_ID,
-    clientSecret: APP_SECRET,
-  },
-  ((accessToken, refreshToken, profile, done) => {
-    User.upsertFbUser(accessToken, refreshToken, profile, (err, user) => done(err, user));
-  }),
-));
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '../client/build')));
