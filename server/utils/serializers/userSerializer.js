@@ -9,7 +9,8 @@ const UserSerializer = new Serializer('user', {
   included: false,
   keyForAttribute: 'snake_case',
   typeForAttribute: (attribute) => {
-    if (attribute === 'books') return 'book';
+    if (attribute === 'selling') return 'book';
+    if (attribute === 'favorite') return 'book';
     return attribute;
   },
   favorite: {

@@ -24,6 +24,7 @@ class App extends Component {
   async componentWillMount() {
     // check if user already logged in
     let token = localStorage.getItem('jwtToken');
+    console.log(token);
     if (!token || token === '') return;
     // get user from token
     try {

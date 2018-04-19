@@ -6,6 +6,8 @@ import Paper from 'material-ui/Paper';
 import Typography from 'material-ui/Typography';
 import TransactionList from './TransactionList';
 import BookList from './BookList';
+import { UserDeserializer } from '../serializers/userSerializer';
+import { BookDeserializer } from '../serializers/bookSerializer';
 
 class Dashboard extends Component {
   state = {
@@ -21,33 +23,52 @@ class Dashboard extends Component {
   }
 
   static defaultProps = {
-    token: '12345',
-    favorites: [
-      { id: '12345', title: 'book1' },
-      { id: '123534', title: 'book2' },
-    ],
-    selling: [
-      { id: 'b232', title: 'book3' },
-    ],
     activity: [
       {
         id: '45672', book: '15514', seller: 'someone', buyer: 'someone else', price: 10,
       },
     ],
-    user: {
-      name: 'roland',
-      email: 'rfblue2@gmail.com',
-    },
   }
 
-  componentWillMount() {
+  async componentWillMount() {
+    // TODO use redux to maintain global user state
+    // check if user already logged in
+    const token = localStorage.getItem('jwtToken');
+    if (!token || token === '') return;
+    // get user from token
+    try {
+      const res = await fetch('/api/users/me', {
+        headers: { 'x-auth-token': token },
+      });
+      let user = await res.json();
+      user = await UserDeserializer.deserialize(user);
+      // TODO have server return these relationships with query in "included"
+      user.favorite = await Promise.all(user.favorite.map(async (f) => {
+        const res = await fetch(`/api/books/${f}`);
+        const resjson = await res.json();
+        return BookDeserializer.deserialize(resjson);
+      }));
+      user.selling = await Promise.all(user.selling.map(async (s) => {
+        const res = await fetch(`/api/books/${s}`);
+        const resjson = await res.json();
+        return BookDeserializer.deserialize(resjson);
+      }));
+      console.log(`user info: ${JSON.stringify(user, null, 2)}`);
+      this.setState({ token, user });
+    } catch (e) {
+      console.log(`error: ${e}`);
+    }
   }
 
   render() {
     const {
-      classes, user, selling, favorites, activity,
+      classes, activity,
     } = this.props;
+    const {
+      user,
+    } = this.state;
 
+    if (!user) return <div>Not logged in</div>;
     return (
       <div className={classes.dash}>
         <h1>Dashboard</h1>
@@ -58,7 +79,7 @@ class Dashboard extends Component {
               <Typography variant="headline" component="h3">
                 Unsold Books
               </Typography>
-              <BookList books={selling} onClick={() => 'test'} />
+              <BookList books={user.selling} onClick={() => 'test'} />
             </Paper>
           </Grid>
           <Grid item xs={12} md={4}>
@@ -66,7 +87,7 @@ class Dashboard extends Component {
               <Typography variant="headline" component="h3">
                 Favorites
               </Typography>
-              <BookList books={favorites} onClick={() => 'test'} />
+              <BookList books={user.favorite} onClick={() => 'test'} />
             </Paper>
           </Grid>
           <Grid item xs={12} md={4}>
