@@ -6,7 +6,8 @@ import Grid from 'material-ui/Grid';
 import Paper from 'material-ui/Paper';
 import Typography from 'material-ui/Typography';
 import TransactionList from './TransactionList';
-import BookList from './BookList';
+import FavoriteList from './FavoriteList';
+import SellingList from './SellingList';
 import { UserDeserializer } from '../serializers/userSerializer';
 import { BookDeserializer } from '../serializers/bookSerializer';
 import { TransactionDeserializer } from '../serializers/transactionSerializer';
@@ -100,7 +101,7 @@ class Dashboard extends Component {
               <Typography variant="headline" component="h3">
                 Unsold Books
               </Typography>
-              <BookList books={user.selling} onClick={() => 'test'} />
+              <SellingList books={user.selling} onClick={() => 'test'} onMarkSoldClick={() => 'test'}/>
             </Paper>
           </Grid>
           <Grid item xs={12} md={4}>
@@ -108,7 +109,7 @@ class Dashboard extends Component {
               <Typography variant="headline" component="h3">
                 Favorites
               </Typography>
-              <BookList books={user.favorite} onClick={this.goToBook} />
+              <FavoriteList books={user.favorite} onClick={this.goToBook} />
             </Paper>
           </Grid>
           <Grid item xs={12} md={4}>
