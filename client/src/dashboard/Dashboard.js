@@ -194,7 +194,11 @@ class Dashboard extends Component {
               <Typography variant="headline" component="h3">
                 Unsold Books
               </Typography>
-              <SellingList books={user.selling} onClick={this.goToBook} onMarkSoldClick={this.markSold} />
+              <SellingList
+                books={user.selling}
+                onClick={this.goToBook}
+                onMarkSoldClick={this.markSold}
+              />
             </Paper>
           </Grid>
           <Grid item xs={12} md={4}>

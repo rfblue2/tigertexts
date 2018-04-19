@@ -1,3 +1,4 @@
+/* eslint no-underscore-dangle: "off" */
 import express from 'express';
 import fetch from 'isomorphic-fetch';
 import jwt from 'jsonwebtoken';

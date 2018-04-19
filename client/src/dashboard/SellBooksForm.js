@@ -12,7 +12,6 @@ class SellBooksForm extends Component {
   }
 
   state = {
-    selling: [],
     books: [],
   }
 
