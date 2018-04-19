@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
-import List from 'material-ui/List';
+import GridList from 'material-ui/GridList';
 import Result from './Result';
-
 
 class ResultList extends Component {
   static propTypes = {
@@ -19,7 +18,7 @@ class ResultList extends Component {
 
     return (
       <div>
-        <List>
+        <GridList cols={2.5}>
           { books.map(b =>
           (<Result
             key={b.id}
@@ -27,7 +26,7 @@ class ResultList extends Component {
             book={b}
           />))
         }
-        </List>
+        </GridList>
       </div>
     );
   }
