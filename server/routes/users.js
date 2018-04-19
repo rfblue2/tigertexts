@@ -167,6 +167,7 @@ router.route('/selling')
   }))
 
   .post(authenticate, getCurrentUser, wrap(async (req, res) => {
+    console.log(JSON.stringify(req.body, null, 2));
     const data = await UserDeserializer.deserialize(req.body);
     await User.findOneAndUpdate({
       _id: req.user._id,
