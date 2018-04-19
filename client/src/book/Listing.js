@@ -5,9 +5,8 @@ import { ListItem, ListItemText } from 'material-ui/List';
 
 const Listing = ({ classes, listing }) => (
   <ListItem>
-    <ListItemText className={classes.bookSource} primary={listing.title} />
-    <ListItemText className={classes.bookSource} secondary={listing.kind} />
-    <ListItemText className={classes.bookPrice} secondary={`$${listing.price}`} />
+    <ListItemText className={classes.bookSource} primary={listing.title} secondary={listing.kind} />
+    {listing.price ? <ListItemText className={classes.bookPrice} secondary={`$${listing.price}`} /> : '' }
   </ListItem>
 );
 
