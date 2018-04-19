@@ -29,6 +29,7 @@ class Dashboard extends Component {
   }
 
   async componentWillMount() {
+    this.markSold = this._markSold.bind(this);
     this.onSell = this._onSell.bind(this);
     this.goToBook = this._goToBook.bind(this);
     this.handleOpen = this._handleOpen.bind(this);
@@ -102,6 +103,18 @@ class Dashboard extends Component {
   _handleClose = () => {
     this.setState({ showForm: false });
   };
+
+  async _markSold(id) {
+    await fetch(`/api/users/selling/${id}`, {
+      headers: { 'x-auth-token': this.state.token },
+    });
+    this.setState({
+      user: {
+        ...this.state.user,
+        selling: this.state.user.selling.filter(b => b.id !== id),
+      },
+    });
+  }
 
   async _onSell(selectedItems) {
     const { token, user } = this.state;
@@ -182,7 +195,7 @@ class Dashboard extends Component {
               <Typography variant="headline" component="h3">
                 Unsold Books
               </Typography>
-              <SellingList books={user.selling} onClick={this.goToBook} onMarkSoldClick={() => 'test'} />
+              <SellingList books={user.selling} onClick={this.goToBook} onMarkSoldClick={this.markSold} />
             </Paper>
           </Grid>
           <Grid item xs={12} md={4}>
