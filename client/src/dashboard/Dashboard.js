@@ -13,7 +13,7 @@ import TransactionList from './TransactionList';
 import FavoriteList from './FavoriteList';
 import SellingList from './SellingList';
 import SellBooksForm from './SellBooksForm';
-import {UserDeserializer, UserSerializer} from '../serializers/userSerializer'
+import { UserDeserializer } from '../serializers/userSerializer';
 import { BookDeserializer } from '../serializers/bookSerializer';
 import { TransactionDeserializer } from '../serializers/transactionSerializer';
 
@@ -129,12 +129,10 @@ class Dashboard extends Component {
         attributes: {},
         relationships: {
           selling: {
-            data: books.map((b) => {
-              return {
-                type: 'book',
-                id: b.id,
-              };
-            }),
+            data: books.map(b => ({
+              type: 'book',
+              id: b.id,
+            })),
           },
         },
       },
@@ -161,7 +159,7 @@ class Dashboard extends Component {
       redirectToBookId,
       showForm,
     } = this.state;
-    console.log("USER: " + JSON.stringify(user, null, 2));
+    console.log(`USER: ${JSON.stringify(user, null, 2)}`);
     if (redirectToBook) return <Redirect push to={`/book/${redirectToBookId}`} />;
 
     if (!user) return <div className={classes.unloggedin}>Please Log In</div>;
@@ -187,7 +185,7 @@ class Dashboard extends Component {
           open={showForm}
           onClose={this.handleClose}
         >
-          <SellBooksForm onSell={this.onSell}/>
+          <SellBooksForm onSell={this.onSell} />
         </Modal>
 
         <Grid container className={classes.grid} justify="center" spacing={24}>

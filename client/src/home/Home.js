@@ -81,7 +81,7 @@ class Home extends Component {
       <div className={classes.home}>
         <h1>TigerTexts</h1>
         <Typography variant="subheading">A One Stop Shop for Coursebooks</Typography>
-        <br/>
+        <br />
         <div>
           <AutoComplete
             executeSearch={this.executeSearch}

@@ -151,7 +151,7 @@ router.route('/favorites')
 router.route('/favorites/:id')
 
   .delete(authenticate, getCurrentUser, wrap(async (req, res) => {
-    let user = req.user.toObject();
+    const user = req.user.toObject();
     user.favorite = user.favorite.filter(f => String(f) !== req.params.id);
     await User.findOneAndUpdate({
       _id: req.user._id,
@@ -189,7 +189,7 @@ router.route('/selling')
 router.route('/selling/:id')
 
   .delete(authenticate, getCurrentUser, wrap(async (req, res) => {
-    let user = req.user.toObject();
+    const user = req.user.toObject();
     user.selling = user.selling.filter(f => String(f) !== req.params.id);
     console.log(JSON.stringify(user.selling, null, 2));
     await User.findOneAndUpdate({

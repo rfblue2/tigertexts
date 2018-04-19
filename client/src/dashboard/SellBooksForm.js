@@ -29,7 +29,7 @@ class SellBooksForm extends Component {
       left: '50%',
       transform: 'translate(-50%, -50%)',
     };
-  };
+  }
 
   render() {
     const { classes, onSell } = this.props;
