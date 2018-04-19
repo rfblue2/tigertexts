@@ -13,6 +13,22 @@ class TransactionList extends Component {
     onClick: PropTypes.func.isRequired,
   }
 
+  buildItemText(t) {
+    let text = '';
+    if (t.seller) {
+      text += `${t.seller} sold ${t.book.title}`;
+      if (t.buyer) {
+        text += ` to ${t.buyer}`;
+      }
+    } else {
+      text += `${t.buyer} bought ${t.book.title}`;
+    }
+    if (t.price) {
+      text += ` for $${t.price}`;
+    }
+    return text;
+  }
+
   render() {
     const { transactions, onClick } = this.props;
 
@@ -21,7 +37,7 @@ class TransactionList extends Component {
         <List>
           { transactions.map(t =>
             (<ListItem button key={t.id} onClick={() => onClick(t.id)}>
-              <ListItemText primary={`${t.seller} sold ${t.book} to ${t.buyer} for $${t.price}`} />
+              <ListItemText primary={this.buildItemText(t)} />
             </ListItem>))
           }
         </List>

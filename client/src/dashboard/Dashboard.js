@@ -8,6 +8,7 @@ import TransactionList from './TransactionList';
 import BookList from './BookList';
 import { UserDeserializer } from '../serializers/userSerializer';
 import { BookDeserializer } from '../serializers/bookSerializer';
+import {TransactionDeserializer} from '../serializers/transactionSerializer'
 
 class Dashboard extends Component {
   state = {
@@ -63,7 +64,14 @@ class Dashboard extends Component {
         headers: { 'x-auth-token': token },
       });
       const actresjson = await actres.json();
-      user.activity = await BookDeserializer.deserialize(actresjson);
+      user.activity = await TransactionDeserializer.deserialize(actresjson);
+      user.activity = await Promise.all(user.activity.map(async (t) => {
+        const bookRes = await fetch(`/api/books/${t.book}`);
+        const bookResjson = await bookRes.json();
+        const transact = { ...t };
+        transact.book = await BookDeserializer.deserialize(bookResjson);
+        return transact;
+      }));
 
       console.log(`user info: ${JSON.stringify(user, null, 2)}`);
       this.setState({ token, user });
@@ -74,7 +82,7 @@ class Dashboard extends Component {
 
   render() {
     const {
-      classes, activity,
+      classes,
     } = this.props;
     const {
       user,
@@ -107,7 +115,7 @@ class Dashboard extends Component {
               <Typography variant="headline" component="h3">
                 Activity
               </Typography>
-              <TransactionList transactions={activity} onClick={() => 'test'} />
+              <TransactionList transactions={user.activity} onClick={() => 'test'} />
             </Paper>
           </Grid>
         </Grid>
