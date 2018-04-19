@@ -5,6 +5,7 @@ const BookSchema = new mongoose.Schema({
   updatedAt: Date,
   isbn: { type: String, required: true },
   title: { type: String, required: true },
+  image: String,
   book_type: { type: String, enum: ['softcover', 'hardcover'] },
   authors: [String],
   classes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Class' }],

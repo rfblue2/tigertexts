@@ -5,7 +5,7 @@ import {
 
 const BookSerializer = new Serializer('book', {
   pluralizeType: false,
-  attributes: ['isbn', 'title', 'book_type', 'authors', 'classes'],
+  attributes: ['isbn', 'title', 'image', 'book_type', 'authors', 'classes'],
   included: false,
   typeForAttribute: (attribute) => {
     if (attribute === 'classes') return 'class';

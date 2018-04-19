@@ -7,7 +7,6 @@ import Divider from 'material-ui/Divider';
 import { BookDeserializer } from '../serializers/bookSerializer';
 import { ListingDeserializer } from '../serializers/listingSerializer';
 import Listing from './Listing';
-import mockImg from './test.jpg';
 
 class Book extends Component {
   static propTypes = {
@@ -53,7 +52,7 @@ class Book extends Component {
         <h1 className={classes.bookTitle} >{book.title}</h1>
         <div className={classes.bookDesc} > {book.description} </div>
         <div className={classes.bookAuthors} > {book.authors ? book.authors.map(a => <p key={a}>{a}</p>) : ''} </div>
-        <div className={classes.bookPic} > <img src={mockImg} alt="book" /> </div>
+        <div className={classes.bookPic} > <img src={book.image} alt="book" /> </div>
         <Divider />
         <List>
           <Subheader className={classes.subheader} >Book Prices</Subheader>
