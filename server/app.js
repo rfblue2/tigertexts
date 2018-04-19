@@ -7,11 +7,16 @@ import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import { Error } from 'jsonapi-serializer';
 
+import passport from 'passport';
+import FacebookTokenStrategy from 'passport-facebook-token';
+import User from './models/user';
+
 import config from 'config';
 import Users from './routes/users';
 import Classes from './routes/classes';
 import Books from './routes/books';
 import Listings from './routes/listings';
+import Transactions from './routes/transactions';
 
 const app = express();
 
@@ -25,14 +30,27 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-//don't show the log when it is test
-if(config.util.getEnv('NODE_ENV') !== 'test') {
+// don't show the log when it is test
+if (config.util.getEnv('NODE_ENV') !== 'test') {
   app.use(logger('dev'));
 }
 
 mongoose.connect(process.env.MONGODB_URI || config.DBHost);
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
+
+// Auth
+const APP_ID = '1949273201750772';
+const APP_SECRET = process.env.FACEBOOK_APP_SECRET;
+passport.use(new FacebookTokenStrategy(
+  {
+    clientID: APP_ID,
+    clientSecret: APP_SECRET,
+  },
+  ((accessToken, refreshToken, profile, done) => {
+    User.upsertFbUser(accessToken, refreshToken, profile, (err, user) => done(err, user));
+  }),
+));
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '../client/build')));
@@ -42,12 +60,7 @@ app.use('/api/users', Users);
 app.use('/api/classes', Classes);
 app.use('/api/books', Books);
 app.use('/api/listings', Listings);
-
-// Serve Certbot verification file
-app.get("/.well-known/acme-challenge/nAriI6kygwGaTilVGQDDZrI7wmqObASCVao0n3lMaDk", 
-  function(req, res){
-    res.send("nAriI6kygwGaTilVGQDDZrI7wmqObASCVao0n3lMaDk.3zfUE1TNUplOFdcH21FW7h2-PBqjrWYIpHTqXCEc2Ck");
-  });
+app.use('/api/transactions', Transactions);
 
 // render react app for anything else
 app.get('*', (req, res) => {
