@@ -147,6 +147,17 @@ router.route('/favorites')
     res.status(200).end();
   }));
 
+router.route('/favorites/:id')
+
+  .delete(authenticate, getCurrentUser, wrap(async (req, res) => {
+    let user = req.user.toObject();
+    user.favorite = user.favorite.filter(f => String(f) !== req.params.id);
+    await User.findOneAndUpdate({
+      _id: req.user._id,
+    }, { favorite: user.favorite }, { new: true });
+    res.status(200).end();
+  }));
+
 // Convenience method for viewing (get) and adding (post) books being sold
 router.route('/selling')
 
@@ -160,6 +171,18 @@ router.route('/selling')
     await User.findOneAndUpdate({
       _id: req.user._id,
     }, { $push: { selling: { $each: data.selling } } }, { new: true });
+    res.status(200).end();
+  }));
+
+router.route('/selling/:id')
+
+  .delete(authenticate, getCurrentUser, wrap(async (req, res) => {
+    let user = req.user.toObject();
+    user.selling = user.selling.filter(f => String(f) !== req.params.id);
+    console.log(JSON.stringify(user.selling, null, 2));
+    await User.findOneAndUpdate({
+      _id: req.user._id,
+    }, { selling: user.selling }, { new: true });
     res.status(200).end();
   }));
 
