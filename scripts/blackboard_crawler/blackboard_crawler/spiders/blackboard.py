@@ -131,6 +131,10 @@ class BlackboardSpider(scrapy.Spider):
             bookItem['datePublished'] = date
             bookItem['required'] = True
 
+            # Only if price exists / book is at Labyrinth
+            if book.xpath('.//td[contains(@class, "shoppingCart")]//div[@class = "textElement"]'):
+                bookItem['price'] = book.xpath('.//td[contains(@class, "shoppingCart")]//div[@class = "textElement"]/text()').extract()[0]
+                bookItem['price'] = bookItem['price'][bookItem['price'].index("$") + 1:]
             bookList.append(dict(bookItem))
 
 
@@ -161,6 +165,11 @@ class BlackboardSpider(scrapy.Spider):
                 bookItem['publisher'] = publisher
                 bookItem['datePublished'] = date
                 bookItem['required'] = False
+
+                # Only if price exists / book is at Labyrinth
+                if book.xpath('.//td[contains(@class, "shoppingCart")]//div[@class = "textElement"]'):
+                    bookItem['price'] = book.xpath('.//td[contains(@class, "shoppingCart")]//div[@class = "textElement"]/text()').extract()[0]
+                    bookItem['price'] = bookItem['price'][bookItem['price'].index("$") + 1:]
 
                 bookList.append(dict(bookItem))
 

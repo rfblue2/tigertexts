@@ -26,3 +26,4 @@ class Book(scrapy.Item):
     datePublished = scrapy.Field()
     publisher = scrapy.Field()
     required = scrapy.Field()
+    price = scrapy.Field()

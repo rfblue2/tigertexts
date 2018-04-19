@@ -1,6 +1,7 @@
 import json
 import requests
 import sys
+import urllib3
 
 def post_classes():
   raw = json.load(open('blackboard_crawler/results.json'))
@@ -16,9 +17,9 @@ def post_classes():
   elif sys.argv[1] == 'prod':
     host = 'tigertexts.herokuapp.com'
 
-  classes_url = 'http://' + host + '/api/classes' # API Endpoint (change to localhost:3001 if testing locally)
+  classes_url = 'https://' + host + '/api/classes' # API Endpoint (change to localhost:3001 if testing locally)
   print classes_url
-  books_url = 'http://' + host + '/api/books'
+  books_url = 'https://' + host + '/api/books'
   print books_url
   headers = {'Content-type': 'application/json'}
 
@@ -31,7 +32,7 @@ def post_classes():
     class_attributes = {'title': line['name'].replace(line['course_ID'], '').lstrip(), 
     'numbers': line['course_ID'].split('_')[0].split('-')}
     data = {'data': {'type': 'class', 'attributes': class_attributes}}
-    r = requests.post(classes_url, data = json.dumps(data), headers = headers)
+    r = requests.post(classes_url, data = json.dumps(data), headers = headers, verify = False)
     if not r.ok:
       print('Could not POST %s' % line['course_ID'])
     counter += 1
