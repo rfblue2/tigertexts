@@ -37,22 +37,34 @@ class Dashboard extends Component {
     if (!token || token === '') return;
     // get user from token
     try {
+      // Fetch User information
       const res = await fetch('/api/users/me', {
         headers: { 'x-auth-token': token },
       });
       let user = await res.json();
       user = await UserDeserializer.deserialize(user);
+
       // TODO have server return these relationships with query in "included"
-      user.favorite = await Promise.all(user.favorite.map(async (f) => {
-        const res = await fetch(`/api/books/${f}`);
-        const resjson = await res.json();
-        return BookDeserializer.deserialize(resjson);
-      }));
-      user.selling = await Promise.all(user.selling.map(async (s) => {
-        const res = await fetch(`/api/books/${s}`);
-        const resjson = await res.json();
-        return BookDeserializer.deserialize(resjson);
-      }));
+      // TODO avoid await hell
+      // Fetch favorites
+      const favres = await fetch('api/users/favorites', {
+        headers: { 'x-auth-token': token },
+      });
+      const favresjson = await favres.json();
+      user.favorite = await BookDeserializer.deserialize(favresjson);
+      // Fetch selling
+      const sellres = await fetch('api/users/selling', {
+        headers: { 'x-auth-token': token },
+      });
+      const sellresjson = await sellres.json();
+      user.selling = await BookDeserializer.deserialize(sellresjson);
+      // Fetch activity
+      const actres = await fetch('api/users/activity', {
+        headers: { 'x-auth-token': token },
+      });
+      const actresjson = await actres.json();
+      user.activity = await BookDeserializer.deserialize(actresjson);
+
       console.log(`user info: ${JSON.stringify(user, null, 2)}`);
       this.setState({ token, user });
     } catch (e) {

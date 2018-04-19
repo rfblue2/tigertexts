@@ -118,10 +118,10 @@ router.route('/me')
  * TODO currently checks query param for mongo id
  */
 
-router.route('/:id/activity')
+router.route('/activity')
 
-  .get(wrap(async (req, res) => {
-    const user = await User.findById(req.params.id);
+  .get(authenticate, getCurrentUser, wrap(async (req, res) => {
+    const user = req.user;
     const id = user._id;
     const activity = await Transaction.find({
       $or: [
@@ -133,35 +133,35 @@ router.route('/:id/activity')
   }));
 
 // Convenience method for viewing (get) and adding (post) favorites
-router.route('/:id/favorites')
+router.route('/favorites')
 
-  .get(wrap(async (req, res) => {
-    const user = await User.findById(req.params.id);
+  .get(authenticate, getCurrentUser, wrap(async (req, res) => {
+    const user = req.user;
     const favorites = await Book.find({ _id: { $in: user.toObject().favorite } });
     res.json(BookSerializer.serialize(favorites));
   }))
 
-  .post(wrap(async (req, res) => {
+  .post(authenticate, getCurrentUser, wrap(async (req, res) => {
     const data = await UserDeserializer.deserialize(req.body);
     await User.findOneAndUpdate({
-      _id: req.params.id,
+      _id: req.user._id,
     }, { $push: { favorite: { $each: data.favorite } } }, { new: true });
     res.status(200).end();
   }));
 
 // Convenience method for viewing (get) and adding (post) books being sold
-router.route('/:id/selling')
+router.route('/selling')
 
-  .get(wrap(async (req, res) => {
-    const user = await User.findById(req.params.id);
+  .get(authenticate, getCurrentUser, wrap(async (req, res) => {
+    const user = req.user;
     const selling = await Book.find({ _id: { $in: user.toObject().selling } });
     res.json(BookSerializer.serialize(selling));
   }))
 
-  .post(wrap(async (req, res) => {
+  .post(authenticate, getCurrentUser, wrap(async (req, res) => {
     const data = await UserDeserializer.deserialize(req.body);
     await User.findOneAndUpdate({
-      _id: req.params.id,
+      _id: req.user._id,
     }, { $push: { selling: { $each: data.selling } } }, { new: true });
     res.status(200).end();
   }));
