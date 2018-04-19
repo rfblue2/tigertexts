@@ -149,7 +149,7 @@ class AutoComplete extends Component {
                   )),
                   onChange: this.handleInputChange,
                   onKeyDown: this.handleKeyDown,
-                  placeholder: 'Enter your courses!',
+                  placeholder: 'Enter course numbers',
                   id: 'integration-downshift-multiple',
                 }),
               })}

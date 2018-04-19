@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
+import { Redirect } from 'react-router-dom';
 import Grid from 'material-ui/Grid';
 import Paper from 'material-ui/Paper';
 import Typography from 'material-ui/Typography';
@@ -16,9 +17,11 @@ class Dashboard extends Component {
   }
 
   state = {
+    redirectToBook: false,
   }
 
   async componentWillMount() {
+    this.goToBook = this._goToBook.bind(this);
     // TODO use redux to maintain global user state
     // check if user already logged in
     const token = localStorage.getItem('jwtToken');
@@ -72,13 +75,19 @@ class Dashboard extends Component {
     }
   }
 
+  // sends you to book page
+  _goToBook(id) {
+    this.setState({ redirectToBook: true, redirectToBookId: id });
+  }
+
   render() {
     const {
       classes,
     } = this.props;
     const {
-      user,
+      user, redirectToBook, redirectToBookId,
     } = this.state;
+    if (redirectToBook) return <Redirect push to={`/book/${redirectToBookId}`} />;
 
     if (!user) return <div>Not logged in</div>;
     return (
@@ -99,7 +108,7 @@ class Dashboard extends Component {
               <Typography variant="headline" component="h3">
                 Favorites
               </Typography>
-              <BookList books={user.favorite} onClick={() => 'test'} />
+              <BookList books={user.favorite} onClick={this.goToBook} />
             </Paper>
           </Grid>
           <Grid item xs={12} md={4}>

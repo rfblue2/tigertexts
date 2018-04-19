@@ -80,7 +80,6 @@ class Home extends Component {
     return (
       <div className={classes.home}>
         <h1>Textbooks</h1>
-        <div>Enter Course Number:</div>
         <div>
           <AutoComplete
             executeSearch={this.executeSearch}
