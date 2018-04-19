@@ -10,6 +10,7 @@ import {
 import { BookSerializer } from '../utils/serializers/bookSerializer';
 import User from '../models/user';
 import Book from '../models/book';
+import Listing from '../models/listing';
 import Transaction from '../models/transaction';
 import wrap from '../utils/wrap';
 
@@ -169,9 +170,19 @@ router.route('/selling')
   .post(authenticate, getCurrentUser, wrap(async (req, res) => {
     console.log(JSON.stringify(req.body, null, 2));
     const data = await UserDeserializer.deserialize(req.body);
+    console.log(JSON.stringify(data, null, 2));
     await User.findOneAndUpdate({
       _id: req.user._id,
     }, { $push: { selling: { $each: data.selling } } }, { new: true });
+    await Promise.all(data.selling.map(async (s) => {
+      const listing = new Listing({
+        kind: 'platform',
+        title: `Seller: ${req.user.name}`,
+        book: s,
+        seller: req.user._id,
+      });
+      listing.save();
+    }));
     res.status(200).end();
   }));
 
@@ -184,6 +195,7 @@ router.route('/selling/:id')
     await User.findOneAndUpdate({
       _id: req.user._id,
     }, { selling: user.selling }, { new: true });
+    await Listing.findOneAndRemove({ seller: req.user._id });
     res.status(200).end();
   }));
 

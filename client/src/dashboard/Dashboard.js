@@ -106,6 +106,7 @@ class Dashboard extends Component {
 
   async _markSold(id) {
     await fetch(`/api/users/selling/${id}`, {
+      method: 'DELETE',
       headers: { 'x-auth-token': this.state.token },
     });
     this.setState({
