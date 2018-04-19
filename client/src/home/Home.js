@@ -2,13 +2,16 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import { Redirect } from 'react-router-dom';
-import SearchBar from './SearchBar';
 import ResultList from './ResultList';
 import { BookDeserializer } from '../serializers/bookSerializer';
 import { ClassDeserializer } from '../serializers/classSerializer';
-import IntegrationDownshift from './AutoComplete';
+import AutoComplete from './AutoComplete';
 
 class Home extends Component {
+  static propTypes = {
+    classes: PropTypes.object.isRequired,
+  };
+
   state = {
     courses: [],
     queryResults: [], // query results
@@ -49,12 +52,12 @@ class Home extends Component {
       const books = await BookDeserializer.deserialize(resjson);
       // gets the unique course ids for all classes specified in the inpput
       const courses = this.state.courses
-          .filter(c => c.numbers.map(fmtCourse).some(v => selectedItem.map(fmtCourse).includes(v)));
-      var course_ids = courses.map(c => c.id)
+        .filter(c => c.numbers.map(fmtCourse).some(v => selectedItem.map(fmtCourse).includes(v)));
+      const courseIds = courses.map(c => c.id);
 
 
       if (!courses) return;
-      const results = books.filter(b => b.classes.some(v => course_ids.includes(v)));
+      const results = books.filter(b => b.classes.some(v => courseIds.includes(v)));
 
       this.setState({
         queryResults: results,
@@ -79,9 +82,9 @@ class Home extends Component {
         <h1>Textbooks</h1>
         <div>Enter Course Number:</div>
         <div>
-          <IntegrationDownshift 
+          <AutoComplete
             executeSearch={this.executeSearch}
-            classlist={[].concat.apply([], courses.map(c => c.numbers))}
+            classlist={courses.map(c => c.numbers).reduce((a, b) => b.concat(a), [])}
           />
         </div>
 
@@ -94,16 +97,9 @@ class Home extends Component {
   }
 }
 
-Home.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
-
 const styles = {
   home: {
     margin: '20px',
-  },
-  searchBar: {
-    width: '100%',
   },
 };
 

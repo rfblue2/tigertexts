@@ -26,17 +26,8 @@ class App extends Component {
     const token = localStorage.getItem('jwtToken');
     console.log(token);
     if (!token || token === '') return;
-    // get user from token
-    try {
-      const res = await fetch('/api/users/me', {
-        headers: { 'x-auth-token': token },
-      });
-      const user = await res.json();
-      // console.log(`user info: ${JSON.stringify(user, null, 2)}`);
-      this.setState({ isLoggedIn: true, jwt: token });
-    } catch (e) {
-      console.log(`error: ${e}`);
-    }
+    // TODO this is a good place for dispatching redux to fetch user data
+    this.setState({ isLoggedIn: true, jwt: token });
   }
 
   handleLogout() {

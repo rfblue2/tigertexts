@@ -10,6 +10,15 @@ import Listing from './Listing';
 import mockImg from './test.jpg';
 
 class Book extends Component {
+  static propTypes = {
+    classes: PropTypes.object.isRequired,
+    match: PropTypes.shape({
+      params: PropTypes.shape({
+        bookId: PropTypes.string.isRequired,
+      }).isRequired,
+    }).isRequired,
+  };
+
   state = {
     book: {},
     listings: [],
@@ -43,26 +52,17 @@ class Book extends Component {
       <div className="Book">
         <h1 className={classes.bookTitle} >{book.title}</h1>
         <div className={classes.bookDesc} > {book.description} </div>
-        <div className={classes.bookAuthors} > {book.authors ? book.authors.map(a => <p>{a}</p>) : ''} </div>
+        <div className={classes.bookAuthors} > {book.authors ? book.authors.map(a => <p key={a}>{a}</p>) : ''} </div>
         <div className={classes.bookPic} > <img src={mockImg} alt="book" /> </div>
         <Divider />
         <List>
           <Subheader className={classes.subheader} >Book Prices</Subheader>
-          { listings.map(l => <Listing listing={l} />)}
+          { listings.map(l => <Listing key={l.id} listing={l} />)}
         </List>
       </div>
     );
   }
 }
-
-Book.propTypes = {
-  classes: PropTypes.object.isRequired,
-  match: PropTypes.shape({
-    params: PropTypes.shape({
-      bookId: PropTypes.string.isRequired,
-    }).isRequired,
-  }).isRequired,
-};
 
 const styles = {
   bookTitle: {

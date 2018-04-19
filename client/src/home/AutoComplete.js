@@ -8,13 +8,23 @@ import Paper from 'material-ui/Paper';
 import { MenuItem } from 'material-ui/Menu';
 import Chip from 'material-ui/Chip';
 
-class IntegrationDownshift extends Component {
+class AutoComplete extends Component {
+  static propTypes = {
+    classes: PropTypes.object.isRequired,
+    executeSearch: PropTypes.func.isRequired,
+    classlist: PropTypes.arrayOf(PropTypes.string),
+  };
+
+  static defaultProps = {
+    classlist: [],
+  }
+
   state = {
     inputValue: '',
     selectedItem: [],
   };
 
-  handleKeyDown = event => {
+  handleKeyDown = (event) => {
     const { inputValue, selectedItem } = this.state;
     const { executeSearch } = this.props;
 
@@ -22,17 +32,16 @@ class IntegrationDownshift extends Component {
       this.setState({
         selectedItem: selectedItem.slice(0, selectedItem.length - 1),
       });
-    }
-    else if (selectedItem.length && !inputValue.length && keycode(event) === 'enter') {
-      executeSearch(selectedItem)
+    } else if (selectedItem.length && !inputValue.length && keycode(event) === 'enter') {
+      executeSearch(selectedItem);
     }
   };
 
-  handleInputChange = event => {
+  handleInputChange = (event) => {
     this.setState({ inputValue: event.target.value });
   };
 
-  handleChange = item => {
+  handleChange = (item) => {
     let { selectedItem } = this.state;
 
     if (selectedItem.indexOf(item) === -1) {
@@ -43,7 +52,7 @@ class IntegrationDownshift extends Component {
       inputValue: '',
       selectedItem,
     });
-    console.log(selectedItem)
+    console.log(selectedItem);
   };
 
   handleDelete = item => () => {
@@ -54,9 +63,9 @@ class IntegrationDownshift extends Component {
   };
 
   renderInput(inputProps) {
-    const { executeSearch } = this.props;
-
-    const { InputProps, classes, ref, ...other } = inputProps;
+    const {
+      InputProps, classes, ref, ...other
+    } = inputProps;
 
     return (
       <TextField
@@ -72,7 +81,9 @@ class IntegrationDownshift extends Component {
     );
   }
 
-  renderSuggestion({ suggestion, index, itemProps, highlightedIndex, selectedItem }) {
+  renderSuggestion({
+    suggestion, index, itemProps, highlightedIndex, selectedItem,
+  }) {
     const isHighlighted = highlightedIndex === index;
     const isSelected = (selectedItem || '').indexOf(suggestion) > -1;
 
@@ -94,7 +105,7 @@ class IntegrationDownshift extends Component {
   getSuggestions(inputValue, classlist) {
     let count = 0;
 
-    return classlist.filter(suggestion => {
+    return classlist.filter((suggestion) => {
       const keep =
         (!inputValue || suggestion.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1) &&
         count < 5;
@@ -108,8 +119,7 @@ class IntegrationDownshift extends Component {
   }
 
   render() {
-    const { classes } = this.props;
-    const { classlist, executeSearch } = this.props;
+    const { classes, classlist } = this.props;
     const { inputValue, selectedItem } = this.state;
 
     return (
@@ -152,8 +162,7 @@ class IntegrationDownshift extends Component {
                       itemProps: getItemProps({ item: suggestion }),
                       highlightedIndex,
                       selectedItem: selectedItem2,
-                    }),
-                  )}
+                    }))}
                 </Paper>
               ) : null}
             </div>
@@ -163,12 +172,6 @@ class IntegrationDownshift extends Component {
     );
   }
 }
-
-IntegrationDownshift.propTypes = {
-  classes: PropTypes.object.isRequired,
-  executeSearch: PropTypes.func.isRequired,
-};
-
 
 const styles = theme => ({
   root: {
@@ -194,4 +197,4 @@ const styles = theme => ({
   },
 });
 
-export default withStyles(styles)(IntegrationDownshift);
+export default withStyles(styles)(AutoComplete);

@@ -121,8 +121,7 @@ router.route('/me')
 router.route('/activity')
 
   .get(authenticate, getCurrentUser, wrap(async (req, res) => {
-    const user = req.user;
-    const id = user._id;
+    const id = req.user._id;
     const activity = await Transaction.find({
       $or: [
         { seller: id },
@@ -136,8 +135,7 @@ router.route('/activity')
 router.route('/favorites')
 
   .get(authenticate, getCurrentUser, wrap(async (req, res) => {
-    const user = req.user;
-    const favorites = await Book.find({ _id: { $in: user.toObject().favorite } });
+    const favorites = await Book.find({ _id: { $in: req.user.toObject().favorite } });
     res.json(BookSerializer.serialize(favorites));
   }))
 
@@ -153,8 +151,7 @@ router.route('/favorites')
 router.route('/selling')
 
   .get(authenticate, getCurrentUser, wrap(async (req, res) => {
-    const user = req.user;
-    const selling = await Book.find({ _id: { $in: user.toObject().selling } });
+    const selling = await Book.find({ _id: { $in: req.user.toObject().selling } });
     res.json(BookSerializer.serialize(selling));
   }))
 

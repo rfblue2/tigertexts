@@ -4,16 +4,16 @@ import { withStyles } from 'material-ui/styles';
 import List, { ListItem, ListItemText } from 'material-ui/List';
 
 class TransactionList extends Component {
-  state = {
-  }
-
   static propTypes = {
     classes: PropTypes.object.isRequired,
     transactions: PropTypes.arrayOf(PropTypes.object.isRequired).isRequired,
     onClick: PropTypes.func.isRequired,
   }
 
-  buildItemText(t) {
+  state = {
+  }
+
+  static buildItemText(t) {
     let text = '';
     if (t.seller) {
       text += `${t.seller} sold ${t.book.title}`;
@@ -35,10 +35,11 @@ class TransactionList extends Component {
     return (
       <div>
         <List>
-          { transactions.map(t =>
-            (<ListItem button key={t.id} onClick={() => onClick(t.id)}>
-              <ListItemText primary={this.buildItemText(t)} />
-            </ListItem>))
+          { transactions.map(t => (
+            <ListItem button key={t.id} onClick={() => onClick(t.id)}>
+              <ListItemText primary={TransactionList.buildItemText(t)} />
+            </ListItem>
+            ))
           }
         </List>
       </div>

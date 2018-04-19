@@ -6,6 +6,11 @@ import Result from './Result';
 
 
 class ResultList extends Component {
+  static propTypes = {
+    books: PropTypes.arrayOf(PropTypes.object.isRequired).isRequired,
+    onResultClick: PropTypes.func.isRequired,
+  };
+
   state = {
   }
 
@@ -27,11 +32,6 @@ class ResultList extends Component {
     );
   }
 }
-
-ResultList.propTypes = {
-  books: PropTypes.arrayOf(PropTypes.object.isRequired).isRequired,
-  onResultClick: PropTypes.func.isRequired,
-};
 
 const styles = {
   home: {

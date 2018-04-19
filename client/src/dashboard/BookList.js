@@ -4,9 +4,6 @@ import { withStyles } from 'material-ui/styles';
 import List, { ListItem, ListItemText } from 'material-ui/List';
 
 class BookList extends Component {
-  state = {
-  }
-
   static propTypes = {
     classes: PropTypes.object.isRequired,
     books: PropTypes.arrayOf(PropTypes.object.isRequired).isRequired,

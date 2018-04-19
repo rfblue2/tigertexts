@@ -8,27 +8,14 @@ import TransactionList from './TransactionList';
 import BookList from './BookList';
 import { UserDeserializer } from '../serializers/userSerializer';
 import { BookDeserializer } from '../serializers/bookSerializer';
-import {TransactionDeserializer} from '../serializers/transactionSerializer'
+import { TransactionDeserializer } from '../serializers/transactionSerializer';
 
 class Dashboard extends Component {
-  state = {
-  }
-
   static propTypes = {
     classes: PropTypes.object.isRequired,
-    token: PropTypes.string.isRequired, // token for auth with server
-    favorites: PropTypes.arrayOf(PropTypes.object), // array of books
-    selling: PropTypes.arrayOf(PropTypes.object), // array of books
-    activity: PropTypes.arrayOf(PropTypes.object), // array of transactions
-    user: PropTypes.object, // the user object
   }
 
-  static defaultProps = {
-    activity: [
-      {
-        id: '45672', book: '15514', seller: 'someone', buyer: 'someone else', price: 10,
-      },
-    ],
+  state = {
   }
 
   async componentWillMount() {
