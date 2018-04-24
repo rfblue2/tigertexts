@@ -2,34 +2,37 @@ import {
   Serializer,
   Deserializer,
 } from 'jsonapi-serializer';
+import { Types } from 'mongoose';
 
-const ListingSerializer = new Serializer('listing', {
+const serializeListing = (listing, opts = { included: true }) => (new Serializer('listing', {
   pluralizeType: false,
   attributes: ['kind', 'title', 'date_posted', 'detail', 'price', 'price_type', 'book'],
-  included: false,
   keyForAttribute: 'snake_case',
   typeForAttribute: (attribute) => {
     if (attribute === 'books') return 'book';
     return attribute;
   },
   book: {
-    ref: (listing, book) => book.id,
+    ref: (listingself, book) => {
+      // Direct mongo query returns mere id, otherwise object has id field
+      if (Types.ObjectId.isValid(book)) {
+        return book;
+      }
+      return book.id;
+    },
+    attributes: ['isbn', 'title', 'image', 'book_type', 'authors', 'classes'],
+    included: opts.included,
   },
-  transform: (record) => {
-    const newRecord = record.toObject({ getters: true });
-    newRecord.book = { id: newRecord.book };
-    return newRecord;
-  },
-});
+})).serialize(listing);
 
-const ListingDeserializer = new Deserializer({
+const deserializeListing = (listing, opts) => (new Deserializer({
   keyForAttribute: 'snake_case',
   book: {
     valueForRelationship: relationship => relationship.id,
   },
-});
+})).deserialize(listing);
 
 export { 
-  ListingSerializer,
-  ListingDeserializer,
+  serializeListing,
+  deserializeListing,
 };

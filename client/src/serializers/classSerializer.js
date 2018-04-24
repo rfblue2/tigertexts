@@ -3,14 +3,14 @@ import {
   Deserializer,
 } from 'jsonapi-serializer';
 
-const ClassSerializer = new Serializer('class', {
+const serializeClass = course => (new Serializer('class', {
   pluralizeType: false,
   attributes: ['title', 'numbers'],
-});
+})).serialize(course);
 
-const ClassDeserializer = new Deserializer();
+const deserializeClass = course => (new Deserializer()).deserialize(course);
 
 export {
-  ClassSerializer,
-  ClassDeserializer,
+  serializeClass,
+  deserializeClass,
 };

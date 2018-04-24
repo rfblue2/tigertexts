@@ -4,8 +4,8 @@ import { withStyles } from 'material-ui/styles';
 import Typography from 'material-ui/Typography';
 import { Redirect } from 'react-router-dom';
 import ResultList from './ResultList';
-import { BookDeserializer } from '../../serializers/bookSerializer';
-import { ClassDeserializer } from '../../serializers/classSerializer';
+import { deserializeBook } from '../../serializers/bookSerializer';
+import { deserializeClass } from '../../serializers/classSerializer';
 import AutoComplete from './AutoComplete';
 
 class Home extends Component {
@@ -30,10 +30,10 @@ class Home extends Component {
       // results and not the entire book list!
       const cres = await fetch('/api/classes');
       const cresjson = await cres.json();
-      const courses = await ClassDeserializer.deserialize(cresjson);
+      const courses = await deserializeClass(cresjson);
       const bres = await fetch('/api/books');
       const bresjson = await bres.json();
-      const books = await BookDeserializer.deserialize(bresjson);
+      const books = await deserializeBook(bresjson);
       this.setState({ courses, books });
     } catch (e) {
       console.error(`error: ${e}`);

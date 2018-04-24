@@ -14,9 +14,9 @@ import TransactionList from './TransactionList';
 import FavoriteList from './FavoriteList';
 import SellingList from './SellingList';
 import SellBooksForm from './SellBooksForm';
-import { UserDeserializer } from '../../serializers/userSerializer';
-import { BookDeserializer } from '../../serializers/bookSerializer';
-import { TransactionDeserializer } from '../../serializers/transactionSerializer';
+import { deserializeUser } from '../../serializers/userSerializer';
+import { deserializeBook } from '../../serializers/bookSerializer';
+import { deserializeTransaction } from '../../serializers/transactionSerializer';
 
 class Dashboard extends Component {
   static propTypes = {
@@ -44,7 +44,7 @@ class Dashboard extends Component {
     // get user from token
     try {
       // Fetch User information
-      const res = await fetch('/api/users/me', {
+      const res = await fetch('/api/users/me?include=favorite,selling', {
         headers: { 'x-auth-token': token },
       });
 
@@ -53,37 +53,24 @@ class Dashboard extends Component {
         localStorage.removeItem('jwtToken');
       }
       let user = await res.json();
-      user = await UserDeserializer.deserialize(user);
+      user = await deserializeUser(user);
 
-      // TODO have server return these relationships with query in "included"
-      // TODO avoid await hell
       // Fetch all the books (for sell modal)
       const resbook = await fetch('/api/books');
       const resjson = await resbook.json();
-      const books = await BookDeserializer.deserialize(resjson);
-      // Fetch favorites
-      const favres = await fetch('api/users/favorites', {
-        headers: { 'x-auth-token': token },
-      });
-      const favresjson = await favres.json();
-      user.favorite = await BookDeserializer.deserialize(favresjson);
-      // Fetch selling
-      const sellres = await fetch('api/users/selling', {
-        headers: { 'x-auth-token': token },
-      });
-      const sellresjson = await sellres.json();
-      user.selling = await BookDeserializer.deserialize(sellresjson);
+      const books = await deserializeBook(resjson);
+
       // Fetch activity
       const actres = await fetch('api/users/activity', {
         headers: { 'x-auth-token': token },
       });
       const actresjson = await actres.json();
-      user.activity = await TransactionDeserializer.deserialize(actresjson);
+      user.activity = await deserializeTransaction(actresjson);
       user.activity = await Promise.all(user.activity.map(async (t) => {
         const bookRes = await fetch(`/api/books/${t.book}`);
         const bookResjson = await bookRes.json();
         const transact = { ...t };
-        transact.book = await BookDeserializer.deserialize(bookResjson);
+        transact.book = await deserializeBook(bookResjson);
         return transact;
       }));
 

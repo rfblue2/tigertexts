@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import Typography from 'material-ui/Typography';
-import { BookDeserializer } from '../../serializers/bookSerializer';
+import { deserializeBook } from '../../serializers/bookSerializer';
 import AutoCompleteBook from './AutoCompleteBook';
 
 class SellBooksForm extends Component {
@@ -18,7 +18,7 @@ class SellBooksForm extends Component {
   async componentWillMount() {
     const res = await fetch('/api/books');
     const resjson = await res.json();
-    const books = await BookDeserializer.deserialize(resjson);
+    const books = await deserializeBook(resjson);
     this.setState({ books: books.map(b => b.title) });
   }
 
