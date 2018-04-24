@@ -4,8 +4,8 @@ import { withStyles } from 'material-ui/styles';
 import Typography from 'material-ui/Typography';
 import { Redirect } from 'react-router-dom';
 import ResultList from './ResultList';
-import { BookDeserializer } from '../serializers/bookSerializer';
-import { ClassDeserializer } from '../serializers/classSerializer';
+import { BookDeserializer } from '../../serializers/bookSerializer';
+import { ClassDeserializer } from '../../serializers/classSerializer';
 import AutoComplete from './AutoComplete';
 
 class Home extends Component {

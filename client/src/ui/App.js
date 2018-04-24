@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import {
   BrowserRouter as Router,
   Route,
@@ -11,62 +13,42 @@ import IconButton from 'material-ui/IconButton';
 import Button from 'material-ui/Button';
 import HomeIcon from '@material-ui/icons/Home';
 import FacebookLogin from 'react-facebook-login';
-import Login from './Login';
+import {
+  getJwt,
+  removeJwt,
+  facebookResponse,
+} from '../actions/users.actions';
+import Login from '../Login';
 import Dashboard from './dashboard/Dashboard';
 import Home from './home/Home';
 import Book from './book/Book';
 
 class App extends Component {
-  state = {
+  static propTypes = {
+    dispatch: PropTypes.func.isRequired,
+    isLoggedIn: PropTypes.bool,
+  }
+
+  static defaultProps = {
     isLoggedIn: false,
   }
 
-  async componentWillMount() {
-    // check if user already logged in
-    const token = localStorage.getItem('jwtToken');
-    console.log(token);
-    if (!token || token === '') return;
-    // get user from token
-    try {
-      // Fetch User information
-      const res = await fetch('/api/users/me', {
-        headers: { 'x-auth-token': token },
-      });
-      // token probably expired
-      if (res.status === 401) {
-        localStorage.removeItem('jwtToken');
-        return;
-      }
-    } catch (e) {
-      console.log(`error: ${e}`);
-    }
-    // TODO this is a good place for dispatching redux to fetch user data
-    this.setState({ isLoggedIn: true, jwt: token });
+  componentWillMount() {
+    // Check if already logged in
+    this.props.dispatch(getJwt());
   }
 
   handleLogout() {
-    localStorage.removeItem('jwtToken');
-    this.setState({ isLoggedIn: false, jwt: null });
+    this.props.dispatch(removeJwt());
   }
 
-  async responseFacebook(res) {
-    try {
-      // console.log(`Facebook response: ${JSON.stringify(res)}`);
-      const loginRes = await fetch(`/api/users/login?token=${res.accessToken}&email=${res.email}&name=${res.name}&userId=${res.id}`);
-      if (loginRes.ok) {
-        // console.log(JSON.stringify(userObj, null, 2));
-        const jwtToken = loginRes.headers.get('x-auth-token');
-        localStorage.setItem('jwtToken', jwtToken);
-        this.setState({ isLoggedIn: true, jwt: jwtToken });
-      }
-    } catch (err) {
-      console.log(`error: ${err}`);
-    }
+  responseFacebook(res) {
+    // Get token from facebook info
+    this.props.dispatch(facebookResponse(res));
   }
 
   render() {
-    const { isLoggedIn } = this.state;
-    const { classes } = this.props;
+    const { classes, isLoggedIn } = this.props;
     return (
       <Router>
         <div className={classes.root}>
@@ -135,4 +117,15 @@ const styles = {
   },
 };
 
-export default withStyles(styles)(App);
+const mapStateToProps = state => ({
+  isLoggedIn: state.user.token !== null,
+});
+
+const mapDispatchToProps = dispatch => ({
+  dispatch,
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(withStyles(styles)(App));

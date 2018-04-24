@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { withStyles } from 'material-ui/styles';
 import { Redirect } from 'react-router-dom';
 import Grid from 'material-ui/Grid';
@@ -13,13 +14,15 @@ import TransactionList from './TransactionList';
 import FavoriteList from './FavoriteList';
 import SellingList from './SellingList';
 import SellBooksForm from './SellBooksForm';
-import { UserDeserializer } from '../serializers/userSerializer';
-import { BookDeserializer } from '../serializers/bookSerializer';
-import { TransactionDeserializer } from '../serializers/transactionSerializer';
+import { UserDeserializer } from '../../serializers/userSerializer';
+import { BookDeserializer } from '../../serializers/bookSerializer';
+import { TransactionDeserializer } from '../../serializers/transactionSerializer';
 
 class Dashboard extends Component {
   static propTypes = {
     classes: PropTypes.object.isRequired,
+    dispatch: PropTypes.func.isRequired,
+    token: Proptypes.string,
   }
 
   state = {
@@ -244,4 +247,15 @@ const styles = {
   },
 };
 
-export default withStyles(styles)(Dashboard);
+const mapStateToProps = state => ({
+  token: state.user.token,
+});
+
+const mapDispatchToProps = dispatch => ({
+  dispatch,
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(withStyles(styles)(Dashboard));

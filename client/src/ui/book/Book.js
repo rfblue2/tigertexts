@@ -4,8 +4,8 @@ import List from 'material-ui/List';
 import { withStyles } from 'material-ui/styles';
 import Subheader from 'material-ui/List/ListSubheader';
 import Divider from 'material-ui/Divider';
-import { BookDeserializer } from '../serializers/bookSerializer';
-import { ListingDeserializer } from '../serializers/listingSerializer';
+import { BookDeserializer } from '../../serializers/bookSerializer';
+import { ListingDeserializer } from '../../serializers/listingSerializer';
 import Listing from './Listing';
 
 class Book extends Component {
