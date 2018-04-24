@@ -79,6 +79,22 @@ describe('Listings', () => {
       expect(res.body.data).to.be.a('array');
       expect(res.body.data.length).to.be.eql(0);
     });
+
+    it('should GET all the listings and their books', async () => {
+      const listing = new Listing(testListing2);
+      await listing.save();
+      const res = await chai.request(server)
+        .get('/api/listings?include=book');
+      expect(res).to.have.status(200);
+      expect(res.body.data).to.be.a('array');
+      expect(res.body.data.length).to.be.eql(1);
+      expect(res.body.data[0]).to.have.property('type').eql('listing');
+      expect(res.body.data[0]).to.have.property('attributes').eql(testListing1);
+      expect(res.body.data[0]).to.have.property('relationships').eql(testListingReq1.data.relationships);
+      expect(res.body.included).to.be.a('array');
+      expect(res.body.included.length).to.be.eql(1);
+      expect(res.body.included[0]).to.have.property('attributes').eql(testBook1);
+    });
   });
 
 

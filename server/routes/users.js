@@ -3,17 +3,18 @@ import express from 'express';
 import fetch from 'isomorphic-fetch';
 import jwt from 'jsonwebtoken';
 import expressJwt from 'express-jwt';
-import { TransactionSerializer } from '../utils/serializers/transactionSerializer';
+import { serializeTransaction } from '../utils/serializers/transactionSerializer';
 import {
-  UserDeserializer,
-  UserSerializer,
+  serializeUser,
+  deserializeUser,
 } from '../utils/serializers/userSerializer';
-import { BookSerializer } from '../utils/serializers/bookSerializer';
+import { serializeBook } from '../utils/serializers/bookSerializer';
 import User from '../models/user';
 import Book from '../models/book';
 import Listing from '../models/listing';
 import Transaction from '../models/transaction';
 import wrap from '../utils/wrap';
+import { parseInclude, populateQuery } from '../utils/queryparse';
 
 const router = express.Router();
 
@@ -96,23 +97,20 @@ const authenticate = expressJwt({
   },
 });
 
-const getCurrentUser = function (req, res, next) {
-  User.findById(req.auth.id, (err, user) => {
-    if (err) {
-      next(err);
-    } else {
-      req.user = user;
-      next();
-    }
-  });
-};
-
-const getOne = (req, res) => {
-  res.json(UserSerializer.serialize(req.user));
-};
+const getCurrentUser = wrap(async (req, res, next) => {
+  req.query = User.findById(req.auth.id);
+  req.user = await req.query.exec();
+  next();
+});
 
 router.route('/me')
-  .get(authenticate, getCurrentUser, getOne);
+  .get(
+    authenticate, parseInclude, getCurrentUser, populateQuery,
+    wrap(async (req, res) => {
+      const user = await req.query.exec();
+      res.json(serializeUser(user, { included: req.fields.length !== 0 }));
+    }),
+  );
 
 /**
  * API Routes
@@ -130,7 +128,7 @@ router.route('/activity')
         { buyer: id },
       ],
     });
-    res.json(TransactionSerializer.serialize(activity));
+    res.json(serializeTransaction(activity));
   }));
 
 // Convenience method for viewing (get) and adding (post) favorites
@@ -138,11 +136,11 @@ router.route('/favorites')
 
   .get(authenticate, getCurrentUser, wrap(async (req, res) => {
     const favorites = await Book.find({ _id: { $in: req.user.toObject().favorite } });
-    res.json(BookSerializer.serialize(favorites));
+    res.json(serializeBook(favorites));
   }))
 
   .post(authenticate, getCurrentUser, wrap(async (req, res) => {
-    const data = await UserDeserializer.deserialize(req.body);
+    const data = await deserializeUser(req.body);
     await User.findOneAndUpdate({
       _id: req.user._id,
     }, { $push: { favorite: { $each: data.favorite } } }, { new: true });
@@ -165,13 +163,11 @@ router.route('/selling')
 
   .get(authenticate, getCurrentUser, wrap(async (req, res) => {
     const selling = await Book.find({ _id: { $in: req.user.toObject().selling } });
-    res.json(BookSerializer.serialize(selling));
+    res.json(serializeBook(selling));
   }))
 
   .post(authenticate, getCurrentUser, wrap(async (req, res) => {
-    console.log(JSON.stringify(req.body, null, 2));
-    const data = await UserDeserializer.deserialize(req.body);
-    console.log(JSON.stringify(data, null, 2));
+    const data = await deserializeUser(req.body);
     await User.findOneAndUpdate({
       _id: req.user._id,
     }, { $push: { selling: { $each: data.selling } } }, { new: true });
@@ -192,7 +188,6 @@ router.route('/selling/:id')
   .delete(authenticate, getCurrentUser, wrap(async (req, res) => {
     const user = req.user.toObject();
     user.selling = user.selling.filter(f => String(f) !== req.params.id);
-    console.log(JSON.stringify(user.selling, null, 2));
     await User.findOneAndUpdate({
       _id: req.user._id,
     }, { selling: user.selling }, { new: true });

@@ -4,8 +4,8 @@ import List from 'material-ui/List';
 import { withStyles } from 'material-ui/styles';
 import Subheader from 'material-ui/List/ListSubheader';
 import Divider from 'material-ui/Divider';
-import { BookDeserializer } from '../serializers/bookSerializer';
-import { ListingDeserializer } from '../serializers/listingSerializer';
+import { deserializeBook } from '../serializers/bookSerializer';
+import { deserializeListing } from '../serializers/listingSerializer';
 import Listing from './Listing';
 
 class Book extends Component {
@@ -28,11 +28,11 @@ class Book extends Component {
       const { bookId } = this.props.match.params;
       const res = await fetch(`/api/books/${bookId}`);
       const resjson = await res.json();
-      const book = await BookDeserializer.deserialize(resjson);
+      const book = await deserializeBook(resjson);
 
       const res1 = await fetch(`/api/books/${bookId}/listings`);
       const res1json = await res1.json();
-      const listings = await ListingDeserializer.deserialize(res1json);
+      const listings = await deserializeListing(res1json);
 
       this.setState({ book, listings });
     } catch (e) {

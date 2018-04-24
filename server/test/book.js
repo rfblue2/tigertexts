@@ -100,6 +100,42 @@ describe('Books', () => {
       expect(res.body.data).to.be.a('array');
       expect(res.body.data.length).to.be.eql(0);
     });
+
+    it('should GET all the books and classes', async () => {
+      const book = new Book(testBook4);
+      await book.save();
+      const res = await chai.request(server)
+        .get('/api/books?include=classes');
+      expect(res).to.have.status(200);
+      expect(res.body.data).to.be.a('array');
+      expect(res.body.data.length).to.be.eql(1);
+      expect(res.body.data[0]).to.have.property('type').eql('book');
+      expect(res.body.data[0]).to.have.property('attributes').eql(testBook1);
+      expect(res.body.data[0]).to.have.property('relationships').eql(testBookReq1.data.relationships);
+      expect(res.body.included).to.be.a('array');
+      expect(res.body.included.length).to.be.eql(2);
+      expect(res.body.included[0]).to.have.property('attributes').eql(testClass1);
+      expect(res.body.included[1]).to.have.property('attributes').eql(testClass2);
+    });
+
+    it('should GET all the books and class title', async () => {
+      const book = new Book(testBook4);
+      await book.save();
+      const res = await chai.request(server)
+        .get('/api/books?include=classes.title');
+      expect(res).to.have.status(200);
+      expect(res.body.data).to.be.a('array');
+      expect(res.body.data.length).to.be.eql(1);
+      expect(res.body.data[0]).to.have.property('type').eql('book');
+      expect(res.body.data[0]).to.have.property('attributes').eql(testBook1);
+      expect(res.body.data[0]).to.have.property('relationships').eql(testBookReq1.data.relationships);
+      expect(res.body.included).to.be.a('array');
+      expect(res.body.included.length).to.be.eql(2);
+      expect(res.body.included[0].attributes).to.have.property('title').eql(testClass1.title);
+      expect(res.body.included[1].attributes).to.have.property('title').eql(testClass2.title);
+      expect(res.body.included[0].attributes).to.not.have.property('numbers');
+      expect(res.body.included[1].attributes).to.not.have.property('numbers');
+    });
   });
 
 

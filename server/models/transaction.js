@@ -4,6 +4,8 @@ const TransactionSchema = new mongoose.Schema({
   createdAt: Date,
   updatedAt: Date,
   initiated: Date,
+  price: Number,
+  status: String, // Pending, Complete, Canceled, etc.
   seller: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   buyer: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   book: { type: mongoose.Schema.Types.ObjectId, ref: 'Book' },

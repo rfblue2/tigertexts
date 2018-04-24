@@ -1,54 +1,62 @@
 import express from 'express';
 import { APIError } from '../utils/errors';
-import { BookSerializer, BookDeserializer } from '../utils/serializers/bookSerializer';
-import { ListingSerializer } from '../utils/serializers/listingSerializer';
+import { serializeBook, deserializeBook } from '../utils/serializers/bookSerializer';
+import { serializeListing } from '../utils/serializers/listingSerializer';
 import Book from '../models/book';
 import Listing from '../models/listing';
 import wrap from '../utils/wrap';
+import { parseInclude, populateQuery } from '../utils/queryparse';
 
 const router = express.Router();
 
+
+// Execute query and serialize book and send it
+const getAndSend = wrap(async (req, res) => {
+  const book = await req.query.exec();
+  if (!book) throw new APIError('Resource not found', 404);
+  res.json(serializeBook(book, { included: req.fields.length !== 0 }));
+});
+
 router.route('/')
 
-  .get(async (req, res) => {
-    const books = await Book.find();
-    res.json(BookSerializer.serialize(books));
-  })
+  .get(parseInclude, (req, res, next) => {
+    req.query = Book.find();
+    next();
+  }, populateQuery, getAndSend)
 
   .post(wrap(async (req, res) => {
-    const data = await BookDeserializer.deserialize(req.body);
+    const data = await deserializeBook(req.body);
     const book = new Book({ ...data });
     const newBook = await book.save();
-    res.status(201).json(BookSerializer.serialize(newBook));
+    res.status(201).json(serializeBook(newBook));
   }));
 
 router.route('/:id')
 
-  .get(wrap(async (req, res) => {
-    const book = await Book.findById(req.params.id);
-    if (!book) throw new APIError('Resource not found', 404);
-    res.json(BookSerializer.serialize(book));
-  }))
+  .get(parseInclude, (req, res, next) => {
+    req.query = Book.findById(req.params.id);
+    next();
+  }, populateQuery, getAndSend)
 
-  .patch(wrap(async (req, res) => {
-    const data = await BookDeserializer.deserialize(req.body);
-    const book = await Book.findOneAndUpdate({
+  .patch(parseInclude, wrap(async (req, res, next) => {
+    const data = await deserializeBook(req.body);
+    req.query = Book.findOneAndUpdate({
       _id: req.params.id,
     }, { ...data }, { new: true });
-    res.json(BookSerializer.serialize(book));
-  }))
+    next();
+  }), populateQuery, getAndSend)
 
-  .delete(wrap(async (req, res) => {
-    const book = await Book.findByIdAndRemove(req.params.id);
-    res.json(BookSerializer.serialize(book));
-  }));
+  .delete((req, res, next) => {
+    req.query = Book.findByIdAndRemove(req.params.id);
+    next();
+  }, populateQuery, getAndSend);
 
 router.route('/:id/listings')
 
   .get(wrap(async (req, res) => {
     const listings = await Listing.find({ book: req.params.id });
     if (!listings) throw new APIError('No listings associated with book');
-    res.json(ListingSerializer.serialize(listings));
+    res.json(serializeListing(listings));
   }));
 
 export default router;

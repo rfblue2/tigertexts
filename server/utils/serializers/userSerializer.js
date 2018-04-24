@@ -2,11 +2,11 @@ import {
   Serializer,
   Deserializer,
 } from 'jsonapi-serializer';
+import { Types } from 'mongoose';
 
-const UserSerializer = new Serializer('user', {
+const serializeUser = (user, opts) => (new Serializer('user', {
   pluralizeType: false,
   attributes: ['name', 'email', 'facebook_id', 'role', 'favorite', 'selling'],
-  included: false,
   keyForAttribute: 'snake_case',
   typeForAttribute: (attribute) => {
     if (attribute === 'selling') return 'book';
@@ -14,27 +14,37 @@ const UserSerializer = new Serializer('user', {
     return attribute;
   },
   favorite: {
-    ref: (user, favorites) => favorites.id,
+    included: opts.included,
+    attributes: ['isbn', 'title', 'image', 'book_type', 'authors', 'classes'],
+    ref: (userself, favorite) => {
+      // Direct mongo query returns mere id, otherwise object has id field
+      if (Types.ObjectId.isValid(favorite)) {
+        return favorite;
+      }
+      return favorite ? favorite.id : favorite;
+    },
   },
   selling: {
-    ref: (user, selling) => selling.id,
+    included: opts.included,
+    attributes: ['isbn', 'title', 'image', 'book_type', 'authors', 'classes'],
+    ref: (userself, selling) => {
+      // Direct mongo query returns mere id, otherwise object has id field
+      if (Types.ObjectId.isValid(selling)) {
+        return selling;
+      }
+      return selling ? selling.id : selling;
+    },
   },
-  transform: (record) => {
-    const newRecord = record.toObject({ getters: true });
-    newRecord.favorite = record.favorite.map(id => ({ id }));
-    newRecord.selling = record.selling.map(id => ({ id }));
-    return newRecord;
-  },
-});
+})).serialize(user);
 
-const UserDeserializer = new Deserializer({
+const deserializeUser = (user, opts) => (new Deserializer({
   keyForAttribute: 'snake_case',
   book: {
     valueForRelationship: relationship => relationship.id,
   },
-});
+})).deserialize(user);
 
 export {
-  UserSerializer,
-  UserDeserializer,
+  serializeUser,
+  deserializeUser,
 };

@@ -1,7 +1,7 @@
 import express from 'express';
 import { APIError } from '../utils/errors';
 import { ClassSerializer, ClassDeserializer } from '../utils/serializers/classSerializer';
-import { BookSerializer } from '../utils/serializers/bookSerializer';
+import { serializeBook } from '../utils/serializers/bookSerializer';
 import Class from '../models/class';
 import Book from '../models/book';
 import wrap from '../utils/wrap';
@@ -16,7 +16,7 @@ router.route('/')
   }))
 
   .post(wrap(async (req, res) => {
-    const data = await ClassDeserializer.deserialize(req.body);
+    const data = await deserializeClass(req.body);
     const classObj = new Class({ ...data });
     const newClass = await classObj.save();
     res.status(201).json(ClassSerializer.serialize(newClass));
@@ -31,7 +31,7 @@ router.route('/:id')
   }))
 
   .patch(wrap(async (req, res) => {
-    const data = await ClassDeserializer.deserialize(req.body);
+    const data = await deserializeClass(req.body);
     const classObj = await Class.findOneAndUpdate({
       _id: req.params.id,
     }, { ...data }, { new: true });
@@ -48,7 +48,7 @@ router.route('/:id/books')
   .get(wrap(async (req, res) => {
     const books = await Book.find({ classes: req.params.id });
     if (!books) throw new APIError('No books associated with class', 404);
-    res.json(BookSerializer.serialize(books));
+    res.json(serializeBook(books));
   }));
 
 export default router;
