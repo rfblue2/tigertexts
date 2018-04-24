@@ -16,7 +16,7 @@ router.route('/')
   }))
 
   .post(wrap(async (req, res) => {
-    const data = await deserializeClass(req.body);
+    const data = await ClassDeserializer.deserialize(req.body);
     const classObj = new Class({ ...data });
     const newClass = await classObj.save();
     res.status(201).json(ClassSerializer.serialize(newClass));
@@ -31,7 +31,7 @@ router.route('/:id')
   }))
 
   .patch(wrap(async (req, res) => {
-    const data = await deserializeClass(req.body);
+    const data = await ClassDeserializer.deserialize(req.body);
     const classObj = await Class.findOneAndUpdate({
       _id: req.params.id,
     }, { ...data }, { new: true });

@@ -25,6 +25,7 @@ import Book from './book/Book';
 
 class App extends Component {
   static propTypes = {
+    classes: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired,
     isLoggedIn: PropTypes.bool,
   }
@@ -34,15 +35,18 @@ class App extends Component {
   }
 
   componentWillMount() {
+    this.handleLogout = this._handleLogout.bind(this);
+    this.responseFacebook = this._responseFacebook.bind(this);
+
     // Check if already logged in
     this.props.dispatch(getJwt());
   }
 
-  handleLogout() {
+  _handleLogout() {
     this.props.dispatch(removeJwt());
   }
 
-  responseFacebook(res) {
+  _responseFacebook(res) {
     // Get token from facebook info
     this.props.dispatch(facebookResponse(res));
   }
@@ -74,13 +78,13 @@ class App extends Component {
                 isLoggedIn ?
                   <Button
                     color="inherit"
-                    onClick={this.handleLogout.bind(this)}
+                    onClick={this.handleLogout}
                     className={classes.logoutButton}
                   >Logout
                   </Button> :
                   <FacebookLogin
                     appId="1949273201750772"
-                    callback={this.responseFacebook.bind(this)}
+                    callback={this.responseFacebook}
                     fields="name,email,picture"
                     icon="fa-facebook"
                     className={classes.loginButton}
@@ -118,7 +122,7 @@ const styles = {
 };
 
 const mapStateToProps = state => ({
-  isLoggedIn: state.user.token !== null,
+  isLoggedIn: state.user.loggedIn,
 });
 
 const mapDispatchToProps = dispatch => ({

@@ -33,6 +33,7 @@ class AutoCompleteBook extends Component {
         selectedItem: selectedItem.slice(0, selectedItem.length - 1),
       });
     } else if (selectedItem.length && !inputValue.length && keycode(event) === 'enter') {
+      this.setState({ selectedItem: [] });
       execute(selectedItem);
     }
   };

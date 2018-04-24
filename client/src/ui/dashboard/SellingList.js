@@ -48,11 +48,10 @@ class SellingList extends Component {
 
   render() {
     const { books } = this.props;
-
     return (
       <div>
         <List>
-          { this.renderListWithDividers(books.map(this.renderListItem)) }
+          { books ? this.renderListWithDividers(books.map(this.renderListItem)) : 'Loading' }
         </List>
       </div>
     );

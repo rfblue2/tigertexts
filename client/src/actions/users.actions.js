@@ -6,13 +6,23 @@ import {
   NOT_LOGGED_IN,
   GET_USER_REQ,
   GET_USER_RES,
+  USER_ACTIVITY_REQ,
+  USER_ACTIVITY_RES,
+  USER_POST_SELL_REQ,
+  USER_POST_SELL_RES,
   USER_ERROR,
+  USER_DELETE_SELL_REQ,
+  USER_DELETE_SELL_RES,
 } from '../constants/users.constants';
 import {
   handleFbResponse,
   getUser,
+  fetchUserActivity,
+  postSelling,
+  deleteSelling,
 } from '../services/users.service';
-import { UserDeserializer } from '../serializers/userSerializer';
+import { deserializeUser } from '../serializers/userSerializer';
+import { deserializeBook } from '../serializers/bookSerializer';
 
 export const getJwt = () => {
   // check if user already logged in
@@ -37,7 +47,6 @@ export const userError = err => ({
 });
 
 export const facebookResponse = (res) => {
-
   const request = fbRes => ({
     type: FACEBOOK_LOGIN_REQ,
     res: fbRes,
@@ -66,12 +75,11 @@ export const facebookResponse = (res) => {
   };
 };
 
-
-export const getUserInfo = (tok) => {
-
-  const request = token => ({
+export const getUserInfo = (tok, fields) => {
+  const request = (token, queryFields) => ({
     type: GET_USER_REQ,
     token,
+    fields: queryFields,
   });
 
   const success = (user, token) => ({
@@ -85,15 +93,15 @@ export const getUserInfo = (tok) => {
   });
 
   return async (dispatch) => {
-    dispatch(request(tok));
+    dispatch(request(tok, fields));
     try {
-      const res = await getUser(tok);
+      const res = await getUser(tok, fields);
 
       if (!res) {
         dispatch(notLoggedIn());
       }
 
-      const user = UserDeserializer.deserialize(res);
+      const user = await deserializeUser(res);
 
       dispatch(success(user, tok));
     } catch (err) {
@@ -102,3 +110,75 @@ export const getUserInfo = (tok) => {
   };
 };
 
+export const getUserActivity = (tok) => {
+  const request = token => ({
+    type: USER_ACTIVITY_REQ,
+    token,
+  });
+
+  const success = activity => ({
+    type: USER_ACTIVITY_RES,
+    activity,
+  });
+
+  return async (dispatch) => {
+    dispatch(request(tok));
+    try {
+      const activity = await fetchUserActivity(tok);
+      dispatch(success(activity));
+    } catch (err) {
+      dispatch(userError(err));
+    }
+  };
+};
+
+export const userPostSellBooks = (tok, user, bookIds) => {
+  const request = (token, usr, ids) => ({
+    type: USER_POST_SELL_REQ,
+    token,
+    user: usr,
+    bookIds: ids,
+  });
+
+  const success = books => ({
+    type: USER_POST_SELL_RES,
+    books,
+  });
+
+  return async (dispatch) => {
+    dispatch(request, tok, user, bookIds);
+    try {
+      const res = await postSelling(tok, user, bookIds);
+      const resjson = await res.json();
+      const books = await deserializeBook(resjson);
+      dispatch(success(books));
+    } catch (err) {
+      dispatch(userError(err));
+    }
+  };
+};
+
+export const userDeleteSellBook = (tok, bookId) => {
+  const request = (token, id) => ({
+    type: USER_DELETE_SELL_REQ,
+    token,
+    bookId: id,
+  });
+
+  const success = book => ({
+    type: USER_DELETE_SELL_RES,
+    book,
+  });
+
+  return async (dispatch) => {
+    dispatch(request, tok, bookId);
+    try {
+      const res = await deleteSelling(tok, bookId);
+      const resjson = await res.json();
+      const book = await deserializeBook(resjson);
+      dispatch(success(book));
+    } catch (err) {
+      dispatch(userError(err));
+    }
+  };
+};

@@ -41,7 +41,7 @@ class FavoriteList extends Component {
     return (
       <div>
         <List>
-          { this.renderListWithDividers(books.map(this.renderListItem)) }
+          { books ? this.renderListWithDividers(books.map(this.renderListItem)) : 'Loading' }
         </List>
       </div>
     );

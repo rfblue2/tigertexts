@@ -6,7 +6,7 @@ import List, { ListItem, ListItemText } from 'material-ui/List';
 class TransactionList extends Component {
   static propTypes = {
     classes: PropTypes.object.isRequired,
-    transactions: PropTypes.arrayOf(PropTypes.object.isRequired).isRequired,
+    transactions: PropTypes.arrayOf(PropTypes.object.isRequired),
     onClick: PropTypes.func.isRequired,
   }
 
@@ -35,11 +35,11 @@ class TransactionList extends Component {
     return (
       <div>
         <List>
-          { transactions.map(t => (
+          { transactions ? transactions.map(t => (
             <ListItem button key={t.id} onClick={() => onClick(t.id)}>
               <ListItemText primary={TransactionList.buildItemText(t)} />
             </ListItem>
-            ))
+            )) : 'loading'
           }
         </List>
       </div>

@@ -52,7 +52,7 @@ router.get('/login', wrap(async (req, res) => {
 
   // console.log(`Obtained long access token: ${longLivedToken}`);
 
-  let user = await User.findOne({ facebook_id: userId });
+  let user = await User.findOne({ 'facebookProvider.id': userId });
   let savedUser;
 
   // Create a new user
@@ -180,19 +180,21 @@ router.route('/selling')
       });
       listing.save();
     }));
-    res.status(200).end();
+    const books = await Book.find({ _id: { $in: data.selling } });
+    res.json(serializeBook(books));
   }));
 
 router.route('/selling/:id')
 
   .delete(authenticate, getCurrentUser, wrap(async (req, res) => {
+    const book = await Book.findById(req.params.id);
     const user = req.user.toObject();
     user.selling = user.selling.filter(f => String(f) !== req.params.id);
     await User.findOneAndUpdate({
       _id: req.user._id,
     }, { selling: user.selling }, { new: true });
     await Listing.findOneAndRemove({ seller: req.user._id });
-    res.status(200).end();
+    res.json(serializeBook(book));
   }));
 
 export default router;

@@ -7,22 +7,27 @@ import Grid from 'material-ui/Grid';
 import Paper from 'material-ui/Paper';
 import Typography from 'material-ui/Typography';
 import Button from 'material-ui/Button';
-import Modal from 'material-ui/Modal';
 import Tooltip from 'material-ui/Tooltip';
 import AddIcon from '@material-ui/icons/Add';
+import {
+  getUserActivity,
+  getUserInfo,
+  userDeleteSellBook,
+  userPostSellBooks,
+} from '../../actions/users.actions';
 import TransactionList from './TransactionList';
 import FavoriteList from './FavoriteList';
 import SellingList from './SellingList';
-import SellBooksForm from './SellBooksForm';
-import { deserializeUser } from '../../serializers/userSerializer';
+import SellBooksDialog from './SellBooksDialog';
 import { deserializeBook } from '../../serializers/bookSerializer';
-import { deserializeTransaction } from '../../serializers/transactionSerializer';
 
 class Dashboard extends Component {
   static propTypes = {
     classes: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired,
-    token: Proptypes.string,
+    token: PropTypes.string.isRequired,
+    user: PropTypes.object.isRequired,
+    loggedIn: PropTypes.bool.isRequired,
   }
 
   state = {
@@ -37,45 +42,17 @@ class Dashboard extends Component {
     this.goToBook = this._goToBook.bind(this);
     this.handleOpen = this._handleOpen.bind(this);
     this.handleClose = this._handleClose.bind(this);
-    // TODO use redux to maintain global user state
-    // check if user already logged in
-    const token = localStorage.getItem('jwtToken');
-    if (!token || token === '') return;
-    // get user from token
     try {
-      // Fetch User information
-      const res = await fetch('/api/users/me?include=favorite,selling', {
-        headers: { 'x-auth-token': token },
-      });
-
-      // token probably expired, logout
-      if (res.status === 401) {
-        localStorage.removeItem('jwtToken');
-      }
-      let user = await res.json();
-      user = await deserializeUser(user);
-
       // Fetch all the books (for sell modal)
       const resbook = await fetch('/api/books');
       const resjson = await resbook.json();
       const books = await deserializeBook(resjson);
 
-      // Fetch activity
-      const actres = await fetch('api/users/activity', {
-        headers: { 'x-auth-token': token },
-      });
-      const actresjson = await actres.json();
-      user.activity = await deserializeTransaction(actresjson);
-      user.activity = await Promise.all(user.activity.map(async (t) => {
-        const bookRes = await fetch(`/api/books/${t.book}`);
-        const bookResjson = await bookRes.json();
-        const transact = { ...t };
-        transact.book = await deserializeBook(bookResjson);
-        return transact;
-      }));
-
-      console.log(`user info: ${JSON.stringify(user, null, 2)}`);
-      this.setState({ token, user, books });
+      this.setState({ books });
+      // TODO Bug with JSON API Serializer: If selling and favorite share books,
+      // deserializer will not behave properly
+      this.props.dispatch(getUserInfo(this.props.token, ['favorite', 'selling']));
+      this.props.dispatch(getUserActivity(this.props.token));
     } catch (e) {
       console.log(`error: ${e}`);
     }
@@ -95,64 +72,37 @@ class Dashboard extends Component {
   };
 
   async _markSold(id) {
-    await fetch(`/api/users/selling/${id}`, {
-      method: 'DELETE',
-      headers: { 'x-auth-token': this.state.token },
-    });
-    this.setState({
-      user: {
-        ...this.state.user,
-        selling: this.state.user.selling.filter(b => b.id !== id),
-      },
-    });
+    this.props.dispatch(userDeleteSellBook(this.props.token, id));
   }
 
-  async _onSell(selectedItems) {
-    const { token, user } = this.state;
+  _onSell(selectedItems) {
+    const { token, user } = this.props;
     const items = selectedItems.map(i => i.toLowerCase());
     const books = this.state.books
       .filter(b => items.includes(b.title.toLowerCase()));
-    const userObj = {
-      data: {
-        type: 'user',
-        id: user.id,
-        attributes: {},
-        relationships: {
-          selling: {
-            data: books.map(b => ({
-              type: 'book',
-              id: b.id,
-            })),
-          },
-        },
-      },
-    };
-    console.log(JSON.stringify(userObj));
-    await fetch('api/users/selling', {
-      method: 'POST',
-      headers: { 'x-auth-token': token, 'Content-Type': 'application/json' },
-      body: JSON.stringify(userObj),
-    });
+    const bookIds = books.map(b => b.id);
     this.setState({
-      user: { ...user, selling: [...this.state.user.selling, ...books] },
       showForm: false,
     });
+    this.props.dispatch(userPostSellBooks(token, user, bookIds));
   }
 
   render() {
     const {
       classes,
+      user,
+      token,
+      loggedIn,
     } = this.props;
     const {
-      user,
       redirectToBook,
       redirectToBookId,
       showForm,
     } = this.state;
-    console.log(`USER: ${JSON.stringify(user, null, 2)}`);
+    // console.log(`USER BEFORE RENDER: ${JSON.stringify(user, null, 2)}`);
     if (redirectToBook) return <Redirect push to={`/book/${redirectToBookId}`} />;
 
-    if (!user) return <div className={classes.unloggedin}>Please Log In</div>;
+    if (!loggedIn) return <div className={classes.unloggedin}>Please Log In</div>;
     return (
       <div className={classes.dash}>
         <h1>Dashboard</h1>
@@ -170,13 +120,12 @@ class Dashboard extends Component {
           </Button>
         </Tooltip>
 
-        <Modal
-          aria-labelledby="Sell a book"
-          open={showForm}
-          onClose={this.handleClose}
-        >
-          <SellBooksForm onSell={this.onSell} />
-        </Modal>
+        <SellBooksDialog
+          className={classes.dialog}
+          onSell={this.onSell}
+          handleClose={this.handleClose}
+          showForm={showForm}
+        />
 
         <Grid container className={classes.grid} justify="center" spacing={24}>
           <Grid item xs={12} md={4}>
@@ -232,10 +181,16 @@ const styles = {
     right: 16 * 3,
     zIndex: 10, // float above all!
   },
+  dialog: {
+    width: '100%',
+    height: '100%',
+  },
 };
 
 const mapStateToProps = state => ({
   token: state.user.token,
+  user: state.user.user,
+  loggedIn: state.user.loggedIn,
 });
 
 const mapDispatchToProps = dispatch => ({
