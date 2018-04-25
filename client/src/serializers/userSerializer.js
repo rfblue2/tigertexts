@@ -2,7 +2,6 @@ import {
   Serializer,
   Deserializer,
 } from 'jsonapi-serializer';
-import { Types } from 'mongoose';
 
 const serializeUser = (user, opts) => (new Serializer('user', {
   pluralizeType: false,
@@ -18,7 +17,7 @@ const serializeUser = (user, opts) => (new Serializer('user', {
     attributes: ['isbn', 'title', 'image', 'book_type', 'authors', 'classes'],
     ref: (userself, favorite) => {
       // Direct mongo query returns mere id, otherwise object has id field
-      if (Types.ObjectId.isValid(favorite)) {
+      if (favorite instanceof String) {
         return favorite;
       }
       return favorite ? favorite.id : favorite;
@@ -29,7 +28,7 @@ const serializeUser = (user, opts) => (new Serializer('user', {
     attributes: ['isbn', 'title', 'image', 'book_type', 'authors', 'classes'],
     ref: (userself, selling) => {
       // Direct mongo query returns mere id, otherwise object has id field
-      if (Types.ObjectId.isValid(selling)) {
+      if (selling instanceof String) {
         return selling;
       }
       return selling ? selling.id : selling;

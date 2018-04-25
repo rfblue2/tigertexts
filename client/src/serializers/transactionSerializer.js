@@ -2,7 +2,6 @@ import {
   Serializer,
   Deserializer,
 } from 'jsonapi-serializer';
-import { Types } from 'mongoose';
 
 const serializeTransaction = (transaction, opts = { included: true }) => (new Serializer('transaction', {
   pluralizeType: false,
@@ -19,7 +18,7 @@ const serializeTransaction = (transaction, opts = { included: true }) => (new Se
     attributes: ['isbn', 'title', 'image', 'book_type', 'authors', 'classes'],
     ref: (transactionself, book) => {
       // Direct mongo query returns mere id, otherwise object has id field
-      if (Types.ObjectId.isValid(book)) {
+      if (book instanceof String) {
         return book;
       }
       return book ? book.id : book;
@@ -30,7 +29,7 @@ const serializeTransaction = (transaction, opts = { included: true }) => (new Se
     attributes: ['name', 'email'],
     ref: (transactionself, seller) => {
       // Direct mongo query returns mere id, otherwise object has id field
-      if (Types.ObjectId.isValid(seller)) {
+      if (seller instanceof String) {
         return seller;
       }
       return seller ? seller.id : seller;
@@ -41,7 +40,7 @@ const serializeTransaction = (transaction, opts = { included: true }) => (new Se
     attributes: ['name', 'email'],
     ref: (transactionself, buyer) => {
       // Direct mongo query returns mere id, otherwise object has id field
-      if (Types.ObjectId.isValid(buyer)) {
+      if (buyer instanceof String) {
         return buyer;
       }
       return buyer ? buyer.id : buyer;

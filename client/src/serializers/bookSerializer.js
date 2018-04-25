@@ -2,7 +2,6 @@ import {
   Serializer,
   Deserializer,
 } from 'jsonapi-serializer';
-import { Types } from 'mongoose';
 
 const serializeBook = (book, opts = { included: true }) => (new Serializer('book', {
   pluralizeType: false,
@@ -14,7 +13,7 @@ const serializeBook = (book, opts = { included: true }) => (new Serializer('book
   classes: {
     ref: (bookself, classObj) => {
       // Direct mongo query returns mere id, otherwise object has id field
-      if (Types.ObjectId.isValid(classObj)) {
+      if (classObj instanceof String) {
         return classObj;
       }
       return classObj.id;
