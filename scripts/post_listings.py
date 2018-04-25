@@ -9,7 +9,7 @@ def post_listings():
 
   # Delete classes without book
   for i in range(len(raw) - 1, -1, -1):
-    if 'bookList' not in raw[i].keys():
+    if 'bookList' not in raw[i].keys() or 'F2018' in raw[i]['course_ID']:
       del raw[i]
 
   host = ''
@@ -41,7 +41,7 @@ def post_listings():
       # Some books might appear in multiple listings (like Practice of Programming in COS333/217)
       if book['title'] not in listing_dict.keys() and 'price' in book.keys():
         listing_attributes = {'title': book['title'], 'kind': 'labyrinth', 'price': float(book['price']), 'price_type': 'new'}
-        book_id = [{'id': book_to_id[book['title']], 'type': 'book'}]
+        book_id = {'id': book_to_id[book['title']], 'type': 'book'}
         data = {'data': {'type': 'listings', 'attributes': listing_attributes, 'relationships': {'book': {'data': book_id}}}}
         listing_dict[book['title']] = data
         requests.post(listings_url, data = json.dumps(data), headers = headers, verify = False)
