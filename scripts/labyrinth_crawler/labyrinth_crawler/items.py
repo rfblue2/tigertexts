@@ -20,3 +20,4 @@ class LabyrinthCrawlerItem(scrapy.Item):
     likeNewPrice = scrapy.Field()
     acceptablePrice = scrapy.Field()
     usedPrice = scrapy.Field()
+    imageLink = scrapy.Field()
