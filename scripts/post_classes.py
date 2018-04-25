@@ -4,11 +4,12 @@ import sys
 import urllib3
 
 def post_classes():
+  urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
   raw = json.load(open('blackboard_crawler/results.json'))
 
   # Delete classes without book
   for i in range(len(raw) - 1, -1, -1):
-    if 'bookList' not in raw[i].keys():
+    if 'bookList' not in raw[i].keys() or 'F2018' in raw[i]['course_ID']:
       del raw[i]
 
   host = ''
