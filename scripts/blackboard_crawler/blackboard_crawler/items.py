@@ -16,7 +16,7 @@ class BlackboardCrawlerItem(scrapy.Item):
     instructor = scrapy.Field()
     description = scrapy.Field()
     bookList = scrapy.Field()
-    readingList = scrapy.Field()
+
 
 class Book(scrapy.Item):
     title = scrapy.Field()

@@ -53,6 +53,9 @@ class LabyrinthSpider(scrapy.Spider):
         conditionsPricesString = priceString.split('>')[1]
         conditionsPricesList = conditionsPricesString.split(',')
 
+        imagelink = response.xpath('//td[contains(@width, "168")]//img/@src').extract_first()
+        item['imageLink'] = "http://www.labyrinthbooks.com" + imagelink
+
         for conditionPrice in conditionsPricesList:
             if "Like New" in conditionPrice:
                 item['likeNewPrice'] = re.findall(r'\d+.\d+', conditionPrice)[0]
