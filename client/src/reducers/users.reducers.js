@@ -31,7 +31,7 @@ const userReducer = (state = {
   switch (type) {
     case GET_JWT:
       return {
-        ...state, token, error: null, loggedIn: true,
+        ...state, token, error: null, loggedIn: token !== null,
       };
     case REMOVE_JWT:
       return {
