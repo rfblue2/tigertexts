@@ -1,13 +1,25 @@
+/* eslint no-underscore-dangle: "off" */
 import express from 'express';
 import fetch from 'isomorphic-fetch';
+import jwt from 'jsonwebtoken';
+import expressJwt from 'express-jwt';
+import { serializeTransaction } from '../utils/serializers/transactionSerializer';
+import {
+  serializeUser,
+  deserializeUser,
+} from '../utils/serializers/userSerializer';
+import { serializeBook } from '../utils/serializers/bookSerializer';
 import User from '../models/user';
+import Book from '../models/book';
+import Listing from '../models/listing';
+import Transaction from '../models/transaction';
 import wrap from '../utils/wrap';
+import { parseInclude, populateQuery } from '../utils/queryparse';
 
 const router = express.Router();
 
 /**
- * User API Routes.  Note that we do not conform to
- * JSON API format.  This is primarily used for user auth.
+ * Auth Routes
  */
 
 const APP_ID = '1949273201750772';
@@ -38,26 +50,152 @@ router.get('/login', wrap(async (req, res) => {
 
   const longLivedToken = await fetchLongAccessToken(token);
 
-  let user = await User.findOne({ facebook_id: userId });
+  // console.log(`Obtained long access token: ${longLivedToken}`);
+
+  let user = await User.findOne({ 'facebookProvider.id': userId });
+  let savedUser;
 
   // Create a new user
   if (!user) {
     user = new User({
       name,
       email,
-      long_lived_token: longLivedToken,
-      facebook_id: userId,
+      facebookProvider: {
+        token: longLivedToken,
+        id: userId,
+      },
       role: 'Member',
     });
-    await user.save();
+    savedUser = await user.save();
   } else {
-    await User.findOneAndUpdate({
+    savedUser = await User.findOneAndUpdate({
       _id: user._id,
     }, { long_lived_token: longLivedToken }, { new: true });
   }
 
-  res.status(200).end();
+  // JWT token payload
+  const auth = {
+    id: savedUser._id, facebook_id: userId, name, email,
+  };
+
+  // generate JWT
+  req.token = jwt.sign(auth, 'my-secret', { expiresIn: 60 * 120 });
+
+  // return JWT
+  res.setHeader('x-auth-token', req.token);
+  res.status(200).send(auth);
 }));
+
+const authenticate = expressJwt({
+  secret: 'my-secret',
+  requestProperty: 'auth',
+  getToken: (req) => {
+    if (req.headers['x-auth-token']) {
+      return req.headers['x-auth-token'];
+    }
+    return null;
+  },
+});
+
+const getCurrentUser = wrap(async (req, res, next) => {
+  req.query = User.findById(req.auth.id);
+  req.user = await req.query.exec();
+  next();
+});
+
+router.route('/me')
+  .get(
+    authenticate, parseInclude, getCurrentUser, populateQuery,
+    wrap(async (req, res) => {
+      const user = await req.query.exec();
+      res.json(serializeUser(user, { included: req.fields.length !== 0 }));
+    }),
+  );
+
+/**
+ * API Routes
+ * TODO Secure all these API routes with jwt so that the correct user can access them
+ * TODO currently checks query param for mongo id
+ */
+
+router.route('/activity')
+
+  .get(authenticate, getCurrentUser, wrap(async (req, res) => {
+    const id = req.user._id;
+    const activity = await Transaction.find({
+      $or: [
+        { seller: id },
+        { buyer: id },
+      ],
+    });
+    res.json(serializeTransaction(activity));
+  }));
+
+// Convenience method for viewing (get) and adding (post) favorites
+router.route('/favorites')
+
+  .get(authenticate, getCurrentUser, wrap(async (req, res) => {
+    const favorites = await Book.find({ _id: { $in: req.user.toObject().favorite } });
+    res.json(serializeBook(favorites));
+  }))
+
+  .post(authenticate, getCurrentUser, wrap(async (req, res) => {
+    const data = await deserializeUser(req.body);
+    await User.findOneAndUpdate({
+      _id: req.user._id,
+    }, { $push: { favorite: { $each: data.favorite } } }, { new: true });
+    res.status(200).end();
+  }));
+
+router.route('/favorites/:id')
+
+  .delete(authenticate, getCurrentUser, wrap(async (req, res) => {
+    const user = req.user.toObject();
+    user.favorite = user.favorite.filter(f => String(f) !== req.params.id);
+    await User.findOneAndUpdate({
+      _id: req.user._id,
+    }, { favorite: user.favorite }, { new: true });
+    res.status(200).end();
+  }));
+
+// Convenience method for viewing (get) and adding (post) books being sold
+router.route('/selling')
+
+  .get(authenticate, getCurrentUser, wrap(async (req, res) => {
+    const selling = await Book.find({ _id: { $in: req.user.toObject().selling } });
+    res.json(serializeBook(selling));
+  }))
+
+  .post(authenticate, getCurrentUser, wrap(async (req, res) => {
+    const data = await deserializeUser(req.body);
+    await User.findOneAndUpdate({
+      _id: req.user._id,
+    }, { $push: { selling: { $each: data.selling } } }, { new: true });
+    await Promise.all(data.selling.map(async (s) => {
+      const listing = new Listing({
+        kind: 'platform',
+        title: `Seller: ${req.user.name}`,
+        book: s,
+        seller: req.user._id,
+      });
+      listing.save();
+    }));
+    const books = await Book.find({ _id: { $in: data.selling } });
+    res.json(serializeBook(books));
+  }));
+
+router.route('/selling/:id')
+
+  .delete(authenticate, getCurrentUser, wrap(async (req, res) => {
+    const book = await Book.findById(req.params.id);
+    const user = req.user.toObject();
+    user.selling = user.selling.filter(f => String(f) !== req.params.id);
+    await User.findOneAndUpdate({
+      _id: req.user._id,
+    }, { selling: user.selling }, { new: true });
+    await Listing.findOneAndRemove({ seller: req.user._id });
+    res.json(serializeBook(book));
+  }));
 
 export default router;
 

@@ -10,14 +10,20 @@
   },
   "dependencies": {
     "@material-ui/icons": "^1.0.0-beta.42",
+    "downshift": "^1.31.8",
     "jsonapi-serializer": "^3.5.6",
+    "keycode": "^2.2.0",
     "material-ui": "^1.0.0-beta.41",
+    "mongoose": "^5.0.16",
     "prop-types": "^15.6.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-facebook-login": "^4.0.1",
+    "react-redux": "^5.0.7",
     "react-router-dom": "^4.2.2",
-    "react-scripts": "1.1.1"
+    "react-scripts": "1.1.1",
+    "redux": "^4.0.0",
+    "redux-thunk": "^2.2.0"
   },
   "proxy": "https://localhost:3001/"
 }
