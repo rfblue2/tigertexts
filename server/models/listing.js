@@ -9,6 +9,7 @@ const ListingSchema = new mongoose.Schema({
   detail: String,
   price: Number,
   price_type: String,
+  url: String,
   seller: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // on platform only
   book: { type: mongoose.Schema.Types.ObjectId, ref: 'Book', required: true },
 });

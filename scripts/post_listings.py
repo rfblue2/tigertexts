@@ -75,9 +75,9 @@ def post_listings():
             if 'Amazon' in option['seller']:
               listing_attributes = dict()
               if option['condition'] == 'New':
-                listing_attributes = {'title': book['title'], 'kind': 'amazon', 'price': float(option['price'].replace(',', '')), 'price_type': 'new'}
+                listing_attributes = {'title': book['title'], 'kind': 'amazon', 'price': float(option['price'].replace(',', '')), 'price_type': 'new', 'url': option['link']}
               elif option['condition'] == 'Used':
-                listing_attributes = {'title': book['title'], 'kind': 'amazon', 'price': float(option['price'].replace(',', '')), 'price_type': 'used'}
+                listing_attributes = {'title': book['title'], 'kind': 'amazon', 'price': float(option['price'].replace(',', '')), 'price_type': 'used', 'url': option['link']}
               book_id = {'id': book_to_id[book['title']], 'type': 'book'}
               data = {'data': {'type': 'listings', 'attributes': listing_attributes, 'relationships': {'book': {'data': book_id}}}}
               listing_dict[book['title']] = data
