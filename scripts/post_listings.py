@@ -59,36 +59,42 @@ def post_listings():
             if price_type in labyrinth_dict[book['ISBN']].keys():
               listing_attributes = dict()
               if price_type == 'newPrice' or price_type == 'likeNewPrice':
-                listing_attributes = {'title': book['title'], 'kind': 'labyrinth', 'price': float(labyrinth_dict[book['ISBN']][price_type]), 'price_type': 'new'}
+                listing_attributes = {'title': book['title'], 'kind': 'labyrinth', 'price': float(labyrinth_dict[book['ISBN']][price_type].replace(',', '')), 'price_type': 'new'}
               else:
-                listing_attributes = {'title': book['title'], 'kind': 'labyrinth', 'price': float(labyrinth_dict[book['ISBN']][price_type]), 'price_type': 'used'}
+                listing_attributes = {'title': book['title'], 'kind': 'labyrinth', 'price': float(labyrinth_dict[book['ISBN']][price_type].replace(',', '')), 'price_type': 'used'}
               book_id = {'id': book_to_id[book['title']], 'type': 'book'}
               data = {'data': {'type': 'listings', 'attributes': listing_attributes, 'relationships': {'book': {'data': book_id}}}}
               listing_dict[book['title']] = data
               requests.post(listings_url, data = json.dumps(data), headers = headers, verify = False)
+              counter += 1
+              if counter % 100 == 0:
+                print "Listing %d" % counter
         # Amazon and third parties
         if book['ISBN'] in amazon_dict:
-            for option in amazon_dict[book['ISBN']]['options']:
-                listing_attributes = dict()
-                if option['condition'] == 'New':
-                    listing_attributes = {'title': book['title'], 'kind': 'amazon', 'price': float(option['price']), 'price_type': 'new'}
-                elif option['condition'] == 'Used':
-                    listing_attributes = {'title': book['title'], 'kind': 'amazon', 'price': float(option['price']), 'price_type': 'used'}
-                book_id = {'id': book_to_id[book['title']], 'type': 'book'}
-                data = {'data': {'type': 'listings', 'attributes': listing_attributes, 'relationships': {'book': {'data': book_id}}}}
-                listing_dict[book['title']] = data
-                requests.post(listings_url, data = json.dumps(data), headers = headers, verify = False)
-
+          for option in amazon_dict[book['ISBN']]['options']:
+            if 'Amazon' in option['seller']:
+              listing_attributes = dict()
+              if option['condition'] == 'New':
+                listing_attributes = {'title': book['title'], 'kind': 'amazon', 'price': float(option['price'].replace(',', '')), 'price_type': 'new'}
+              elif option['condition'] == 'Used':
+                listing_attributes = {'title': book['title'], 'kind': 'amazon', 'price': float(option['price'].replace(',', '')), 'price_type': 'used'}
+              book_id = {'id': book_to_id[book['title']], 'type': 'book'}
+              data = {'data': {'type': 'listings', 'attributes': listing_attributes, 'relationships': {'book': {'data': book_id}}}}
+              listing_dict[book['title']] = data
+              requests.post(listings_url, data = json.dumps(data), headers = headers, verify = False)
+              counter += 1
+              if counter % 100 == 0:
+                print "Listing %d" % counter
         # Blackboard only
         elif 'price' in book.keys():
-          listing_attributes = {'title': book['title'], 'kind': 'labyrinth', 'price': float(book['price']), 'price_type': 'new'}
+          listing_attributes = {'title': book['title'], 'kind': 'labyrinth', 'price': float(book['price'].replace(',', '')), 'price_type': 'new'}
           book_id = {'id': book_to_id[book['title']], 'type': 'book'}
           data = {'data': {'type': 'listings', 'attributes': listing_attributes, 'relationships': {'book': {'data': book_id}}}}
           listing_dict[book['title']] = data
           requests.post(listings_url, data = json.dumps(data), headers = headers, verify = False)
-      counter += 1
-      if counter % 100 == 0:
-        print "Listing %d" % counter
+          counter += 1
+          if counter % 100 == 0:
+            print "Listing %d" % counter
 
   print "Done POSTING listings"
 
