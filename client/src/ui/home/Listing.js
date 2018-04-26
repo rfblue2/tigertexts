@@ -6,11 +6,12 @@ import formatNumber from 'simple-format-number';
 import Typography from 'material-ui/Typography';
 import Grid from 'material-ui/Grid';
 import Paper from 'material-ui/Paper';
+import Link from 'react-router-dom/Link';
 
 
 
 const Listing = ({ classes, listing }) => (
-  <ListItem disableGutters={true}>
+  <ListItem button component ="a" href={listing.url} target="_blank" disableGutters={true}>
     <Paper className = {classes.paper} elevation={1} square={true}>
     <Grid container>
       <Grid item xs = {6} md = {6}>

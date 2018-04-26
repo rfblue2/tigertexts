@@ -6,7 +6,7 @@ import { Types } from 'mongoose';
 
 const serializeListing = (listing, opts = { included: true }) => (new Serializer('listing', {
   pluralizeType: false,
-  attributes: ['kind', 'title', 'date_posted', 'detail', 'price', 'price_type', 'book'],
+  attributes: ['kind', 'title', 'date_posted', 'detail', 'price', 'url', 'price_type', 'book'],
   keyForAttribute: 'snake_case',
   typeForAttribute: (attribute) => {
     if (attribute === 'books') return 'book';
