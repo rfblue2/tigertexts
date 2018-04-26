@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
-import GridList from 'material-ui/GridList';
+import GridList, { GridListTile } from 'material-ui/GridList';
 import Book from './Book';
 
 class BookList extends Component {
@@ -13,16 +13,20 @@ class BookList extends Component {
   }
 
   render() {
-    const { books } = this.props;
+    const { classes, books } = this.props;
 
     return (
       <div>
-        <GridList cols={2.5}>
+        <GridList className = {classes.list} cellHeight={'100vh'} cols={1} >
           { books.map(b =>
-          (<Book
-            key={b.id}
-            book={b}
-          />))
+          (
+            <GridListTile>
+              <Book
+                key={b.id}
+                book={b}
+              />
+            </GridListTile>
+          ))
         }
         </GridList>
       </div>
@@ -31,6 +35,10 @@ class BookList extends Component {
 }
 
 const styles = {
+  list: {
+    marginLeft: '23vh',
+    marginRight: '23vh',
+  },
   home: {
     margin: '20px',
   },

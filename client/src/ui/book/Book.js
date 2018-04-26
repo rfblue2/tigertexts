@@ -17,7 +17,8 @@ import Typography from 'material-ui/Typography';
 import Grid from 'material-ui/Grid';
 import Paper from 'material-ui/Paper';
 import Listing from '../home/Listing';
-
+import classnames from 'classnames';
+import Divider from 'material-ui/Divider';
 
 class Book extends Component {
 
@@ -62,8 +63,10 @@ class Book extends Component {
             >
             <FavoriteIcon />
           </IconButton>
-
           <IconButton
+              className={classnames(classes.expand, {
+                [classes.expandOpen]: this.state.expanded,
+              })}
               onClick={this.handleExpandClick.bind(this)}
               aria-expanded={this.state.expanded}
               aria-label="Show more"
@@ -72,27 +75,23 @@ class Book extends Component {
           </IconButton>
         </CardActions>
         <Collapse in={this.state.expanded} timeout="auto" unmountOnExit>
+          <Divider />
           <CardContent>
             <div className={classes.root}>
             <Grid container spacing={24}>
-              <Grid item xs={12}>
+              <Grid item md = {3}>
                 <img className = {classes.bookpic} src={book.image} alt={"book"} />
+              </Grid>
+              <Grid item md = {9}>  
                 <Subheader className = {classes.subheader}>Book Description</Subheader>
                 <Typography className = {classes.description}> {book.detail} </Typography>
               </Grid>
-              <Grid item xs={12}>
+              <Grid item md = {12}>
                 <Subheader className = {classes.subheader}>Book Prices</Subheader>
                 { book.listings.map(l => <Listing key={l.id} listing={l} />)}
               </Grid>
             </Grid>
             </div>
-
-
-
-            
-            <List className = {classes.listings}>
-              
-            </List>
           </CardContent>
         </Collapse>
       </Card>
@@ -100,33 +99,39 @@ class Book extends Component {
   }
 }
 
-const styles = {
+const styles = theme => ({
   card: {
     margin: '5px',
     transition: 'all 0.5s ease',
-    width: '100%',
-    maxwidth: '',
-  },
-  result: {
-    padding: '10px',
-    width: '50%',
   },
   subheader: {
     fontSize: '18px',
     color: 'black',
+    align: 'left',
+    textAlign: 'left',
+    marginRight: 'auto',
+    paddingLeft: '0px',
+  },
+  expand: {
+    transform: 'rotate(0deg)',
+    transition: theme.transitions.create('transform', {
+      duration: theme.transitions.duration.shortest,
+    }),
+    marginRight: 'auto',
+  },
+  expandOpen: {
+    transform: 'rotate(180deg)',
   },
   description: {
     color: 'grey',
   },
   listings: {
-    width: '100%'
   },
   bookpic: {
     height: '200px',
     width: 'auto',
-    float: 'left',
   },
-};
+})
 
 
 export default withStyles(styles)(Book);
