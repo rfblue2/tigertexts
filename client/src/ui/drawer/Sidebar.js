@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
+import { Link } from 'react-router-dom';
 import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import FavoriteIcon from '@material-ui/icons/Favorite';
+import InfoIcon from '@material-ui/icons/Info';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import AddIcon from '@material-ui/icons/Add';
 import Drawer from 'material-ui/Drawer';
@@ -18,6 +20,7 @@ class Sidebar extends Component {
     showProfile: PropTypes.func.isRequired,
     showSelling: PropTypes.func.isRequired,
     showFavorites: PropTypes.func.isRequired,
+    loggedIn: PropTypes.bool.isRequired,
   }
 
   static defaultProps = {
@@ -31,6 +34,7 @@ class Sidebar extends Component {
       showProfile,
       showSelling,
       showFavorites,
+      loggedIn,
     } = this.props;
     return (
       <Drawer
@@ -43,30 +47,44 @@ class Sidebar extends Component {
       >
         <div className={classes.toolbar} />
         <List component="nav">
-          <ListItem button onClick={showProfile}>
-            <ListItemIcon>
-              <AccountCircleIcon />
-            </ListItemIcon>
-            <ListItemText primary="Profile" />
-          </ListItem>
-          <ListItem button onClick={showSelling}>
-            <ListItemIcon>
-              <LibraryBooksIcon />
-            </ListItemIcon>
-            <ListItemText primary="Selling" />
-          </ListItem>
-          <ListItem button onClick={showFavorites}>
-            <ListItemIcon>
-              <FavoriteIcon />
-            </ListItemIcon>
-            <ListItemText primary="Favorites" />
-          </ListItem>
-          <ListItem button onClick={openSellForm}>
-            <ListItemIcon>
-              <AddIcon />
-            </ListItemIcon>
-            <ListItemText primary="Sell a Book" />
-          </ListItem>
+          {/*<ListItem button component={Link} to="/about">*/}
+            {/*<ListItemIcon>*/}
+              {/*<InfoIcon />*/}
+            {/*</ListItemIcon>*/}
+            {/*<ListItemText primary="About" />*/}
+          {/*</ListItem>*/}
+          { loggedIn ?
+            <ListItem button onClick={showProfile}>
+              <ListItemIcon>
+                <AccountCircleIcon />
+              </ListItemIcon>
+              <ListItemText primary="Profile" />
+            </ListItem> : ''
+          }
+          {loggedIn ?
+            <ListItem button onClick={showSelling}>
+              <ListItemIcon>
+                <LibraryBooksIcon />
+              </ListItemIcon>
+              <ListItemText primary="Selling" />
+            </ListItem> : ''
+          }
+          {loggedIn ?
+            <ListItem button onClick={showFavorites}>
+              <ListItemIcon>
+                <FavoriteIcon />
+              </ListItemIcon>
+              <ListItemText primary="Favorites" />
+            </ListItem> : ''
+          }
+          {loggedIn ?
+            <ListItem button onClick={openSellForm}>
+              <ListItemIcon>
+                <AddIcon />
+              </ListItemIcon>
+              <ListItemText primary="Sell a Book" />
+            </ListItem> : ''
+          }
         </List>
       </Drawer>
     );

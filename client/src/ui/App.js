@@ -19,6 +19,7 @@ import Sidebar from './drawer/Sidebar';
 import Navbar from './nav/Navbar';
 import { deserializeClass } from '../serializers/classSerializer';
 import SellBooksDialog from './dashboard/SellBooksDialog';
+import About from './About'
 
 const drawerWidth = 240;
 
@@ -123,6 +124,7 @@ class App extends Component {
           </Navbar>
           <Sidebar
             open={sidebarOpen}
+            loggedIn={isLoggedIn}
             sellBook={this.sellBook}
             showSelling={this.showSelling}
             showFavorites={this.showFavorites}
@@ -142,8 +144,7 @@ class App extends Component {
             />
             <div className={classes.toolbar} />
             <Route exact path="/" component={BookListContainer} />
-            <Route exact path="/favorites" component={BookListContainer} />
-            <Route exact path="/selling" component={BookListContainer} />
+            <Route exact path="/about" component={About} />
           </main>
         </div>
       </Router>

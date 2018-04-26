@@ -23,6 +23,10 @@ class BookList extends Component {
   render() {
     const { classes, books, selling, favorites, markSold } = this.props;
 
+    if (!books || books.length === 0) {
+      return <div className={classes.empty}>No results to show</div>
+    }
+
     return (
       <div>
         <GridList className = {classes.list} cellHeight={'100%'} cols={1} >
@@ -52,6 +56,9 @@ const styles = {
   },
   home: {
     margin: '20px',
+  },
+  empty: {
+    verticalAlign: 'middle',
   },
 };
 
