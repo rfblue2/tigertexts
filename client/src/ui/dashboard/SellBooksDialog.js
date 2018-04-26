@@ -28,21 +28,26 @@ class SellBooksDialog extends Component {
     const res = await fetch('/api/books');
     const resjson = await res.json();
     const books = await deserializeBook(resjson);
-    this.setState({ books: books.map(b => b.title) });
+    this.setState({ books: books });
   }
 
-  selectBooks(titles) {
-    this.setState({ selected: [...this.state.selected, ...titles] });
+  selectBooks(books) {
+    this.setState({ selected: [...this.state.selected, ...books] });
   }
 
-  renderSelectedBook(title) {
-    return <div key={title}>{title}</div>;
+  renderSelectedBook(book) {
+    return <div key={book.id}>{book.title}</div>;
+  }
+
+  close() {
+    this.setState({ selected: [] });
+    this.props.handleClose();
   }
 
   // consider full screen dialog (might look nicer)
   render() {
     const {
-      classes, onSell, showForm, handleClose,
+      classes, onSell, showForm,
     } = this.props;
     const { books } = this.state;
 
@@ -50,7 +55,7 @@ class SellBooksDialog extends Component {
       <Dialog
         aria-labelledby="sell-a-book"
         open={showForm}
-        onClose={handleClose}
+        onClose={this.close.bind(this)}
         className={classes.dialog}
       >
         <DialogTitle id="sell-a-book">
@@ -58,7 +63,7 @@ class SellBooksDialog extends Component {
         </DialogTitle>
         <DialogContent className={classes.content}>
           <DialogContentText>Select books and set their prices here.</DialogContentText>
-          <AutoCompleteBook booklist={books} execute={this.selectBooks.bind(this)} />
+          <AutoCompleteBook bookList={books} executeSearch={this.selectBooks.bind(this)} />
           { this.state.selected.map(this.renderSelectedBook) }
         </DialogContent>
         <DialogActions>

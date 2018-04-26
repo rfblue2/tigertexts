@@ -10,17 +10,15 @@ import { withStyles } from 'material-ui/styles';
 import {
   getJwt,
   removeJwt,
-  facebookResponse,
+  facebookResponse, getUserInfo, userPostSellBooks, userDeleteSellBook,
 } from '../actions/users.actions';
-import { getBooksForClasses } from '../actions/books.actions';
+import { getBooksForClasses, getUserFavoriteBooks, getUserSellingBooks } from '../actions/books.actions';
 import AutoComplete from './nav/AutoComplete';
-import Login from '../Login';
-import Dashboard from './dashboard/Dashboard';
 import BookListContainer from './book/BookListContainer';
 import Sidebar from './drawer/Sidebar';
-import Book from './book/BookPage';
 import Navbar from './nav/Navbar';
 import { deserializeClass } from '../serializers/classSerializer';
+import SellBooksDialog from './dashboard/SellBooksDialog';
 
 const drawerWidth = 240;
 
@@ -28,12 +26,15 @@ class App extends Component {
   state = {
     courses: [],
     sidebarOpen: true,
+    showSellForm: false,
   }
 
   static propTypes = {
     classes: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired,
     isLoggedIn: PropTypes.bool,
+    user: PropTypes.object,
+    token: PropTypes.string,
   }
 
   static defaultProps = {
@@ -45,6 +46,11 @@ class App extends Component {
     this.responseFacebook = this._responseFacebook.bind(this);
     this.handleSearch = this._handleSearch.bind(this);
     this.handleMenu = this._handleMenu.bind(this);
+    this.handleOpenForm = this._handleOpenForm.bind(this);
+    this.handleCloseForm = this._handleCloseForm.bind(this);
+    this.showSelling = this._showSelling.bind(this);
+    this.showFavorites = this._showFavorites.bind(this);
+    this.sellBooks = this._sellBooks.bind(this);
 
     // TODO move this into redux (maybe)
     const cres = await fetch('/api/classes');
@@ -73,9 +79,33 @@ class App extends Component {
     this.setState({ sidebarOpen: !this.state.sidebarOpen });
   }
 
+  _sellBooks(selectedBooks) {
+    const { token, user } = this.props;
+    this.setState({
+      showSellForm: false,
+    });
+    this.props.dispatch(userPostSellBooks(token, user, selectedBooks.map(b => b.id)));
+  }
+
+  _handleOpenForm = () => {
+    this.setState({ showSellForm: true });
+  };
+
+  _handleCloseForm = () => {
+    this.setState({ showSellForm: false });
+  };
+
+  _showSelling() {
+    this.props.dispatch(getUserSellingBooks(this.props.token));
+  }
+
+  _showFavorites() {
+    this.props.dispatch(getUserFavoriteBooks(this.props.token));
+  }
+
   render() {
     const { classes, isLoggedIn } = this.props;
-    const { courses, sidebarOpen } = this.state;
+    const { courses, sidebarOpen, showSellForm } = this.state;
 
     return (
       <Router>
@@ -93,6 +123,10 @@ class App extends Component {
           </Navbar>
           <Sidebar
             open={sidebarOpen}
+            sellBook={this.sellBook}
+            showSelling={this.showSelling}
+            showFavorites={this.showFavorites}
+            openSellForm={this.handleOpenForm}
           />
           <main
             className={classNames(classes.content, classes['content-left'], {
@@ -100,11 +134,16 @@ class App extends Component {
               [classes['contentShift-left']]: sidebarOpen,
             })}
           >
+            <SellBooksDialog
+              className={classes.dialog}
+              onSell={this.sellBooks}
+              handleClose={this.handleCloseForm}
+              showForm={showSellForm}
+            />
             <div className={classes.toolbar} />
             <Route exact path="/" component={BookListContainer} />
-            <Route path="/dashboard" component={Dashboard} />
-            <Route path="/login" component={Login} />
-            <Route path="/book/:bookId" component={Book} />
+            <Route exact path="/favorites" component={BookListContainer} />
+            <Route exact path="/selling" component={BookListContainer} />
           </main>
         </div>
       </Router>
@@ -115,6 +154,10 @@ class App extends Component {
 const styles = theme => ({
   root: {
     flexGrow: 1,
+  },
+  dialog: {
+    width: '100%',
+    height: '100%',
   },
   appFrame: {
     zIndex: 1,
@@ -160,6 +203,8 @@ const styles = theme => ({
 
 const mapStateToProps = state => ({
   isLoggedIn: state.user.loggedIn,
+  token: state.user.token,
+  user: state.user.user,
 });
 
 const mapDispatchToProps = dispatch => ({

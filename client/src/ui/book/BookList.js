@@ -7,13 +7,21 @@ import Book from './Book';
 class BookList extends Component {
   static propTypes = {
     books: PropTypes.arrayOf(PropTypes.object.isRequired).isRequired,
+    markSold: PropTypes.func.isRequired,
+    selling: PropTypes.arrayOf(PropTypes.String),
+    favorites: PropTypes.arrayOf(PropTypes.String),
   };
+
+  static defaultProps = {
+    selling: [],
+    favorites: [],
+  }
 
   state = {
   }
 
   render() {
-    const { classes, books } = this.props;
+    const { classes, books, selling, favorites, markSold } = this.props;
 
     return (
       <div>
@@ -24,6 +32,9 @@ class BookList extends Component {
               <Book
                 key={b.id}
                 book={b}
+                selling={selling.includes(b.id)}
+                favorite={favorites.includes(b.id)}
+                onMarkSoldClick={markSold}
               />
             </GridListTile>
           ))

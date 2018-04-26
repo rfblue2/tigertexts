@@ -46,9 +46,9 @@ export const getUserSellingBooks = (token) => {
     token: tok,
   });
 
-  const response = selling => ({
+  const response = books => ({
     type: GET_USER_SELLING_RES,
-    selling,
+    books,
   });
 
   return async (dispatch) => {
@@ -68,9 +68,9 @@ export const getUserFavoriteBooks = (token) => {
     token: tok,
   });
 
-  const response = favorites => ({
+  const response = books => ({
     type: GET_USER_FAVORITES_RES,
-    favorites,
+    books,
   });
 
   return async (dispatch) => {

@@ -11,30 +11,29 @@ import Chip from 'material-ui/Chip';
 class AutoCompleteBook extends Component {
   static propTypes = {
     classes: PropTypes.object.isRequired,
-    execute: PropTypes.func.isRequired,
-    booklist: PropTypes.arrayOf(PropTypes.string),
+    executeSearch: PropTypes.func.isRequired,
+    bookList: PropTypes.arrayOf(PropTypes.object),
   };
 
   static defaultProps = {
-    booklist: [],
+    bookList: [],
   }
 
   state = {
     inputValue: '',
-    selectedItem: [],
+    selectedItems: [],
   };
 
   handleKeyDown = (event) => {
-    const { inputValue, selectedItem } = this.state;
-    const { execute } = this.props;
+    const { inputValue, selectedItems } = this.state;
+    const { executeSearch } = this.props;
 
-    if (selectedItem.length && !inputValue.length && keycode(event) === 'backspace') {
+    if (selectedItems.length && !inputValue.length && keycode(event) === 'backspace') {
       this.setState({
-        selectedItem: selectedItem.slice(0, selectedItem.length - 1),
+        selectedItems: selectedItems.slice(0, selectedItems.length - 1),
       });
-    } else if (selectedItem.length && !inputValue.length && keycode(event) === 'enter') {
-      this.setState({ selectedItem: [] });
-      execute(selectedItem);
+    } else if (selectedItems.length && !inputValue.length && keycode(event) === 'enter') {
+      executeSearch(selectedItems);
     }
   };
 
@@ -43,23 +42,23 @@ class AutoCompleteBook extends Component {
   };
 
   handleChange = (item) => {
-    let { selectedItem } = this.state;
+    let { selectedItems } = this.state;
 
-    if (selectedItem.indexOf(item) === -1) {
-      selectedItem = [...selectedItem, item];
+    if (selectedItems.indexOf(item) === -1) {
+      selectedItems = [...selectedItems, item];
     }
 
     this.setState({
       inputValue: '',
-      selectedItem,
+      selectedItems,
     });
   };
 
   handleDelete = item => () => {
-    const selectedItem = [...this.state.selectedItem];
-    selectedItem.splice(selectedItem.indexOf(item), 1);
+    const selectedItems = [...this.state.selectedItems];
+    selectedItems.splice(selectedItems.indexOf(item), 1);
 
-    this.setState({ selectedItem });
+    this.setState({ selectedItems });
   };
 
   renderInput(inputProps) {
@@ -82,33 +81,33 @@ class AutoCompleteBook extends Component {
   }
 
   renderSuggestion({
-    suggestion, index, itemProps, highlightedIndex, selectedItem,
-  }) {
+                     suggestion, index, itemProps, highlightedIndex, selectedItems,
+                   }) {
     const isHighlighted = highlightedIndex === index;
-    const isSelected = (selectedItem || '').indexOf(suggestion) > -1;
+    const isSelected = (selectedItems || '').indexOf(suggestion) > -1;
 
     return (
       <MenuItem
         {...itemProps}
-        key={suggestion}
+        key={suggestion.id}
         selected={isHighlighted}
         component="div"
         style={{
           fontWeight: isSelected ? 500 : 400,
         }}
       >
-        {suggestion}
+        {suggestion.title}
       </MenuItem>
     );
   }
 
-  getSuggestions(inputValue, booklist) {
+  getSuggestions(inputValue, bookList) {
     let count = 0;
 
-    return booklist.filter((suggestion) => {
-      const keep =
-        (!inputValue || suggestion.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1) &&
-        count < 5;
+    return bookList.filter((suggestion) => {
+      let keep = suggestion.title.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1;
+
+      keep = keep && count < 5;
 
       if (keep) {
         count += 1;
@@ -119,49 +118,49 @@ class AutoCompleteBook extends Component {
   }
 
   render() {
-    const { classes, booklist } = this.props;
-    const { inputValue, selectedItem } = this.state;
+    const { classes, bookList } = this.props;
+    const { inputValue, selectedItems } = this.state;
 
     return (
       <div className={classes.root}>
-        <Downshift inputValue={inputValue} onChange={this.handleChange} selectedItem={selectedItem}>
+        <Downshift inputValue={inputValue} onChange={this.handleChange} selectedItems={selectedItems}>
           {({
-            getInputProps,
-            getItemProps,
-            isOpen,
-            inputValue: inputValue2,
-            selectedItem: selectedItem2,
-            highlightedIndex,
-          }) => (
+              getInputProps,
+              getItemProps,
+              isOpen,
+              inputValue: inputValue2,
+              selectedItems: selectedItems2,
+              highlightedIndex,
+            }) => (
             <div className={classes.container}>
               {this.renderInput({
                 fullWidth: true,
                 classes,
                 InputProps: getInputProps({
-                  startAdornment: selectedItem.map(item => (
+                  startAdornment: selectedItems.map(item => (
                     <Chip
-                      key={item}
+                      key={item.id}
                       tabIndex={-1}
-                      label={item}
+                      label={item.title}
                       className={classes.chip}
                       onDelete={this.handleDelete(item)}
                     />
                   )),
                   onChange: this.handleInputChange,
                   onKeyDown: this.handleKeyDown,
-                  placeholder: 'Enter Book Title',
+                  placeholder: 'Enter book titles',
                   id: 'integration-downshift-multiple',
                 }),
               })}
               {isOpen ? (
                 <Paper className={classes.paper} square>
-                  {this.getSuggestions(inputValue2, booklist).map((suggestion, index) =>
+                  {this.getSuggestions(inputValue2, bookList).map((suggestion, index) =>
                     this.renderSuggestion({
                       suggestion,
                       index,
                       itemProps: getItemProps({ item: suggestion }),
                       highlightedIndex,
-                      selectedItem: selectedItem2,
+                      selectedItems: selectedItems2,
                     }))}
                 </Paper>
               ) : null}
