@@ -52,7 +52,6 @@ class AutoComplete extends Component {
       inputValue: '',
       selectedItems,
     });
-    console.log(selectedItems);
   };
 
   handleDelete = item => () => {

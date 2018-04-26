@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
 import { withStyles } from 'material-ui/styles';
 import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
@@ -27,7 +26,7 @@ class Navbar extends Component {
       classes, isLoggedIn, responseFacebook, handleLogout, handleMenu,
     } = this.props;
     return (
-      <AppBar className="nav" position="static">
+      <AppBar className={classes.appBar} position="static">
         <Toolbar>
           <IconButton
             color="inherit"
@@ -61,11 +60,16 @@ class Navbar extends Component {
 }
 
 const styles = theme => ({
-  nav: {
-    zIndex: theme.zIndex.drawer + 1,
-  },
   flex: {
     flex: 1,
+  },
+  appBar: {
+    position: 'fixed',
+    transition: theme.transitions.create(['margin', 'width'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    zIndex: theme.zIndex.drawer + 1,
   },
   homeButton: {
     marginLeft: -12,

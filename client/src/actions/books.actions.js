@@ -33,7 +33,6 @@ export const getBooksForClasses = (classIds) => {
     dispatch(request(classIds));
     try {
       const books = await getClassBooks(classIds);
-      console.log(JSON.stringify(books, null, 2));
       dispatch(response(books));
     } catch (err) {
       dispatch(bookError(err));

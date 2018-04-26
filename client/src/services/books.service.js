@@ -23,10 +23,8 @@ export const getClassBooks = async (classIds) => {
     const lres = await fetch(`api/books/${b.id}/listings`);
     const ljson = await lres.json();
     const listings = await deserializeListing(ljson);
-    console.log(JSON.stringify(listings, null, 2));
     return { ...b, listings };
   }));
-  console.log(JSON.stringify(booksWithListings, null, 2));
   return booksWithListings;
 };
 

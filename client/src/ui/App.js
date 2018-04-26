@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import classNames from 'classnames';
 import {
   BrowserRouter as Router,
   Route,
@@ -20,6 +21,8 @@ import Sidebar from './drawer/Sidebar';
 import Book from './book/BookPage';
 import Navbar from './nav/Navbar';
 import { deserializeClass } from '../serializers/classSerializer';
+
+const drawerWidth = 240;
 
 class App extends Component {
   state = {
@@ -76,7 +79,7 @@ class App extends Component {
 
     return (
       <Router>
-        <div className={classes.root}>
+        <div className={classes.appFrame}>
           <Navbar
             isLoggedIn={isLoggedIn}
             responseFacebook={this.responseFacebook}
@@ -91,12 +94,18 @@ class App extends Component {
           <Sidebar
             open={sidebarOpen}
           />
-          <div className={classes.content}>
+          <main
+            className={classNames(classes.content, classes['content-left'], {
+              [classes.contentShift]: sidebarOpen,
+              [classes['contentShift-left']]: sidebarOpen,
+            })}
+          >
+            <div className={classes.toolbar} />
             <Route exact path="/" component={BookListContainer} />
             <Route path="/dashboard" component={Dashboard} />
             <Route path="/login" component={Login} />
             <Route path="/book/:bookId" component={Book} />
-          </div>
+          </main>
         </div>
       </Router>
     );
@@ -106,14 +115,47 @@ class App extends Component {
 const styles = theme => ({
   root: {
     flexGrow: 1,
+  },
+  appFrame: {
     zIndex: 1,
+    overflow: 'hidden',
+    position: 'relative',
+    display: 'flex',
+    width: '100%',
+  },
+  drawerPaper: {
+    position: 'relative',
+    width: drawerWidth,
+  },
+  drawerHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    padding: '0 8px',
+    ...theme.mixins.toolbar,
   },
   content: {
     flexGrow: 1,
     backgroundColor: theme.palette.background.default,
     padding: theme.spacing.unit * 3,
-    minWidth: 0, // So the Typography noWrap works
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
   },
+  'content-left': {
+    marginLeft: 0,
+  },
+  contentShift: {
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
+  'contentShift-left': {
+    marginLeft: drawerWidth,
+  },
+  toolbar: theme.mixins.toolbar,
 });
 
 const mapStateToProps = state => ({

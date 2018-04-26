@@ -22,13 +22,14 @@ class Sidebar extends Component {
     const { classes, open } = this.props;
     return (
       <Drawer
-        variant="persistent"
-        anchor="left"
-        open={open}
         classes={{
           paper: classes.drawerPaper,
         }}
+        variant="persistent"
+        anchor="left"
+        open={open}
       >
+        <div className={classes.toolbar} />
         <List component="nav">
           <ListItem button>
             <ListItemIcon>
@@ -56,7 +57,7 @@ class Sidebar extends Component {
 
 const styles = theme => ({
   drawerPaper: {
-    position: 'relative',
+    position: 'fixed',
     width: drawerWidth,
   },
   toolbar: theme.mixins.toolbar,
