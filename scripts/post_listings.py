@@ -7,6 +7,7 @@ def post_listings():
   urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
   raw = json.load(open('blackboard_crawler/results.json'))
   labyrinth_raw = json.load(open('labyrinth_crawler/results.json'))
+  amazon_raw = json.load(open('amazon_scraper/amazonresults.json'))
 
   # Delete classes without book
   for i in range(len(raw) - 1, -1, -1):
@@ -17,6 +18,11 @@ def post_listings():
   labyrinth_dict = dict()
   for entry in labyrinth_raw:
     labyrinth_dict[entry['isbn']] = entry
+
+  amazon_dict = dict()
+  for entry in amazon_raw:
+    amazon_dict[entry['isbn']] = entry
+
 
   host = ''
   if sys.argv[1] == 'local':
@@ -60,6 +66,19 @@ def post_listings():
               data = {'data': {'type': 'listings', 'attributes': listing_attributes, 'relationships': {'book': {'data': book_id}}}}
               listing_dict[book['title']] = data
               requests.post(listings_url, data = json.dumps(data), headers = headers, verify = False)
+        # Amazon and third parties
+        if book['ISBN'] in amazon_dict:
+            for option in amazon_dict[book['ISBN']]['options']:
+                listing_attributes = dict()
+                if option['condition'] == 'New':
+                    listing_attributes = {'title': book['title'], 'kind': 'amazon', 'price': float(option['price']), 'price_type': 'new'}
+                elif option['condition'] == 'Used':
+                    listing_attributes = {'title': book['title'], 'kind': 'amazon', 'price': float(option['price']), 'price_type': 'used'}
+                book_id = {'id': book_to_id[book['title']], 'type': 'book'}
+                data = {'data': {'type': 'listings', 'attributes': listing_attributes, 'relationships': {'book': {'data': book_id}}}}
+                listing_dict[book['title']] = data
+                requests.post(listings_url, data = json.dumps(data), headers = headers, verify = False)
+
         # Blackboard only
         elif 'price' in book.keys():
           listing_attributes = {'title': book['title'], 'kind': 'labyrinth', 'price': float(book['price']), 'price_type': 'new'}
