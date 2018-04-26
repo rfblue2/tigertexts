@@ -22,6 +22,7 @@ class BookListContainer extends Component {
   }
 
   render() {
+    console.log('About to repopulate books: ' + JSON.stringify(this.props.books, null, 2));
     return (
       <BookList
         books={this.props.books}

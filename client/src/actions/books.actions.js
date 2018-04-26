@@ -18,10 +18,10 @@ export const bookError = err => ({
   err,
 });
 
-export const getBooksForClass = (classId) => {
-  const request = id => ({
+export const getBooksForClasses = (classIds) => {
+  const request = ids => ({
     type: GET_CLASS_BOOKS_REQ,
-    id,
+    classIds: ids,
   });
 
   const response = books => ({
@@ -30,9 +30,10 @@ export const getBooksForClass = (classId) => {
   });
 
   return async (dispatch) => {
-    dispatch(request(classId));
+    dispatch(request(classIds));
     try {
-      const books = await getClassBooks(classId);
+      const books = await getClassBooks(classIds);
+      console.log(JSON.stringify(books, null, 2))
       dispatch(response(books));
     } catch (err) {
       dispatch(bookError(err));
