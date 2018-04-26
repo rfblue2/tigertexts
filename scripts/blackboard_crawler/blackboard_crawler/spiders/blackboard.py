@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from ..items import BlackboardCrawlerItem
-from ..items import Book
+from ..items import BookPage
 import re
 
 
@@ -108,7 +108,7 @@ class BlackboardSpider(scrapy.Spider):
 
         for book in requiredBooksInfo:
             global bookList
-            bookItem = Book()
+            bookItem = BookPage()
 
             bookItem['image'] = 'https://blackboard.princeton.edu' + book.xpath('.//img/@src').extract()[0]
             titleAndISBN = book.xpath('.//td[contains(@class, "textBold")]/text()').extract()
@@ -148,7 +148,7 @@ class BlackboardSpider(scrapy.Spider):
                 continue
 
             if not any(b['ISBN'] == titleAndISBN[1] for b in bookList):
-                bookItem = Book()
+                bookItem = BookPage()
                 bookItem['image'] = 'https://blackboard.princeton.edu' + book.xpath('.//img/@src').extract()[0]
 
                 bookItem['title'] = titleAndISBN[0]

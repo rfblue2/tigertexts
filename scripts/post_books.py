@@ -57,7 +57,7 @@ def post_books():
     requests.post(books_url, data = json.dumps(book_dict[book]), headers = headers, verify = False)
     counter += 1
     if counter % 100 == 0:
-      print "Book %d" % counter
+      print "BookPage %d" % counter
 
   print "Done POSTING books"
 

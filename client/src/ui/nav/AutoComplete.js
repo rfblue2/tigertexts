@@ -12,11 +12,11 @@ class AutoComplete extends Component {
   static propTypes = {
     classes: PropTypes.object.isRequired,
     executeSearch: PropTypes.func.isRequired,
-    classlist: PropTypes.arrayOf(PropTypes.string),
+    courseList: PropTypes.arrayOf(PropTypes.object),
   };
 
   static defaultProps = {
-    classlist: [],
+    courseList: [],
   }
 
   state = {
@@ -102,13 +102,15 @@ class AutoComplete extends Component {
     );
   }
 
-  getSuggestions(inputValue, classlist) {
+  getSuggestions(inputValue, courseList) {
     let count = 0;
 
-    return classlist.filter((suggestion) => {
-      const keep =
-        (!inputValue || suggestion.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1) &&
-        count < 5;
+    return courseList.filter((suggestion) => {
+      const nums = suggestion.numbers;
+      let keep = nums.reduce((p, n) =>
+        p || n.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1, false);
+
+      keep = keep && count < 5;
 
       if (keep) {
         count += 1;
@@ -119,7 +121,7 @@ class AutoComplete extends Component {
   }
 
   render() {
-    const { classes, classlist } = this.props;
+    const { classes, courseList } = this.props;
     const { inputValue, selectedItem } = this.state;
 
     return (
@@ -155,7 +157,7 @@ class AutoComplete extends Component {
               })}
               {isOpen ? (
                 <Paper className={classes.paper} square>
-                  {this.getSuggestions(inputValue2, classlist).map((suggestion, index) =>
+                  {this.getSuggestions(inputValue2, courseList).map((suggestion, index) =>
                     this.renderSuggestion({
                       suggestion,
                       index,

@@ -1,89 +1,75 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import List from 'material-ui/List';
 import { withStyles } from 'material-ui/styles';
+import Card, {
+  CardHeader,
+  CardMedia,
+  CardContent,
+  CardActions,
+} from 'material-ui/Card';
+import IconButton from 'material-ui/IconButton';
+import Collapse from 'material-ui/transitions/Collapse';
 import Subheader from 'material-ui/List/ListSubheader';
-import Divider from 'material-ui/Divider';
-import { deserializeBook } from '../../serializers/bookSerializer';
-import { deserializeListing } from '../../serializers/listingSerializer';
-import Listing from './Listing';
+import List from 'material-ui/List';
+import FavoriteIcon from '@material-ui/icons/Favorite';
+import Typography from 'material-ui/Typography';
+import Listing from '../home/Listing';
 
 class Book extends Component {
+
   static propTypes = {
     classes: PropTypes.object.isRequired,
-    match: PropTypes.shape({
-      params: PropTypes.shape({
-        bookId: PropTypes.string.isRequired,
-      }).isRequired,
-    }).isRequired,
-  };
+    book: PropTypes.object.isRequired,
+  }
 
   state = {
-    book: {},
-    listings: [],
+    expanded: false,
   }
 
-  async componentWillMount() {
-    try {
-      const { bookId } = this.props.match.params;
-      const res = await fetch(`/api/books/${bookId}`);
-      const resjson = await res.json();
-      const book = await deserializeBook(resjson);
-
-      const res1 = await fetch(`/api/books/${bookId}/listings`);
-      const res1json = await res1.json();
-      const listings = await deserializeListing(res1json);
-
-      this.setState({ book, listings });
-    } catch (e) {
-      console.error(`error: ${e}`);
-    }
-  }
+  handleExpandClick = () => {
+    this.setState({ expanded: !this.state.expanded });
+  };
 
   render() {
-    const { book, listings } = this.state;
-    const { classes } = this.props;
-
-    /* TODO: Add pictures */
-    /* TODO: Add link to each Amazon and Labyrinth Page */
-
+    const { classes, book } = this.props;
     return (
-      <div className={classes.book}>
-        <h1 className={classes.bookTitle} >{book.title}</h1>
-        <div className={classes.bookDesc} > {book.description} </div>
-        <div className={classes.bookAuthors} > {book.authors ? book.authors.map(a => <p key={a}>{a}</p>) : ''} </div>
-        <div className={classes.bookPic} > <img src={book.image} alt="book" /> </div>
-        <Divider />
-        <List>
-          <Subheader className={classes.subheader} >Book Prices</Subheader>
-          { listings.map(l => <Listing key={l.id} listing={l} />)}
-        </List>
-      </div>
+      <Card onClick={this.handleExpandClick.bind(this)}>
+        <CardContent>
+          <Typography variant="headline"> {book.title} </Typography>
+          <img src={book.image} alt={"book"} />
+          <div className={classes.bookAuthors} > {book.authors ? book.authors.map(a => <p key={a}>{a}</p>) : ''} </div>
+        </CardContent>
+        <CardActions>
+          <IconButton aria-label="Add to favorites">
+            <FavoriteIcon />
+          </IconButton>
+        </CardActions>
+        <Collapse in={this.state.expanded} timeout="auto" unmountOnExit>
+          <CardContent>
+            <List>
+              <Subheader className={classes.subheader} >Book Prices</Subheader>
+              { book.listings.map(l => <Listing key={l.id} listing={l} />)}
+            </List>
+          </CardContent>
+        </Collapse>
+      </Card>
     );
   }
 }
 
 const styles = {
-  book: {
-    margin: '30px',
+  card: {
+    margin: '5px',
+    transition: 'all 0.5s ease',
+    '&:hover': {
+      cursor: 'pointer',
+    },
   },
-  bookTitle: {
-    margin: '10px',
-  },
-  bookDesc: {
-    margin: '20px',
-  },
-  bookAuthors: {
-    margin: '20px',
-  },
-  bookPic: {
-    margin: '20px',
-  },
-  subheader: {
-    margin: '0px',
-    fontSize: 18,
+  result: {
+    padding: '10px',
+    width: '50%',
   },
 };
 
-export default withStyles(styles)(Book);
 
+export default withStyles(styles)(Book);
