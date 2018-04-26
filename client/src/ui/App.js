@@ -19,7 +19,7 @@ import Sidebar from './drawer/Sidebar';
 import Navbar from './nav/Navbar';
 import { deserializeClass } from '../serializers/classSerializer';
 import SellBooksDialog from './dashboard/SellBooksDialog';
-import About from './About'
+import About from './About';
 
 const drawerWidth = 240;
 

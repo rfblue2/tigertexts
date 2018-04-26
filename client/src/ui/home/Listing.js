@@ -9,20 +9,28 @@ import Paper from 'material-ui/Paper';
 import Link from 'react-router-dom/Link';
 
 
-
 const Listing = ({ classes, listing }) => (
-  <ListItem button component ="a" href={listing.url} target="_blank" disableGutters={true}>
-    <Paper className = {classes.paper} elevation={1} square={true}>
-    <Grid container>
-      <Grid item xs = {6} md = {6}>
-        <ListItemText className={classes.bookSource} primary={listing.title} secondary={listing.kind} />
+  <Paper className={classes.paper} elevation={1} square>
+    <ListItem button component="a" href={listing.url} target="_blank" disableGutters>
+      <Grid container>
+        <Grid item xs={6} md={6}>
+          <ListItemText
+            className={classes.bookSource}
+            primary={listing.title}
+            secondary={listing.kind}
+          />
+        </Grid>
+        <Grid item xs={6} md={6}>
+          {listing.price ?
+            <ListItemText
+              className={classes.bookPrice}
+              primary={listing.price_type}
+              secondary={`$${formatNumber(listing.price)}`}
+            /> : '' }
+        </Grid>
       </Grid>
-      <Grid item xs = {6} md = {6}>
-        {listing.price ? <ListItemText className={classes.bookPrice} primary={listing.price_type} secondary={`$${formatNumber(listing.price)}`} /> : '' }
-      </Grid>
-    </Grid>
-    </Paper>
-  </ListItem>
+    </ListItem>
+  </Paper>
 );
 
 Listing.propTypes = {
@@ -37,18 +45,18 @@ const styles = {
     '&:hover': {
       cursor: 'pointer',
     },
-    margin: '0px'
+    margin: '0px',
   },
   bookPrice: {
     textAlign: 'right',
     marginTop: '5px',
-    marginBottom: '5px'
+    marginBottom: '5px',
   },
   bookSource: {
     textAlign: 'left',
     marginLeft: '10px',
     marginTop: '5px',
-    marginBottom: '5px'
+    marginBottom: '5px',
   },
 };
 

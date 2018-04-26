@@ -22,7 +22,6 @@ import classnames from 'classnames';
 import Divider from 'material-ui/Divider';
 
 class Book extends Component {
-
   static propTypes = {
     classes: PropTypes.object.isRequired,
     book: PropTypes.object.isRequired,
@@ -43,38 +42,38 @@ class Book extends Component {
   }
 
   generateAuthorString = (authors) => {
-    const numAuthors = authors.length
+    const numAuthors = authors.length;
     if (numAuthors == 1) {
-      return(authors[0])
+      return (authors[0]);
+    } else if (numAuthors == 2) {
+      return (`${authors[0]}; ${authors[1]}`);
     }
-    else if (numAuthors == 2) {
-      return(authors[0] + '; ' + authors[1])
-    }
-    else {
-      return(authors[0] + '; ' + authors[1] + '; ...')
-    }
+
+    return (`${authors[0]}; ${authors[1]}; ...`);
   }
 
   render() {
-    const { classes, book, selling, onMarkSoldClick } = this.props;
+    const {
+      classes, book, selling, onMarkSoldClick,
+    } = this.props;
     return (
-      <Card className = {classes.card} >
-        <CardHeader className = {classes.header} title = {book.title} subheader = {this.generateAuthorString(book.authors)}/>
+      <Card className={classes.card} >
+        <CardHeader className={classes.header} title={book.title} subheader={this.generateAuthorString(book.authors)} />
         <CardActions>
-          <IconButton 
-              onClick={this.handleFavoriteClick.bind(this)}
-              aria-label="Add to favorites"
-            >
+          <IconButton
+            onClick={this.handleFavoriteClick.bind(this)}
+            aria-label="Add to favorites"
+          >
             <FavoriteIcon />
           </IconButton>
           <IconButton
-              className={classnames(classes.expand, {
+            className={classnames(classes.expand, {
                 [classes.expandOpen]: this.state.expanded,
               })}
-              onClick={this.handleExpandClick.bind(this)}
-              aria-expanded={this.state.expanded}
-              aria-label="Show more"
-            >
+            onClick={this.handleExpandClick.bind(this)}
+            aria-expanded={this.state.expanded}
+            aria-label="Show more"
+          >
             <ExpandMoreIcon />
           </IconButton>
           {
@@ -87,19 +86,19 @@ class Book extends Component {
           <Divider />
           <CardContent>
             <div className={classes.root}>
-            <Grid container spacing={24}>
-              <Grid item xs = {12} md = {3}>
-                <img className = {classes.bookpic} src={book.image} alt={"book"} />
+              <Grid container spacing={24}>
+                <Grid item xs={12} md={3}>
+                  <img className={classes.bookpic} src={book.image} alt="book" />
+                </Grid>
+                <Grid item xs={12} md={9}>
+                  <Subheader className={classes.subheader}>Book Description</Subheader>
+                  <Typography className={classes.description}> {book.detail} </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Subheader className={classes.subheader}>Book Prices</Subheader>
+                  { book.listings.map(l => <Listing key={l.id} listing={l} />)}
+                </Grid>
               </Grid>
-              <Grid item xs = {12} md = {9}>  
-                <Subheader className = {classes.subheader}>Book Description</Subheader>
-                <Typography className = {classes.description}> {book.detail} </Typography>
-              </Grid>
-              <Grid item xs = {12}>
-                <Subheader className = {classes.subheader}>Book Prices</Subheader>
-                { book.listings.map(l => <Listing key={l.id} listing={l} />)}
-              </Grid>
-            </Grid>
             </div>
           </CardContent>
         </Collapse>
@@ -132,16 +131,15 @@ const styles = theme => ({
     transform: 'rotate(180deg)',
   },
   description: {
-    color: 'grey',
   },
   listings: {
-    margin: '0px'
+    margin: '0px',
   },
   bookpic: {
     height: '200px',
     width: 'auto',
   },
-})
+});
 
 
 export default withStyles(styles)(Book);

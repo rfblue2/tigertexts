@@ -1,6 +1,6 @@
 import { deserializeTransaction } from '../serializers/transactionSerializer';
 import { deserializeBook } from '../serializers/bookSerializer';
-import {deserializeListing} from '../serializers/listingSerializer'
+import { deserializeListing } from '../serializers/listingSerializer';
 
 export const getAndVerifyJwt = async () => {
   // check if user already logged in

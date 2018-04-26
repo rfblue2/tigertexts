@@ -26,7 +26,6 @@ import { deserializeUser } from '../serializers/userSerializer';
 import { deserializeBook } from '../serializers/bookSerializer';
 
 export const getJwt = () => {
-
   const success = token => ({
     type: GET_JWT,
     token,
