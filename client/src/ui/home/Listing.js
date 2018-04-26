@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import { ListItem, ListItemText } from 'material-ui/List';
+import formatNumber from 'simple-format-number';
 import Typography from 'material-ui/Typography';
 import Grid from 'material-ui/Grid';
 import Paper from 'material-ui/Paper';
@@ -16,7 +17,7 @@ const Listing = ({ classes, listing }) => (
         <ListItemText className={classes.bookSource} primary={listing.title} secondary={listing.kind} />
       </Grid>
       <Grid item xs = {6} md = {6}>
-        {listing.price ? <ListItemText className={classes.bookPrice} primary={listing.price_type} secondary={`$${listing.price}`} /> : '' }
+        {listing.price ? <ListItemText className={classes.bookPrice} primary={listing.price_type} secondary={`$${formatNumber(listing.price)}`} /> : '' }
       </Grid>
     </Grid>
     </Paper>

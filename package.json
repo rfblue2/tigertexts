@@ -2,10 +2,6 @@
   "name": "tigertexts",
   "version": "0.0.0",
   "private": true,
-  "engines": {
-    "yarn": "1.6.0",
-    "node": "8.9.1"
-  },
   "scripts": {
     "start": "node ./server/bin/www",
     "dev": "concurrently \"yarn run server\" \"yarn run client\"",
