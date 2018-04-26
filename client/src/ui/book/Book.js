@@ -79,14 +79,14 @@ class Book extends Component {
           <CardContent>
             <div className={classes.root}>
             <Grid container spacing={24}>
-              <Grid item md = {3}>
+              <Grid item xs = {12} md = {3}>
                 <img className = {classes.bookpic} src={book.image} alt={"book"} />
               </Grid>
-              <Grid item md = {9}>  
+              <Grid item xs = {12} md = {9}>  
                 <Subheader className = {classes.subheader}>Book Description</Subheader>
                 <Typography className = {classes.description}> {book.detail} </Typography>
               </Grid>
-              <Grid item md = {12}>
+              <Grid item xs = {12}>
                 <Subheader className = {classes.subheader}>Book Prices</Subheader>
                 { book.listings.map(l => <Listing key={l.id} listing={l} />)}
               </Grid>
@@ -126,6 +126,7 @@ const styles = theme => ({
     color: 'grey',
   },
   listings: {
+    margin: '0px'
   },
   bookpic: {
     height: '200px',

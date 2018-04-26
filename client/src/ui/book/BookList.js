@@ -17,7 +17,7 @@ class BookList extends Component {
 
     return (
       <div>
-        <GridList className = {classes.list} cellHeight={'100vh'} cols={1} >
+        <GridList className = {classes.list} cellHeight={'100%'} cols={1} >
           { books.map(b =>
           (
             <GridListTile>
