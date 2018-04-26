@@ -67,8 +67,7 @@ class AutoComplete extends Component {
     } = inputProps;
 
     return (
-      <TextField
-        InputProps={{
+      <TextField className={classes.textfield} InputProps={{
           inputRef: ref,
           classes: {
             root: classes.inputRoot,
@@ -189,6 +188,15 @@ const styles = theme => ({
     marginTop: theme.spacing.unit,
     left: 0,
     right: 0,
+  },
+  textfield: {
+    marginTop: '8px',
+    backgroundColor: '#FFFFFF',
+    paddingLeft: '10px',
+    width: 'calc(100% - 15px)',
+    marginLeft: '5px',
+    marginRight: '5px',
+    boxShadow: '0px 0px 5px'
   },
   chip: {
     margin: `${theme.spacing.unit / 2}px ${theme.spacing.unit / 4}px`,

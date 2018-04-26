@@ -36,7 +36,6 @@ class Navbar extends Component {
             <MenuIcon />
           </IconButton>
           { this.props.children }
-          <div className={classes.flex} />
           {
             isLoggedIn ?
               <Button
