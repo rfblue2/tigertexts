@@ -6,11 +6,17 @@ import urllib3
 def post_listings():
   urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
   raw = json.load(open('blackboard_crawler/results.json'))
+  labyrinth_raw = json.load(open('labyrinth_crawler/results.json'))
 
   # Delete classes without book
   for i in range(len(raw) - 1, -1, -1):
     if 'bookList' not in raw[i].keys() or 'F2018' in raw[i]['course_ID']:
       del raw[i]
+
+  # Make dict from ISBN to JSON
+  labyrinth_dict = dict()
+  for entry in labyrinth_raw:
+    labyrinth_dict[entry['isbn']] = entry
 
   host = ''
   if sys.argv[1] == 'local':
@@ -36,15 +42,31 @@ def post_listings():
   # A book can have multiple listings
   counter = 0
   listing_dict = dict()
+  price_types = ['newPrice', 'veryGoodPrice', 'likeNewPrice', 'acceptablePrice', 'usedPrice']
   for line in raw:
     for book in line['bookList']:
       # Some books might appear in multiple listings (like Practice of Programming in COS333/217)
-      if book['title'] not in listing_dict.keys() and 'price' in book.keys():
-        listing_attributes = {'title': book['title'], 'kind': 'labyrinth', 'price': float(book['price']), 'price_type': 'new'}
-        book_id = {'id': book_to_id[book['title']], 'type': 'book'}
-        data = {'data': {'type': 'listings', 'attributes': listing_attributes, 'relationships': {'book': {'data': book_id}}}}
-        listing_dict[book['title']] = data
-        requests.post(listings_url, data = json.dumps(data), headers = headers, verify = False)
+      if book['title'] not in listing_dict.keys():
+        # Labyrinth first
+        if book['ISBN'] in labyrinth_dict:
+          for price_type in price_types:
+            if price_type in labyrinth_dict[book['ISBN']].keys():
+              listing_attributes = dict()
+              if price_type == 'newPrice' or price_type == 'likeNewPrice':
+                listing_attributes = {'title': book['title'], 'kind': 'labyrinth', 'price': float(labyrinth_dict[book['ISBN']][price_type]), 'price_type': 'new'}
+              else:
+                listing_attributes = {'title': book['title'], 'kind': 'labyrinth', 'price': float(labyrinth_dict[book['ISBN']][price_type]), 'price_type': 'used'}
+              book_id = {'id': book_to_id[book['title']], 'type': 'book'}
+              data = {'data': {'type': 'listings', 'attributes': listing_attributes, 'relationships': {'book': {'data': book_id}}}}
+              listing_dict[book['title']] = data
+              requests.post(listings_url, data = json.dumps(data), headers = headers, verify = False)
+        # Blackboard only
+        elif 'price' in book.keys():
+          listing_attributes = {'title': book['title'], 'kind': 'labyrinth', 'price': float(book['price']), 'price_type': 'new'}
+          book_id = {'id': book_to_id[book['title']], 'type': 'book'}
+          data = {'data': {'type': 'listings', 'attributes': listing_attributes, 'relationships': {'book': {'data': book_id}}}}
+          listing_dict[book['title']] = data
+          requests.post(listings_url, data = json.dumps(data), headers = headers, verify = False)
       counter += 1
       if counter % 100 == 0:
         print "Listing %d" % counter
