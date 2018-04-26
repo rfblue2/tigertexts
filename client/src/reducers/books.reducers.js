@@ -7,6 +7,10 @@ import {
   GET_USER_SELLING_REQ,
   GET_USER_SELLING_RES,
 } from '../constants/books.constants';
+import {
+  USER_DELETE_SELL_RES,
+  USER_POST_SELL_RES,
+} from '../constants/users.constants';
 
 const bookReducer = (state = {
   books: [
@@ -72,11 +76,25 @@ const bookReducer = (state = {
     case GET_USER_SELLING_REQ:
       return { ...state, error: null };
     case GET_USER_SELLING_RES:
-      return { ...state, books: action.selling, error: null };
+      return { ...state, books: action.books, error: null };
     case GET_USER_FAVORITES_REQ:
       return { ...state, error: null };
     case GET_USER_FAVORITES_RES:
-      return { ...state, books: action.favorites, error: null };
+      console.log('fav');
+      return { ...state, books: action.books, error: null };
+    case USER_DELETE_SELL_RES:
+      return {
+        ...state,
+        books: state.books.filter(b => b.id !== action.book.id),
+        error: null,
+      };
+    case USER_POST_SELL_RES:
+      console.log(JSON.stringify([...state.books, ...action.books]));
+      return {
+        ...state,
+        books: [...state.books, ...action.books],
+        error: null,
+      };
     case BOOK_ERROR:
       return { ...state, error: action.error };
     default:

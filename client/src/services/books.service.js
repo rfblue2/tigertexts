@@ -28,18 +28,37 @@ export const getClassBooks = async (classIds) => {
   return booksWithListings;
 };
 
+export const getBooksListings = async bookIds =>
+  Promise.all(bookIds.map(async (id) => {
+    const lres = await fetch(`api/books/${id}/listings`);
+    const ljson = await lres.json();
+    return deserializeListing(ljson);
+  }));
+
 export const getUserSelling = async (token) => {
   const res = await fetch('api/users/selling', {
     headers: { 'x-auth-token': token },
   });
   const selling = await res.json();
-  return deserializeBook(selling);
+  const books = await deserializeBook(selling);
+  return Promise.all(books.map(async (b) => {
+    const lres = await fetch(`api/books/${b.id}/listings`);
+    const ljson = await lres.json();
+    const listings = await deserializeListing(ljson);
+    return { ...b, listings };
+  }));
 };
 
 export const getUserFavorites = async (token) => {
-  const res = await fetch('api/users/favorite', {
+  const res = await fetch('api/users/favorites', {
     headers: { 'x-auth-token': token },
   });
   const favorite = await res.json();
-  return deserializeBook(favorite);
+  const books = await deserializeBook(favorite);
+  return Promise.all(books.map(async (b) => {
+    const lres = await fetch(`api/books/${b.id}/listings`);
+    const ljson = await lres.json();
+    const listings = await deserializeListing(ljson);
+    return { ...b, listings };
+  }));
 };
