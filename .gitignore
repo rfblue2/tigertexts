@@ -5,3 +5,4 @@ node_modules/
 data/
 package-lock.json
 *.pyc
+fb_script.py

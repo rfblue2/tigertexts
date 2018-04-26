@@ -23,7 +23,8 @@
     "react-router-dom": "^4.2.2",
     "react-scripts": "1.1.1",
     "redux": "^4.0.0",
-    "redux-thunk": "^2.2.0"
+    "redux-thunk": "^2.2.0",
+    "simple-format-number": "~0.1.2"
   },
   "proxy": "https://localhost:3001/"
 }
