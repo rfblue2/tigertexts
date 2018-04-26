@@ -1,89 +1,147 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import List from 'material-ui/List';
 import { withStyles } from 'material-ui/styles';
+import Card, {
+  CardHeader,
+  CardMedia,
+  CardContent,
+  CardActions,
+} from 'material-ui/Card';
+import IconButton from 'material-ui/IconButton';
+import Collapse from 'material-ui/transitions/Collapse';
 import Subheader from 'material-ui/List/ListSubheader';
+import List from 'material-ui/List';
+import FavoriteIcon from '@material-ui/icons/Favorite';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import Typography from 'material-ui/Typography';
+import Grid from 'material-ui/Grid';
+import Button from 'material-ui/Button';
+import Paper from 'material-ui/Paper';
+import Listing from '../home/Listing';
+import classnames from 'classnames';
 import Divider from 'material-ui/Divider';
-import { deserializeBook } from '../../serializers/bookSerializer';
-import { deserializeListing } from '../../serializers/listingSerializer';
-import Listing from './Listing';
 
 class Book extends Component {
+
   static propTypes = {
     classes: PropTypes.object.isRequired,
-    match: PropTypes.shape({
-      params: PropTypes.shape({
-        bookId: PropTypes.string.isRequired,
-      }).isRequired,
-    }).isRequired,
-  };
-
-  state = {
-    book: {},
-    listings: [],
+    book: PropTypes.object.isRequired,
+    selling: PropTypes.bool.isRequired,
+    favorite: PropTypes.bool.isRequired,
+    onMarkSoldClick: PropTypes.func.isRequired,
   }
 
-  async componentWillMount() {
-    try {
-      const { bookId } = this.props.match.params;
-      const res = await fetch(`/api/books/${bookId}`);
-      const resjson = await res.json();
-      const book = await deserializeBook(resjson);
+  state = {
+    expanded: false,
+  }
 
-      const res1 = await fetch(`/api/books/${bookId}/listings`);
-      const res1json = await res1.json();
-      const listings = await deserializeListing(res1json);
+  handleExpandClick = () => {
+    this.setState({ expanded: !this.state.expanded });
+  }
 
-      this.setState({ book, listings });
-    } catch (e) {
-      console.error(`error: ${e}`);
+  handleFavoriteClick = () => {
+  }
+
+  generateAuthorString = (authors) => {
+    const numAuthors = authors.length
+    if (numAuthors == 1) {
+      return(authors[0])
+    }
+    else if (numAuthors == 2) {
+      return(authors[0] + '; ' + authors[1])
+    }
+    else {
+      return(authors[0] + '; ' + authors[1] + '; ...')
     }
   }
 
   render() {
-    const { book, listings } = this.state;
-    const { classes } = this.props;
-
-    /* TODO: Add pictures */
-    /* TODO: Add link to each Amazon and Labyrinth Page */
-
+    const { classes, book, selling, onMarkSoldClick } = this.props;
     return (
-      <div className={classes.book}>
-        <h1 className={classes.bookTitle} >{book.title}</h1>
-        <div className={classes.bookDesc} > {book.description} </div>
-        <div className={classes.bookAuthors} > {book.authors ? book.authors.map(a => <p key={a}>{a}</p>) : ''} </div>
-        <div className={classes.bookPic} > <img src={book.image} alt="book" /> </div>
-        <Divider />
-        <List>
-          <Subheader className={classes.subheader} >Book Prices</Subheader>
-          { listings.map(l => <Listing key={l.id} listing={l} />)}
-        </List>
-      </div>
+      <Card className = {classes.card} >
+        <CardHeader className = {classes.header} title = {book.title} subheader = {this.generateAuthorString(book.authors)}/>
+        <CardActions>
+          <IconButton 
+              onClick={this.handleFavoriteClick.bind(this)}
+              aria-label="Add to favorites"
+            >
+            <FavoriteIcon />
+          </IconButton>
+          <IconButton
+              className={classnames(classes.expand, {
+                [classes.expandOpen]: this.state.expanded,
+              })}
+              onClick={this.handleExpandClick.bind(this)}
+              aria-expanded={this.state.expanded}
+              aria-label="Show more"
+            >
+            <ExpandMoreIcon />
+          </IconButton>
+          {
+            selling ? <Button variant="raised" onClick={() => onMarkSoldClick(book.id)}>
+              Mark Sold
+            </Button> : ''
+          }
+        </CardActions>
+        <Collapse in={this.state.expanded} timeout="auto" unmountOnExit>
+          <Divider />
+          <CardContent>
+            <div className={classes.root}>
+            <Grid container spacing={24}>
+              <Grid item xs = {12} md = {3}>
+                <img className = {classes.bookpic} src={book.image} alt={"book"} />
+              </Grid>
+              <Grid item xs = {12} md = {9}>  
+                <Subheader className = {classes.subheader}>Book Description</Subheader>
+                <Typography className = {classes.description}> {book.detail} </Typography>
+              </Grid>
+              <Grid item xs = {12}>
+                <Subheader className = {classes.subheader}>Book Prices</Subheader>
+                { book.listings.map(l => <Listing key={l.id} listing={l} />)}
+              </Grid>
+            </Grid>
+            </div>
+          </CardContent>
+        </Collapse>
+      </Card>
     );
   }
 }
 
-const styles = {
-  book: {
-    margin: '30px',
-  },
-  bookTitle: {
-    margin: '10px',
-  },
-  bookDesc: {
-    margin: '20px',
-  },
-  bookAuthors: {
-    margin: '20px',
-  },
-  bookPic: {
-    margin: '20px',
+const styles = theme => ({
+  card: {
+    margin: '5px',
+    transition: 'all 0.5s ease',
   },
   subheader: {
-    margin: '0px',
-    fontSize: 18,
+    fontSize: '18px',
+    color: 'black',
+    align: 'left',
+    textAlign: 'left',
+    marginRight: 'auto',
+    paddingLeft: '0px',
   },
-};
+  expand: {
+    transform: 'rotate(0deg)',
+    transition: theme.transitions.create('transform', {
+      duration: theme.transitions.duration.shortest,
+    }),
+    marginRight: 'auto',
+  },
+  expandOpen: {
+    transform: 'rotate(180deg)',
+  },
+  description: {
+    color: 'grey',
+  },
+  listings: {
+    margin: '0px'
+  },
+  bookpic: {
+    height: '200px',
+    width: 'auto',
+  },
+})
+
 
 export default withStyles(styles)(Book);
-

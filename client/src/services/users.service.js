@@ -1,6 +1,25 @@
 import { deserializeTransaction } from '../serializers/transactionSerializer';
 import { deserializeBook } from '../serializers/bookSerializer';
+import {deserializeListing} from '../serializers/listingSerializer'
 
+export const getAndVerifyJwt = async () => {
+  // check if user already logged in
+  const token = localStorage.getItem('jwtToken');
+  if (!token) return null;
+
+  // get user from token
+  const res = await fetch('/api/users/me', {
+    headers: { 'x-auth-token': token },
+  });
+
+  // token probably expired
+  if (res.status === 401) {
+    localStorage.removeItem('jwtToken');
+    return null;
+  }
+
+  return token;
+};
 
 export const handleFbResponse = res =>
   // console.log(`Facebook response: ${JSON.stringify(res)}`);
@@ -53,11 +72,19 @@ export const postSelling = async (token, user, bookIds) => {
       },
     },
   };
-  return fetch('api/users/selling', {
+  const res = await fetch('api/users/selling', {
     method: 'POST',
     headers: { 'x-auth-token': token, 'Content-Type': 'application/json' },
     body: JSON.stringify(userObj),
   });
+  const jsonres = await res.json();
+  const books = await deserializeBook(jsonres);
+  return Promise.all(books.map(async (b) => {
+    const lres = await fetch(`api/books/${b.id}/listings`);
+    const ljson = await lres.json();
+    const listings = await deserializeListing(ljson);
+    return { ...b, listings };
+  }));
 };
 
 export const deleteSelling = async (token, bookId) =>

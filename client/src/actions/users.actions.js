@@ -20,17 +20,23 @@ import {
   fetchUserActivity,
   postSelling,
   deleteSelling,
+  getAndVerifyJwt,
 } from '../services/users.service';
 import { deserializeUser } from '../serializers/userSerializer';
 import { deserializeBook } from '../serializers/bookSerializer';
 
 export const getJwt = () => {
-  // check if user already logged in
-  const token = localStorage.getItem('jwtToken');
-  console.log(token);
-  return {
+
+  const success = token => ({
     type: GET_JWT,
     token,
+  });
+
+  return async (dispatch) => {
+    const token = await getAndVerifyJwt();
+    console.log(token);
+    dispatch(success(token));
+    dispatch(getUserInfo(token, ['favorite', 'selling']));
   };
 };
 
@@ -148,9 +154,7 @@ export const userPostSellBooks = (tok, user, bookIds) => {
   return async (dispatch) => {
     dispatch(request, tok, user, bookIds);
     try {
-      const res = await postSelling(tok, user, bookIds);
-      const resjson = await res.json();
-      const books = await deserializeBook(resjson);
+      const books = await postSelling(tok, user, bookIds);
       dispatch(success(books));
     } catch (err) {
       dispatch(userError(err));

@@ -12,28 +12,28 @@ class AutoComplete extends Component {
   static propTypes = {
     classes: PropTypes.object.isRequired,
     executeSearch: PropTypes.func.isRequired,
-    classlist: PropTypes.arrayOf(PropTypes.string),
+    courseList: PropTypes.arrayOf(PropTypes.object),
   };
 
   static defaultProps = {
-    classlist: [],
+    courseList: [],
   }
 
   state = {
     inputValue: '',
-    selectedItem: [],
+    selectedItems: [],
   };
 
   handleKeyDown = (event) => {
-    const { inputValue, selectedItem } = this.state;
+    const { inputValue, selectedItems } = this.state;
     const { executeSearch } = this.props;
 
-    if (selectedItem.length && !inputValue.length && keycode(event) === 'backspace') {
+    if (selectedItems.length && !inputValue.length && keycode(event) === 'backspace') {
       this.setState({
-        selectedItem: selectedItem.slice(0, selectedItem.length - 1),
+        selectedItems: selectedItems.slice(0, selectedItems.length - 1),
       });
-    } else if (selectedItem.length && !inputValue.length && keycode(event) === 'enter') {
-      executeSearch(selectedItem);
+    } else if (selectedItems.length && !inputValue.length && keycode(event) === 'enter') {
+      executeSearch(selectedItems);
     }
   };
 
@@ -42,24 +42,23 @@ class AutoComplete extends Component {
   };
 
   handleChange = (item) => {
-    let { selectedItem } = this.state;
+    let { selectedItems } = this.state;
 
-    if (selectedItem.indexOf(item) === -1) {
-      selectedItem = [...selectedItem, item];
+    if (selectedItems.indexOf(item) === -1) {
+      selectedItems = [...selectedItems, item];
     }
 
     this.setState({
       inputValue: '',
-      selectedItem,
+      selectedItems,
     });
-    console.log(selectedItem);
   };
 
   handleDelete = item => () => {
-    const selectedItem = [...this.state.selectedItem];
-    selectedItem.splice(selectedItem.indexOf(item), 1);
+    const selectedItems = [...this.state.selectedItems];
+    selectedItems.splice(selectedItems.indexOf(item), 1);
 
-    this.setState({ selectedItem });
+    this.setState({ selectedItems });
   };
 
   renderInput(inputProps) {
@@ -68,8 +67,7 @@ class AutoComplete extends Component {
     } = inputProps;
 
     return (
-      <TextField
-        InputProps={{
+      <TextField className={classes.textfield} InputProps={{
           inputRef: ref,
           classes: {
             root: classes.inputRoot,
@@ -82,33 +80,35 @@ class AutoComplete extends Component {
   }
 
   renderSuggestion({
-    suggestion, index, itemProps, highlightedIndex, selectedItem,
+    suggestion, index, itemProps, highlightedIndex, selectedItems,
   }) {
     const isHighlighted = highlightedIndex === index;
-    const isSelected = (selectedItem || '').indexOf(suggestion) > -1;
+    const isSelected = (selectedItems || '').indexOf(suggestion) > -1;
 
     return (
       <MenuItem
         {...itemProps}
-        key={suggestion}
+        key={suggestion.id}
         selected={isHighlighted}
         component="div"
         style={{
           fontWeight: isSelected ? 500 : 400,
         }}
       >
-        {suggestion}
+        {suggestion.numbers.join('/')}
       </MenuItem>
     );
   }
 
-  getSuggestions(inputValue, classlist) {
+  getSuggestions(inputValue, courseList) {
     let count = 0;
 
-    return classlist.filter((suggestion) => {
-      const keep =
-        (!inputValue || suggestion.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1) &&
-        count < 5;
+    return courseList.filter((suggestion) => {
+      const nums = suggestion.numbers;
+      let keep = nums.reduce((p, n) =>
+        p || n.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1, false);
+
+      keep = keep && count < 5;
 
       if (keep) {
         count += 1;
@@ -119,18 +119,18 @@ class AutoComplete extends Component {
   }
 
   render() {
-    const { classes, classlist } = this.props;
-    const { inputValue, selectedItem } = this.state;
+    const { classes, courseList } = this.props;
+    const { inputValue, selectedItems } = this.state;
 
     return (
       <div className={classes.root}>
-        <Downshift inputValue={inputValue} onChange={this.handleChange} selectedItem={selectedItem}>
+        <Downshift inputValue={inputValue} onChange={this.handleChange} selectedItems={selectedItems}>
           {({
             getInputProps,
             getItemProps,
             isOpen,
             inputValue: inputValue2,
-            selectedItem: selectedItem2,
+            selectedItems: selectedItems2,
             highlightedIndex,
           }) => (
             <div className={classes.container}>
@@ -138,11 +138,11 @@ class AutoComplete extends Component {
                 fullWidth: true,
                 classes,
                 InputProps: getInputProps({
-                  startAdornment: selectedItem.map(item => (
+                  startAdornment: selectedItems.map(item => (
                     <Chip
-                      key={item}
+                      key={item.id}
                       tabIndex={-1}
-                      label={item}
+                      label={item.numbers.join('/')}
                       className={classes.chip}
                       onDelete={this.handleDelete(item)}
                     />
@@ -155,13 +155,13 @@ class AutoComplete extends Component {
               })}
               {isOpen ? (
                 <Paper className={classes.paper} square>
-                  {this.getSuggestions(inputValue2, classlist).map((suggestion, index) =>
+                  {this.getSuggestions(inputValue2, courseList).map((suggestion, index) =>
                     this.renderSuggestion({
                       suggestion,
                       index,
                       itemProps: getItemProps({ item: suggestion }),
                       highlightedIndex,
-                      selectedItem: selectedItem2,
+                      selectedItems: selectedItems2,
                     }))}
                 </Paper>
               ) : null}
@@ -188,6 +188,15 @@ const styles = theme => ({
     marginTop: theme.spacing.unit,
     left: 0,
     right: 0,
+  },
+  textfield: {
+    marginTop: '8px',
+    backgroundColor: '#FFFFFF',
+    paddingLeft: '10px',
+    width: 'calc(100% - 15px)',
+    marginLeft: '5px',
+    marginRight: '5px',
+    boxShadow: '0px 0px 5px'
   },
   chip: {
     margin: `${theme.spacing.unit / 2}px ${theme.spacing.unit / 4}px`,
