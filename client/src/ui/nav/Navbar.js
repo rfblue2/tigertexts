@@ -50,6 +50,7 @@ class Navbar extends Component {
                 fields="name,email,picture"
                 icon="fa-facebook"
                 className={classes.loginButton}
+                size="small"
               />
           }
         </Toolbar>
