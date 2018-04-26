@@ -6,11 +6,17 @@ import urllib3
 def post_books():
   urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
   raw = json.load(open('blackboard_crawler/results.json'))
+  labyrinth_raw = json.load(open('labyrinth_crawler/results.json'))
 
   # Delete classes without book
   for i in range(len(raw) - 1, -1, -1):
     if 'bookList' not in raw[i].keys() or 'F2018' in raw[i]['course_ID']:
       del raw[i]
+
+  # Make dict from ISBN to JSON
+  labyrinth_dict = dict()
+  for entry in labyrinth_raw:
+    labyrinth_dict[entry['isbn']] = entry
 
   host = ''
   if sys.argv[1] == 'local':
@@ -42,7 +48,10 @@ def post_books():
       if book['title'] not in book_dict.keys():
         book_attributes = {'title': book['title'], 'authors': book['author'],
         'isbn': book['ISBN']}
-        if 'image' in book.keys():
+        # Try labyrinth image first
+        if book['ISBN'] in labyrinth_dict:
+          book_attributes['image'] = labyrinth_dict[book['ISBN']]['imageLink']
+        elif 'image' in book.keys():
           book_attributes['image'] = book['image']
         number = line['course_ID'].split('_')[0].split('-')[0] # Cross listed courses have same ID
         id_list = [{'id': class_to_id[number], 'type': 'class'}]
