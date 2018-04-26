@@ -1,5 +1,5 @@
 import { deserializeBook } from '../serializers/bookSerializer';
-import {deserializeListing} from '../serializers/listingSerializer'
+import { deserializeListing } from '../serializers/listingSerializer';
 
 export const getClassBooks = async (classIds) => {
   let returnedbooks = await Promise.all(classIds.map(async (classId) => {

@@ -33,7 +33,7 @@ export const getBooksForClasses = (classIds) => {
     dispatch(request(classIds));
     try {
       const books = await getClassBooks(classIds);
-      console.log(JSON.stringify(books, null, 2))
+      console.log(JSON.stringify(books, null, 2));
       dispatch(response(books));
     } catch (err) {
       dispatch(bookError(err));
@@ -55,7 +55,7 @@ export const getUserSellingBooks = (token) => {
   return async (dispatch) => {
     dispatch(request(token));
     try {
-      const selling= await getUserSelling(token);
+      const selling = await getUserSelling(token);
       dispatch(response(selling));
     } catch (err) {
       dispatch(bookError(err));

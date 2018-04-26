@@ -6,7 +6,7 @@ import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import IconButton from 'material-ui/IconButton';
 import Button from 'material-ui/Button';
-import HomeIcon from '@material-ui/icons/Home';
+import MenuIcon from '@material-ui/icons/Menu';
 import FacebookLogin from 'react-facebook-login';
 
 class Navbar extends Component {
@@ -15,6 +15,7 @@ class Navbar extends Component {
     isLoggedIn: PropTypes.bool,
     responseFacebook: PropTypes.func.isRequired,
     handleLogout: PropTypes.func.isRequired,
+    handleMenu: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
@@ -22,25 +23,19 @@ class Navbar extends Component {
   }
 
   render() {
-    const { classes, isLoggedIn, responseFacebook, handleLogout } = this.props;
+    const {
+      classes, isLoggedIn, responseFacebook, handleLogout, handleMenu,
+    } = this.props;
     return (
-      <AppBar position="static">
+      <AppBar className="nav" position="static">
         <Toolbar>
           <IconButton
-            className={classes.homeButton}
             color="inherit"
-            aria-label="Home"
-            component={({ ...props }) => <Link to="/" {...props} />}
+            aria-label="Menu"
+            onClick={handleMenu}
           >
-            <HomeIcon />
+            <MenuIcon />
           </IconButton>
-          {/*{*/}
-            {/*isLoggedIn ? (*/}
-              {/*<Button color="inherit" component={Link} to="/dashboard">*/}
-                {/*Dashboard*/}
-              {/*</Button>*/}
-            {/*) : ''*/}
-          {/*}*/}
           { this.props.children }
           <div className={classes.flex} />
           {
@@ -65,7 +60,10 @@ class Navbar extends Component {
   }
 }
 
-const styles = {
+const styles = theme => ({
+  nav: {
+    zIndex: theme.zIndex.drawer + 1,
+  },
   flex: {
     flex: 1,
   },
@@ -79,6 +77,6 @@ const styles = {
   loginButton: {
     textAlign: 'right',
   },
-};
+});
 
 export default withStyles(styles)(Navbar);

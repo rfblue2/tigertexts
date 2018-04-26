@@ -12,10 +12,10 @@ const bookReducer = (state = {
   books: [
     // TODO this is mock data
     {
-      title: "Advanced Prog Tech",
-      authors: ["Kernighan", "Pike"],
-      image: "https://images-na.ssl-images-amazon.com/images/I/51a1SwDTnYL._AC_US436_QL65_.jpg",
-      detail: "This impressive paella is a perfect party dish and a fun meal to cook together with your guests. Add 1 cup of frozen peas along with the mussels, if you like",
+      title: 'Advanced Prog Tech',
+      authors: ['Kernighan', 'Pike'],
+      image: 'https://images-na.ssl-images-amazon.com/images/I/51a1SwDTnYL._AC_US436_QL65_.jpg',
+      detail: 'This impressive paella is a perfect party dish and a fun meal to cook together with your guests. Add 1 cup of frozen peas along with the mussels, if you like',
       listings: [{
         kind: 'labyrinth',
         title: 'Test listing',
@@ -23,10 +23,10 @@ const bookReducer = (state = {
       }],
     },
     {
-      title: "Advanced Prog Tech Editors United",
-      authors: ["Kernighan", "Pike", "Smith", "Deb", "Reeer"],
-      image: "https://images-na.ssl-images-amazon.com/images/I/51a1SwDTnYL._AC_US436_QL65_.jpg",
-      detail: "This impressive paella is a perfect party dish and a fun meal to cook together with your guests. Add 1 cup of frozen peas along with the mussels, if you like",
+      title: 'Advanced Prog Tech Editors United',
+      authors: ['Kernighan', 'Pike', 'Smith', 'Deb', 'Reeer'],
+      image: 'https://images-na.ssl-images-amazon.com/images/I/51a1SwDTnYL._AC_US436_QL65_.jpg',
+      detail: 'This impressive paella is a perfect party dish and a fun meal to cook together with your guests. Add 1 cup of frozen peas along with the mussels, if you like',
       listings: [{
         kind: 'labyrinth',
         title: 'Test listing',
@@ -34,10 +34,10 @@ const bookReducer = (state = {
       }],
     },
     {
-      title: "Advanced Prog Tech 1231321312",
-      authors: ["Kernighan"],
-      image: "https://images-na.ssl-images-amazon.com/images/I/51a1SwDTnYL._AC_US436_QL65_.jpg",
-      detail: "This impressive paella is a perfect party dish and a fun meal to cook together with your guests. Add 1 cup of frozen peas along with the mussels, if you like",
+      title: 'Advanced Prog Tech 1231321312',
+      authors: ['Kernighan'],
+      image: 'https://images-na.ssl-images-amazon.com/images/I/51a1SwDTnYL._AC_US436_QL65_.jpg',
+      detail: 'This impressive paella is a perfect party dish and a fun meal to cook together with your guests. Add 1 cup of frozen peas along with the mussels, if you like',
       listings: [{
         kind: 'labyrinth',
         title: 'Test listing',
@@ -45,10 +45,10 @@ const bookReducer = (state = {
       }],
     },
     {
-      title: "C Prog",
-      authors: ["Kernighan", "Pike"],
-      image: "https://images-na.ssl-images-amazon.com/images/I/51a1SwDTnYL._AC_US436_QL65_.jpg",
-      detail: "Heat 1/2 cup of the broth in a pot until simmering, add saffron and set aside for 10 minutes.",
+      title: 'C Prog',
+      authors: ['Kernighan', 'Pike'],
+      image: 'https://images-na.ssl-images-amazon.com/images/I/51a1SwDTnYL._AC_US436_QL65_.jpg',
+      detail: 'Heat 1/2 cup of the broth in a pot until simmering, add saffron and set aside for 10 minutes.',
       listings: [
         {
           kind: 'labyrinth',

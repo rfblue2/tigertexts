@@ -11,20 +11,21 @@ import {
   removeJwt,
   facebookResponse,
 } from '../actions/users.actions';
-import {
-  getBooksForClasses,
-} from '../actions/books.actions';
+import { getBooksForClasses } from '../actions/books.actions';
 import AutoComplete from './nav/AutoComplete';
 import Login from '../Login';
 import Dashboard from './dashboard/Dashboard';
 import BookListContainer from './book/BookListContainer';
-import Home from './home/Home';
+import Sidebar from './drawer/Sidebar';
 import Book from './book/BookPage';
 import Navbar from './nav/Navbar';
 import { deserializeClass } from '../serializers/classSerializer';
 
 class App extends Component {
-  state = { courses: [] }
+  state = {
+    courses: [],
+    sidebarOpen: true,
+  }
 
   static propTypes = {
     classes: PropTypes.object.isRequired,
@@ -40,6 +41,7 @@ class App extends Component {
     this.handleLogout = this._handleLogout.bind(this);
     this.responseFacebook = this._responseFacebook.bind(this);
     this.handleSearch = this._handleSearch.bind(this);
+    this.handleMenu = this._handleMenu.bind(this);
 
     // TODO move this into redux (maybe)
     const cres = await fetch('/api/classes');
@@ -64,10 +66,14 @@ class App extends Component {
     this.props.dispatch(getBooksForClasses(items.map(i => i.id)));
   }
 
+  _handleMenu() {
+    this.setState({ sidebarOpen: !this.state.sidebarOpen });
+  }
+
   render() {
     const { classes, isLoggedIn } = this.props;
-    const { courses } = this.state;
-    console.log(JSON.stringify(courses, null, 2));
+    const { courses, sidebarOpen } = this.state;
+
     return (
       <Router>
         <div className={classes.root}>
@@ -75,27 +81,40 @@ class App extends Component {
             isLoggedIn={isLoggedIn}
             responseFacebook={this.responseFacebook}
             handleLogout={this.handleLogout}
+            handleMenu={this.handleMenu}
           >
             <AutoComplete
               executeSearch={this.handleSearch}
               courseList={courses}
             />
           </Navbar>
-          <Route exact path="/" component={BookListContainer} />
-          <Route path="/dashboard" component={Dashboard} />
-          <Route path="/login" component={Login} />
-          <Route path="/book/:bookId" component={Book} />
+          <Sidebar
+            open={sidebarOpen}
+          />
+          <div className={classes.content}>
+            <Route exact path="/" component={BookListContainer} />
+            <Route path="/dashboard" component={Dashboard} />
+            <Route path="/login" component={Login} />
+            <Route path="/book/:bookId" component={Book} />
+          </div>
         </div>
       </Router>
     );
   }
 }
 
-const styles = {
+const styles = theme => ({
   root: {
     flexGrow: 1,
+    zIndex: 1,
   },
-};
+  content: {
+    flexGrow: 1,
+    backgroundColor: theme.palette.background.default,
+    padding: theme.spacing.unit * 3,
+    minWidth: 0, // So the Typography noWrap works
+  },
+});
 
 const mapStateToProps = state => ({
   isLoggedIn: state.user.loggedIn,
