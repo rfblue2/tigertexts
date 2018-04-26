@@ -3,11 +3,6 @@ import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import { ListItem, ListItemText } from 'material-ui/List';
 
-
-
-
-
-
 const Listing = ({ classes, listing }) => (
   <ListItem>
     <ListItemText className={classes.bookSource} primary={listing.title} secondary={listing.kind} />
