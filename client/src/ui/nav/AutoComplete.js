@@ -21,19 +21,19 @@ class AutoComplete extends Component {
 
   state = {
     inputValue: '',
-    selectedItem: [],
+    selectedItems: [],
   };
 
   handleKeyDown = (event) => {
-    const { inputValue, selectedItem } = this.state;
+    const { inputValue, selectedItems } = this.state;
     const { executeSearch } = this.props;
 
-    if (selectedItem.length && !inputValue.length && keycode(event) === 'backspace') {
+    if (selectedItems.length && !inputValue.length && keycode(event) === 'backspace') {
       this.setState({
-        selectedItem: selectedItem.slice(0, selectedItem.length - 1),
+        selectedItems: selectedItems.slice(0, selectedItems.length - 1),
       });
-    } else if (selectedItem.length && !inputValue.length && keycode(event) === 'enter') {
-      executeSearch(selectedItem);
+    } else if (selectedItems.length && !inputValue.length && keycode(event) === 'enter') {
+      executeSearch(selectedItems);
     }
   };
 
@@ -42,24 +42,24 @@ class AutoComplete extends Component {
   };
 
   handleChange = (item) => {
-    let { selectedItem } = this.state;
+    let { selectedItems } = this.state;
 
-    if (selectedItem.indexOf(item) === -1) {
-      selectedItem = [...selectedItem, item];
+    if (selectedItems.indexOf(item) === -1) {
+      selectedItems = [...selectedItems, item];
     }
 
     this.setState({
       inputValue: '',
-      selectedItem,
+      selectedItems,
     });
-    console.log(selectedItem);
+    console.log(selectedItems);
   };
 
   handleDelete = item => () => {
-    const selectedItem = [...this.state.selectedItem];
-    selectedItem.splice(selectedItem.indexOf(item), 1);
+    const selectedItems = [...this.state.selectedItems];
+    selectedItems.splice(selectedItems.indexOf(item), 1);
 
-    this.setState({ selectedItem });
+    this.setState({ selectedItems });
   };
 
   renderInput(inputProps) {
@@ -82,22 +82,22 @@ class AutoComplete extends Component {
   }
 
   renderSuggestion({
-    suggestion, index, itemProps, highlightedIndex, selectedItem,
+    suggestion, index, itemProps, highlightedIndex, selectedItems,
   }) {
     const isHighlighted = highlightedIndex === index;
-    const isSelected = (selectedItem || '').indexOf(suggestion) > -1;
+    const isSelected = (selectedItems || '').indexOf(suggestion) > -1;
 
     return (
       <MenuItem
         {...itemProps}
-        key={suggestion}
+        key={suggestion.id}
         selected={isHighlighted}
         component="div"
         style={{
           fontWeight: isSelected ? 500 : 400,
         }}
       >
-        {suggestion}
+        {suggestion.numbers.join('/')}
       </MenuItem>
     );
   }
@@ -122,17 +122,17 @@ class AutoComplete extends Component {
 
   render() {
     const { classes, courseList } = this.props;
-    const { inputValue, selectedItem } = this.state;
+    const { inputValue, selectedItems } = this.state;
 
     return (
       <div className={classes.root}>
-        <Downshift inputValue={inputValue} onChange={this.handleChange} selectedItem={selectedItem}>
+        <Downshift inputValue={inputValue} onChange={this.handleChange} selectedItems={selectedItems}>
           {({
             getInputProps,
             getItemProps,
             isOpen,
             inputValue: inputValue2,
-            selectedItem: selectedItem2,
+            selectedItems: selectedItems2,
             highlightedIndex,
           }) => (
             <div className={classes.container}>
@@ -140,11 +140,11 @@ class AutoComplete extends Component {
                 fullWidth: true,
                 classes,
                 InputProps: getInputProps({
-                  startAdornment: selectedItem.map(item => (
+                  startAdornment: selectedItems.map(item => (
                     <Chip
-                      key={item}
+                      key={item.id}
                       tabIndex={-1}
-                      label={item}
+                      label={item.numbers.join('/')}
                       className={classes.chip}
                       onDelete={this.handleDelete(item)}
                     />
@@ -163,7 +163,7 @@ class AutoComplete extends Component {
                       index,
                       itemProps: getItemProps({ item: suggestion }),
                       highlightedIndex,
-                      selectedItem: selectedItem2,
+                      selectedItems: selectedItems2,
                     }))}
                 </Paper>
               ) : null}
