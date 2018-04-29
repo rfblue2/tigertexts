@@ -1,4 +1,5 @@
 import express from 'express';
+import sslRedirect from 'heroku-ssl-redirect';
 import path from 'path';
 import favicon from 'serve-favicon';
 import logger from 'morgan';
@@ -25,6 +26,12 @@ app.set('view engine', 'jade');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+app.use(sslRedirect([
+  'other',
+  'development',
+  'production'
+  ])); // Force SSL
 
 // don't show the log when it is test
 if (config.util.getEnv('NODE_ENV') !== 'test') {
