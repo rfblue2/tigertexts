@@ -2,6 +2,20 @@ import json
 import requests
 import sys
 import urllib3
+from lxml.html import soupparser
+
+# The CampusBook links use a meta refresh with delay so it's tricky to get the target url
+def meta_redirect(content):
+  root = soupparser.fromstring(content, features="html.parser")
+  result_url = root.xpath('//meta[@http-equiv="refresh"]/@content')
+  if result_url:
+    result_url = str(result_url[0])
+    urls = result_url.split('URL=') if len(result_url.split('url=')) < 2 else result_url.split('url=')
+    url = urls[1] if len(urls) >= 2 else None
+  else:
+    return None
+  # remove extra single quote from beginning and end and campus book affiliate tag
+  return url.replace('\'', '').replace('wwwcampusboocom', '')
 
 def post_listings():
   urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -48,6 +62,7 @@ def post_listings():
   # A book can have multiple listings
   counter = 0
   listing_dict = dict()
+  campus_to_amazon = dict() # cache urls that we already parsed to save time 
   price_types = ['newPrice', 'veryGoodPrice', 'likeNewPrice', 'acceptablePrice', 'usedPrice']
   for line in raw:
     for book in line['bookList']:
@@ -74,10 +89,12 @@ def post_listings():
           for option in amazon_dict[book['ISBN']]['options']:
             if 'Amazon' in option['seller']:
               listing_attributes = dict()
+              purchase_link = campus_to_amazon[option['link']] if option['link'] in campus_to_amazon else meta_redirect(requests.get(option['link']).content)
+              campus_to_amazon[option['link']] = purchase_link
               if option['condition'] == 'New':
-                listing_attributes = {'title': book['title'], 'kind': 'amazon', 'price': float(option['price'].replace(',', '')), 'price_type': 'new', 'url': option['link']}
+                listing_attributes = {'title': book['title'], 'kind': 'amazon', 'price': float(option['price'].replace(',', '')), 'price_type': 'new', 'url': purchase_link}
               elif option['condition'] == 'Used':
-                listing_attributes = {'title': book['title'], 'kind': 'amazon', 'price': float(option['price'].replace(',', '')), 'price_type': 'used', 'url': option['link']}
+                listing_attributes = {'title': book['title'], 'kind': 'amazon', 'price': float(option['price'].replace(',', '')), 'price_type': 'used', 'url': purchase_link}
               book_id = {'id': book_to_id[book['title']], 'type': 'book'}
               data = {'data': {'type': 'listings', 'attributes': listing_attributes, 'relationships': {'book': {'data': book_id}}}}
               listing_dict[book['title']] = data
