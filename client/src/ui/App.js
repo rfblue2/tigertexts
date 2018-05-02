@@ -10,16 +10,21 @@ import { withStyles } from 'material-ui/styles';
 import {
   getJwt,
   removeJwt,
-  facebookResponse, getUserInfo, userPostSellBooks, userDeleteSellBook,
+  facebookResponse, userPostSellBooks, userCancelSellDialog,
 } from '../actions/users.actions';
-import { getBooksForClasses, getUserFavoriteBooks, getUserSellingBooks } from '../actions/books.actions';
+import {
+  getBooksForClasses,
+  getSearchResults,
+  getUserFavoriteBooks,
+  getUserSellingBooks,
+} from '../actions/books.actions';
 import AutoComplete from './nav/AutoComplete';
 import BookListContainer from './book/BookListContainer';
 import Sidebar from './drawer/Sidebar';
 import Navbar from './nav/Navbar';
 import { deserializeClass } from '../serializers/classSerializer';
-import SellBooksDialog from './dashboard/SellBooksDialog';
 import About from './About';
+import SellDialog from './dashboard/SellDialog';
 
 const drawerWidth = 240;
 
@@ -27,31 +32,35 @@ class App extends Component {
   state = {
     courses: [],
     sidebarOpen: true,
-    showSellForm: false,
   }
 
   static propTypes = {
     classes: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired,
+    sellingBook: PropTypes.object,
     isLoggedIn: PropTypes.bool,
     user: PropTypes.object,
     token: PropTypes.string,
+    showSellForm: PropTypes.bool.isRequired,
   }
 
   static defaultProps = {
     isLoggedIn: false,
+    sellingBook: null,
+    user: {},
+    token: '',
   }
 
   async componentWillMount() {
+    this.showSearch = this._showSearch.bind(this);
     this.handleLogout = this._handleLogout.bind(this);
     this.responseFacebook = this._responseFacebook.bind(this);
     this.handleSearch = this._handleSearch.bind(this);
     this.handleMenu = this._handleMenu.bind(this);
-    this.handleOpenForm = this._handleOpenForm.bind(this);
     this.handleCloseForm = this._handleCloseForm.bind(this);
     this.showSelling = this._showSelling.bind(this);
     this.showFavorites = this._showFavorites.bind(this);
-    this.sellBooks = this._sellBooks.bind(this);
+    this.sellBook = this._sellBook.bind(this);
 
     // TODO move this into redux (maybe)
     const cres = await fetch('/api/classes');
@@ -72,6 +81,10 @@ class App extends Component {
     this.props.dispatch(facebookResponse(res));
   }
 
+  _showSearch() {
+    this.props.dispatch(getSearchResults());
+  }
+
   _handleSearch(items) {
     this.props.dispatch(getBooksForClasses(items.map(i => i.id)));
   }
@@ -80,20 +93,16 @@ class App extends Component {
     this.setState({ sidebarOpen: !this.state.sidebarOpen });
   }
 
-  _sellBooks(selectedBooks) {
+  _sellBook({ id, price, comment }) {
     const { token, user } = this.props;
-    this.setState({
-      showSellForm: false,
-    });
-    this.props.dispatch(userPostSellBooks(token, user, selectedBooks.map(b => b.id)));
+    this.props.dispatch(userPostSellBooks(
+      token, user, [id],
+      [{ id, price, comment }],
+    ));
   }
 
-  _handleOpenForm = () => {
-    this.setState({ showSellForm: true });
-  };
-
   _handleCloseForm = () => {
-    this.setState({ showSellForm: false });
+    this.props.dispatch(userCancelSellDialog());
   };
 
   _showSelling() {
@@ -105,8 +114,10 @@ class App extends Component {
   }
 
   render() {
-    const { classes, isLoggedIn } = this.props;
-    const { courses, sidebarOpen, showSellForm } = this.state;
+    const {
+      classes, isLoggedIn, showSellForm, sellingBook,
+    } = this.props;
+    const { courses, sidebarOpen } = this.state;
 
     return (
       <Router>
@@ -125,10 +136,11 @@ class App extends Component {
           <Sidebar
             open={sidebarOpen}
             loggedIn={isLoggedIn}
+            showProfile={() => ''}
+            showSearch={this.showSearch}
             sellBook={this.sellBook}
             showSelling={this.showSelling}
             showFavorites={this.showFavorites}
-            openSellForm={this.handleOpenForm}
           />
           <main
             className={classNames(classes.content, classes['content-left'], {
@@ -136,10 +148,11 @@ class App extends Component {
               [classes['contentShift-left']]: sidebarOpen,
             })}
           >
-            <SellBooksDialog
+            <SellDialog
               className={classes.dialog}
-              onSell={this.sellBooks}
-              handleClose={this.handleCloseForm}
+              onSubmit={this.sellBook}
+              onClose={this.handleCloseForm}
+              book={sellingBook}
               showForm={showSellForm}
             />
             <div className={classes.toolbar} />
@@ -204,8 +217,10 @@ const styles = theme => ({
 
 const mapStateToProps = state => ({
   isLoggedIn: state.user.loggedIn,
+  sellingBook: state.user.sellDialog.book,
   token: state.user.token,
   user: state.user.user,
+  showSellForm: state.user.sellDialog.isSelling,
 });
 
 const mapDispatchToProps = dispatch => ({

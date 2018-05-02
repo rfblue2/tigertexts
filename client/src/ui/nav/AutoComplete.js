@@ -175,12 +175,13 @@ class AutoComplete extends Component {
 
 const styles = theme => ({
   root: {
-    flexGrow: 1,
+    flexGrow: 0,
     height: 50,
   },
   container: {
-    flexGrow: 1,
+    flexGrow: 0,
     position: 'relative',
+    height: 50,
   },
   paper: {
     position: 'absolute',
@@ -203,6 +204,8 @@ const styles = theme => ({
   },
   inputRoot: {
     flexWrap: 'wrap',
+    flexGrow: 0,
+    height: 50,
   },
 });
 

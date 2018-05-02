@@ -5,7 +5,7 @@ import {
   GET_USER_SELLING_RES,
   GET_USER_SELLING_REQ,
   GET_USER_FAVORITES_REQ,
-  BOOK_ERROR,
+  BOOK_ERROR, GET_SEARCH_RESULTS,
 } from '../constants/books.constants';
 import {
   getClassBooks,
@@ -16,6 +16,10 @@ import {
 export const bookError = err => ({
   type: BOOK_ERROR,
   err,
+});
+
+export const getSearchResults = () => ({
+  type: GET_SEARCH_RESULTS,
 });
 
 export const getBooksForClasses = (classIds) => {

@@ -18,7 +18,7 @@ const serializeUser = (user, opts) => (new Serializer('user', {
     attributes: ['isbn', 'title', 'image', 'book_type', 'authors', 'classes'],
     ref: (userself, favorite) => {
       // Direct mongo query returns mere id, otherwise object has id field
-      if (Types.ObjectId.isValid(favorite)) {
+      if (Types.ObjectId.isValid(favorite.toString())) {
         return favorite;
       }
       return favorite ? favorite.id : favorite;
@@ -29,7 +29,7 @@ const serializeUser = (user, opts) => (new Serializer('user', {
     attributes: ['isbn', 'title', 'image', 'book_type', 'authors', 'classes'],
     ref: (userself, selling) => {
       // Direct mongo query returns mere id, otherwise object has id field
-      if (Types.ObjectId.isValid(selling)) {
+      if (Types.ObjectId.isValid(selling.toString())) {
         return selling;
       }
       return selling ? selling.id : selling;
@@ -39,9 +39,6 @@ const serializeUser = (user, opts) => (new Serializer('user', {
 
 const deserializeUser = (user, opts) => (new Deserializer({
   keyForAttribute: 'snake_case',
-  book: {
-    valueForRelationship: relationship => relationship.id,
-  },
 })).deserialize(user);
 
 export {

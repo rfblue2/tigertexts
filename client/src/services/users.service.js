@@ -1,6 +1,7 @@
 import { deserializeTransaction } from '../serializers/transactionSerializer';
 import { deserializeBook } from '../serializers/bookSerializer';
 import { deserializeListing } from '../serializers/listingSerializer';
+import { deserializeUser } from '../serializers/userSerializer';
 
 export const getAndVerifyJwt = async () => {
   // check if user already logged in
@@ -31,13 +32,31 @@ export const getUser = async (token, fields) => {
     headers: { 'x-auth-token': token },
   });
 
+  // get listings for user favorites and selling
+  const getBookWithListings = async (b) => {
+    const lres = await fetch(`api/books/${b.id}/listings`);
+    const ljson = await lres.json();
+    const listings = await deserializeListing(ljson);
+    return { ...b, listings };
+  };
+
   // token probably expired
   if (res.status === 401) {
     localStorage.removeItem('jwtToken');
     return null;
   }
 
-  return res.json();
+  const userRes = await res.json();
+  const user = await deserializeUser(userRes);
+
+  if (user.selling) {
+    user.selling = await Promise.all(user.selling.map(getBookWithListings));
+  }
+  if (user.favorites) {
+    user.favorites = await Promise.all(user.favorites.map(getBookWithListings));
+  }
+
+  return user;
 };
 
 export const fetchUserActivity = async (token) => {
@@ -56,8 +75,16 @@ export const fetchUserActivity = async (token) => {
   return activity;
 };
 
-export const postSelling = async (token, user, bookIds) => {
+export const postSelling = async (token, user, bookIds, sellData) => {
   const userObj = {
+    included: sellData.map(sd => ({
+      type: 'book',
+      id: sd.id,
+      attributes: {
+        price: sd.price,
+        comment: sd.comment,
+      },
+    })),
     data: {
       type: 'user',
       id: user.id,
@@ -79,6 +106,7 @@ export const postSelling = async (token, user, bookIds) => {
   });
   const jsonres = await res.json();
   const books = await deserializeBook(jsonres);
+  // update the books' listings
   return Promise.all(books.map(async (b) => {
     const lres = await fetch(`api/books/${b.id}/listings`);
     const ljson = await lres.json();

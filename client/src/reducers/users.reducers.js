@@ -12,7 +12,7 @@ import {
   USER_POST_SELL_RES,
   USER_ERROR,
   USER_DELETE_SELL_REQ,
-  USER_DELETE_SELL_RES,
+  USER_DELETE_SELL_RES, USER_SELL_DIALOG, USER_SELL_DIALOG_CANCEL,
 } from '../constants/users.constants';
 
 const defaultuser = {
@@ -22,6 +22,10 @@ const defaultuser = {
 
 const userReducer = (state = {
   loggedIn: false,
+  sellDialog: {
+    isSelling: false,
+    book: {},
+  },
   user: defaultuser,
   token: '',
 }, action) => {
@@ -57,8 +61,12 @@ const userReducer = (state = {
       return {
         ...state, user: { ...state.user, activity }, error: null,
       };
+    case USER_SELL_DIALOG:
+      return { ...state, sellDialog: { isSelling: true, book }, error: null };
+    case USER_SELL_DIALOG_CANCEL:
+      return { ...state, sellDialog: { isSelling: false, book: {} }, error: null };
     case USER_POST_SELL_REQ:
-      return state;
+      return { ...state, sellDialog: { isSelling: false, book: {} } };
     case USER_POST_SELL_RES:
       return {
         ...state,
@@ -66,6 +74,7 @@ const userReducer = (state = {
           ...state.user,
           selling: [...state.user.selling, ...books],
         },
+        sellDialog: { isSelling: false, book: {} },
         error: null,
       };
     case USER_DELETE_SELL_REQ:

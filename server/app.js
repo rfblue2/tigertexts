@@ -28,8 +28,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use(sslRedirect([
-  'production'
-  ])); // Force SSL
+  'production',
+])); // Force SSL
 
 // don't show the log when it is test
 if (config.util.getEnv('NODE_ENV') !== 'test') {

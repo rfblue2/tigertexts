@@ -170,17 +170,20 @@ router.route('/selling')
     const data = await deserializeUser(req.body);
     await User.findOneAndUpdate({
       _id: req.user._id,
-    }, { $push: { selling: { $each: data.selling } } }, { new: true });
+    }, { $push: { selling: { $each: data.selling.map(s => s.id) } } }, { new: true });
     await Promise.all(data.selling.map(async (s) => {
-      const listing = new Listing({
+      const listingObj = {
         kind: 'platform',
         title: `Seller: ${req.user.name}`,
-        book: s,
+        book: s.id,
         seller: req.user._id,
-      });
+      };
+      if (s.price && s.price !== '') listingObj.price = s.price;
+      if (s.comment && s.comment !== '') listingObj.detail = s.comment;
+      const listing = new Listing(listingObj);
       listing.save();
     }));
-    const books = await Book.find({ _id: { $in: data.selling } });
+    const books = await Book.find({ _id: { $in: data.selling.map(s => s.id) } });
     res.json(serializeBook(books));
   }));
 
@@ -193,7 +196,7 @@ router.route('/selling/:id')
     await User.findOneAndUpdate({
       _id: req.user._id,
     }, { selling: user.selling }, { new: true });
-    await Listing.findOneAndRemove({ seller: req.user._id });
+    await Listing.findOneAndRemove({ seller: req.user._id, book: req.params.id });
     res.json(serializeBook(book));
   }));
 

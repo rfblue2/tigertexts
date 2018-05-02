@@ -3,10 +3,8 @@ import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import { ListItem, ListItemText } from 'material-ui/List';
 import formatNumber from 'simple-format-number';
-import Typography from 'material-ui/Typography';
 import Grid from 'material-ui/Grid';
 import Paper from 'material-ui/Paper';
-import Link from 'react-router-dom/Link';
 
 
 const Listing = ({ classes, listing }) => (
@@ -17,7 +15,7 @@ const Listing = ({ classes, listing }) => (
           <ListItemText
             className={classes.bookSource}
             primary={listing.title}
-            secondary={listing.kind}
+            secondary={(listing.kind).charAt(0).toUpperCase() + (listing.kind).slice(1)}
           />
         </Grid>
         <Grid item xs={6} md={6}>

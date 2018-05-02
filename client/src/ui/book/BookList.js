@@ -7,9 +7,11 @@ import Book from './Book';
 class BookList extends Component {
   static propTypes = {
     books: PropTypes.arrayOf(PropTypes.object.isRequired).isRequired,
+    loggedIn: PropTypes.bool.isRequired,
     markSold: PropTypes.func.isRequired,
-    selling: PropTypes.arrayOf(PropTypes.String),
-    favorites: PropTypes.arrayOf(PropTypes.String),
+    sellBook: PropTypes.func.isRequired,
+    selling: PropTypes.arrayOf(PropTypes.object),
+    favorites: PropTypes.arrayOf(PropTypes.object),
   };
 
   static defaultProps = {
@@ -21,24 +23,27 @@ class BookList extends Component {
   }
 
   render() {
-    const { classes, books, selling, favorites, markSold } = this.props;
+    const {
+      classes, books, selling, favorites, markSold, sellBook, loggedIn,
+    } = this.props;
 
     if (!books || books.length === 0) {
-      return <div className={classes.empty}>No results to show</div>
+      return <div className={classes.empty}>No results to show</div>;
     }
 
     return (
       <div>
-        <GridList className = {classes.list} cellHeight={'100%'} cols={1} >
+        <GridList className={classes.list} cellHeight="100%" cols={1} >
           { books.map(b =>
           (
-            <GridListTile>
+            <GridListTile key={b.id}>
               <Book
-                key={b.id}
                 book={b}
-                selling={selling.includes(b.id)}
-                favorite={favorites.includes(b.id)}
+                loggedIn={loggedIn}
+                selling={selling.map(s => s.id).includes(b.id)}
+                favorite={favorites.map(f => f.id).includes(b.id)}
                 onMarkSoldClick={markSold}
+                onSellClick={sellBook}
               />
             </GridListTile>
           ))

@@ -1,33 +1,28 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
-import Card, {
-  CardHeader,
-  CardMedia,
-  CardContent,
-  CardActions,
-} from 'material-ui/Card';
+import classnames from 'classnames';
+import Card, { CardActions, CardContent, CardHeader } from 'material-ui/Card';
 import IconButton from 'material-ui/IconButton';
 import Collapse from 'material-ui/transitions/Collapse';
 import Subheader from 'material-ui/List/ListSubheader';
-import List from 'material-ui/List';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Typography from 'material-ui/Typography';
+import Divider from 'material-ui/Divider';
 import Grid from 'material-ui/Grid';
 import Button from 'material-ui/Button';
-import Paper from 'material-ui/Paper';
-import Listing from '../home/Listing';
-import classnames from 'classnames';
-import Divider from 'material-ui/Divider';
+import Listing from './Listing';
 
 class Book extends Component {
   static propTypes = {
+    loggedIn: PropTypes.bool.isRequired,
     classes: PropTypes.object.isRequired,
     book: PropTypes.object.isRequired,
     selling: PropTypes.bool.isRequired,
     favorite: PropTypes.bool.isRequired,
     onMarkSoldClick: PropTypes.func.isRequired,
+    onSellClick: PropTypes.func.isRequired,
   }
 
   state = {
@@ -43,22 +38,46 @@ class Book extends Component {
 
   generateAuthorString = (authors) => {
     const numAuthors = authors.length;
-    if (numAuthors == 1) {
+    if (numAuthors === 1) {
       return (authors[0]);
-    } else if (numAuthors == 2) {
+    } else if (numAuthors === 2) {
       return (`${authors[0]}; ${authors[1]}`);
     }
 
     return (`${authors[0]}; ${authors[1]}; ...`);
   }
 
+  // if user is logged in, either mark sold or sell
+  renderSellButton = (book) => {
+    const {
+      loggedIn, selling, onMarkSoldClick, onSellClick,
+    } = this.props;
+    if (!loggedIn) return '';
+    if (selling) {
+      return (
+        <Button variant="raised" onClick={() => onMarkSoldClick(book.id)}>
+          Mark Sold
+        </Button>
+      );
+    }
+    return (
+      <Button variant="raised" onClick={() => onSellClick(book)}>
+        Sell this book
+      </Button>
+    );
+  }
+
   render() {
     const {
-      classes, book, selling, onMarkSoldClick,
+      classes, book,
     } = this.props;
     return (
       <Card className={classes.card} >
-        <CardHeader className={classes.header} title={book.title} subheader={this.generateAuthorString(book.authors)} />
+        <CardHeader
+          className={classes.header}
+          title={book.title}
+          subheader={this.generateAuthorString(book.authors)}
+        />
         <CardActions>
           <IconButton
             onClick={this.handleFavoriteClick.bind(this)}
@@ -76,11 +95,7 @@ class Book extends Component {
           >
             <ExpandMoreIcon />
           </IconButton>
-          {
-            selling ? <Button variant="raised" onClick={() => onMarkSoldClick(book.id)}>
-              Mark Sold
-            </Button> : ''
-          }
+          {this.renderSellButton(book)}
         </CardActions>
         <Collapse in={this.state.expanded} timeout="auto" unmountOnExit>
           <Divider />

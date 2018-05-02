@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
-import { Link } from 'react-router-dom';
 import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import FavoriteIcon from '@material-ui/icons/Favorite';
-import InfoIcon from '@material-ui/icons/Info';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
-import AddIcon from '@material-ui/icons/Add';
+import SearchIcon from '@material-ui/icons/Search';
 import Drawer from 'material-ui/Drawer';
 
 const drawerWidth = 240;
@@ -16,10 +14,10 @@ class Sidebar extends Component {
   static propTypes = {
     classes: PropTypes.object.isRequired,
     open: PropTypes.bool.isRequired,
-    openSellForm: PropTypes.func.isRequired,
     showProfile: PropTypes.func.isRequired,
     showSelling: PropTypes.func.isRequired,
     showFavorites: PropTypes.func.isRequired,
+    showSearch: PropTypes.func.isRequired,
     loggedIn: PropTypes.bool.isRequired,
   }
 
@@ -30,7 +28,7 @@ class Sidebar extends Component {
     const {
       classes,
       open,
-      openSellForm,
+      showSearch,
       showProfile,
       showSelling,
       showFavorites,
@@ -47,12 +45,20 @@ class Sidebar extends Component {
       >
         <div className={classes.toolbar} />
         <List component="nav">
-          {/*<ListItem button component={Link} to="/about">*/}
-            {/*<ListItemIcon>*/}
-              {/*<InfoIcon />*/}
-            {/*</ListItemIcon>*/}
-            {/*<ListItemText primary="About" />*/}
-          {/*</ListItem>*/}
+          {/* <ListItem button component={Link} to="/about"> */}
+          {/* <ListItemIcon> */}
+          {/* <InfoIcon /> */}
+          {/* </ListItemIcon> */}
+          {/* <ListItemText primary="About" /> */}
+          {/* </ListItem> */}
+          {
+            <ListItem button onClick={showSearch}>
+              <ListItemIcon>
+                <SearchIcon />
+              </ListItemIcon>
+              <ListItemText primary="Search Results" />
+            </ListItem>
+          }
           { loggedIn ?
             <ListItem button onClick={showProfile}>
               <ListItemIcon>
@@ -75,14 +81,6 @@ class Sidebar extends Component {
                 <FavoriteIcon />
               </ListItemIcon>
               <ListItemText primary="Favorites" />
-            </ListItem> : ''
-          }
-          {loggedIn ?
-            <ListItem button onClick={openSellForm}>
-              <ListItemIcon>
-                <AddIcon />
-              </ListItemIcon>
-              <ListItemText primary="Sell a Book" />
             </ListItem> : ''
           }
         </List>

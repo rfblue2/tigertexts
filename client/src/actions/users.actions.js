@@ -12,7 +12,7 @@ import {
   USER_POST_SELL_RES,
   USER_ERROR,
   USER_DELETE_SELL_REQ,
-  USER_DELETE_SELL_RES,
+  USER_DELETE_SELL_RES, USER_SELL_DIALOG, USER_SELL_DIALOG_CANCEL,
 } from '../constants/users.constants';
 import {
   handleFbResponse,
@@ -22,7 +22,6 @@ import {
   deleteSelling,
   getAndVerifyJwt,
 } from '../services/users.service';
-import { deserializeUser } from '../serializers/userSerializer';
 import { deserializeBook } from '../serializers/bookSerializer';
 
 export const getJwt = () => {
@@ -100,13 +99,11 @@ export const getUserInfo = (tok, fields) => {
   return async (dispatch) => {
     dispatch(request(tok, fields));
     try {
-      const res = await getUser(tok, fields);
+      const user = await getUser(tok, fields);
 
-      if (!res) {
+      if (!user) {
         dispatch(notLoggedIn());
       }
-
-      const user = await deserializeUser(res);
 
       dispatch(success(user, tok));
     } catch (err) {
@@ -137,12 +134,22 @@ export const getUserActivity = (tok) => {
   };
 };
 
-export const userPostSellBooks = (tok, user, bookIds) => {
-  const request = (token, usr, ids) => ({
+export const userOpenSellDialog = book => ({
+  type: USER_SELL_DIALOG,
+  book,
+});
+
+export const userCancelSellDialog = () => ({
+  type: USER_SELL_DIALOG_CANCEL,
+});
+
+export const userPostSellBooks = (tok, user, bookIds, sellData) => {
+  const request = (token, usr, ids, sellDat) => ({
     type: USER_POST_SELL_REQ,
     token,
     user: usr,
     bookIds: ids,
+    sellData: sellDat,
   });
 
   const success = books => ({
@@ -151,9 +158,9 @@ export const userPostSellBooks = (tok, user, bookIds) => {
   });
 
   return async (dispatch) => {
-    dispatch(request, tok, user, bookIds);
+    dispatch(request, tok, user, bookIds, sellData);
     try {
-      const books = await postSelling(tok, user, bookIds);
+      const books = await postSelling(tok, user, bookIds, sellData);
       dispatch(success(books));
     } catch (err) {
       dispatch(userError(err));
