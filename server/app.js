@@ -28,8 +28,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use(sslRedirect([
-  'other',
-  'development',
   'production'
   ])); // Force SSL
 

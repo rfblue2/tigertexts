@@ -59,9 +59,9 @@ def post_listings():
             if price_type in labyrinth_dict[book['ISBN']].keys():
               listing_attributes = dict()
               if price_type == 'newPrice' or price_type == 'likeNewPrice':
-                listing_attributes = {'title': book['title'], 'kind': 'labyrinth', 'price': float(labyrinth_dict[book['ISBN']][price_type].replace(',', '')), 'price_type': 'new'}
+                listing_attributes = {'title': book['title'], 'kind': 'labyrinth', 'price': float(labyrinth_dict[book['ISBN']][price_type].replace(',', '')), 'price_type': 'new', 'url': "http://www.labyrinthbooks.com/all_detail.aspx?isbn=" + book['ISBN']}
               else:
-                listing_attributes = {'title': book['title'], 'kind': 'labyrinth', 'price': float(labyrinth_dict[book['ISBN']][price_type].replace(',', '')), 'price_type': 'used'}
+                listing_attributes = {'title': book['title'], 'kind': 'labyrinth', 'price': float(labyrinth_dict[book['ISBN']][price_type].replace(',', '')), 'price_type': 'used', 'url': "http://www.labyrinthbooks.com/all_detail.aspx?isbn=" + book['ISBN']}
               book_id = {'id': book_to_id[book['title']], 'type': 'book'}
               data = {'data': {'type': 'listings', 'attributes': listing_attributes, 'relationships': {'book': {'data': book_id}}}}
               listing_dict[book['title']] = data
