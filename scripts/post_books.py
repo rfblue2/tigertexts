@@ -59,6 +59,7 @@ def post_books():
         book_dict[book['title']] = data
       else:
         data = book_dict[book['title']]
+        number = line['course_ID'].split('_')[0].split('-')[0] # Cross listed courses have same ID
         data['data']['relationships']['classes']['data'].append({'id': class_to_id[number], 'type': 'class'})
         book_dict[book['title']] = data
 
