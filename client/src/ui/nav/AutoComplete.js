@@ -68,6 +68,7 @@ const SelectWrapped = (props) => {
   return (
     <VirtualizedSelect
       optionComponent={Option}
+      optionHeight={40}
       noResultsText={<Typography>{'No results found'}</Typography>}
       arrowRenderer={arrowProps => {
         return arrowProps.isOpen ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />;
@@ -117,6 +118,15 @@ const styles = theme => ({
     '.VirtualizedSelectFocusedOption': {
       backgroundColor: 'rgba(200, 200, 200)',
     },
+    '.VirtualizedSelectOption': {
+      padding: '0 .7rem',
+      fontSize: '10pt',
+    },
+    '.Select-control': {
+      borderRadius: '3px',
+      border: '1px solid #ccc',
+      borderSpacing: '0',
+    }
   },
 });
 
@@ -145,6 +155,7 @@ class IntegrationReactSelect extends React.Component {
           placeholder="Enter Course Numbers"
           name="react-select-chip-label"
           InputProps={{
+            disableUnderline: true,
             inputComponent: SelectWrapped,
             inputProps: {
               classes,
