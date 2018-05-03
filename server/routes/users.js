@@ -169,7 +169,7 @@ router.route('/selling')
   }))
 
   .post(authenticate, getCurrentUser, wrap(async (req, res) => {
-    const data = await deserializeUser(req.body);
+    const data = await deserializeUser(req.body, { special: true });
     await User.findOneAndUpdate({
       _id: req.user._id,
     }, { $push: { selling: { $each: data.selling.map(s => s.id) } } }, { new: true });
@@ -180,6 +180,7 @@ router.route('/selling')
         book: s.id,
         seller: req.user._id,
       };
+      console.log(JSON.stringify(s, null,2))
       if (s.price && s.price !== '') listingObj.price = s.price;
       if (s.comment && s.comment !== '') listingObj.detail = s.comment;
       const listing = new Listing(listingObj);
