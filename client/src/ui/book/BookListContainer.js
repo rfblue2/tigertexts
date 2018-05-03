@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withStyles } from 'material-ui/styles';
 import BookList from './BookList';
-import {userDeleteSellBook, userOpenSellDialog} from '../../actions/users.actions'
+import {userDeleteFavorite, userDeleteSellBook, userOpenSellDialog, userPostFavorite} from '../../actions/users.actions'
 
 class BookListContainer extends Component {
   state = { books: [] }
@@ -25,12 +25,20 @@ class BookListContainer extends Component {
     favorites: [],
   }
 
-  async _markSold(id) {
+  _markSold(id) {
     this.props.dispatch(userDeleteSellBook(this.props.token, id));
   }
 
   _sellBook(id) {
     this.props.dispatch(userOpenSellDialog(id));
+  }
+
+  _onFavorite(id, isFavoriting) {
+    if (isFavoriting) {
+      this.props.dispatch(userPostFavorite(this.props.token, this.props.user, id));
+    } else {
+      this.props.dispatch(userDeleteFavorite(this.props.token, id));
+    }
   }
 
   render() {
@@ -54,6 +62,7 @@ class BookListContainer extends Component {
         favorites={favorites}
         markSold={this._markSold.bind(this)}
         sellBook={this._sellBook.bind(this)}
+        onFavorite={this._onFavorite.bind(this)}
         loggedIn={loggedIn}
       />
     );
@@ -68,8 +77,9 @@ const mapStateToProps = state => ({
   books: state.book.books,
   token: state.user.token,
   selling: state.user.user ? state.user.user.selling : [],
-  favorites: state.user.user ? state.user.user.favorites : [],
+  favorites: state.user.user ? state.user.user.favorite : [],
   loggedIn: state.user.loggedIn,
+  user: state.user.user,
 });
 
 

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
-import classnames from 'classnames';
+import classNames from 'classnames';
 import Card, { CardActions, CardContent, CardHeader } from 'material-ui/Card';
 import IconButton from 'material-ui/IconButton';
 import Collapse from 'material-ui/transitions/Collapse';
@@ -12,6 +12,7 @@ import Typography from 'material-ui/Typography';
 import Divider from 'material-ui/Divider';
 import Grid from 'material-ui/Grid';
 import Button from 'material-ui/Button';
+import red from 'material-ui/colors/red';
 import Listing from './Listing';
 
 class Book extends Component {
@@ -23,6 +24,7 @@ class Book extends Component {
     favorite: PropTypes.bool.isRequired,
     onMarkSoldClick: PropTypes.func.isRequired,
     onSellClick: PropTypes.func.isRequired,
+    onFavoriteClick: PropTypes.func.isRequired,
   }
 
   state = {
@@ -31,9 +33,6 @@ class Book extends Component {
 
   handleExpandClick = () => {
     this.setState({ expanded: !this.state.expanded });
-  }
-
-  handleFavoriteClick = () => {
   }
 
   generateAuthorString = (authors) => {
@@ -69,7 +68,7 @@ class Book extends Component {
 
   render() {
     const {
-      classes, book,
+      classes, book, onFavoriteClick, favorite,
     } = this.props;
     return (
       <Card className={classes.card} >
@@ -80,15 +79,18 @@ class Book extends Component {
         />
         <CardActions>
           <IconButton
-            onClick={this.handleFavoriteClick.bind(this)}
+            onClick={() => onFavoriteClick(book.id, !favorite)}
             aria-label="Add to favorites"
+            className={classNames(classes['favorite-icon'], {
+              [classes.favorite]: this.props.favorite,
+            })}
           >
             <FavoriteIcon />
           </IconButton>
           <IconButton
-            className={classnames(classes.expand, {
-                [classes.expandOpen]: this.state.expanded,
-              })}
+            className={classNames(classes.expand, {
+              [classes.expandOpen]: this.state.expanded,
+            })}
             onClick={this.handleExpandClick.bind(this)}
             aria-expanded={this.state.expanded}
             aria-label="Show more"
@@ -146,6 +148,16 @@ const styles = theme => ({
     transform: 'rotate(180deg)',
   },
   description: {
+  },
+  'favorite-icon': {
+    transition: 'all .2s ease-in-out',
+    '&:hover': {
+      transform: 'scale(1.1)',
+      color: red['500'],
+    },
+  },
+  favorite: {
+    color: red['500'],
   },
   listings: {
     margin: '0px',

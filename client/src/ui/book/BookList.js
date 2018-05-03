@@ -10,6 +10,7 @@ class BookList extends Component {
     loggedIn: PropTypes.bool.isRequired,
     markSold: PropTypes.func.isRequired,
     sellBook: PropTypes.func.isRequired,
+    onFavorite: PropTypes.func.isRequired,
     selling: PropTypes.arrayOf(PropTypes.object),
     favorites: PropTypes.arrayOf(PropTypes.object),
   };
@@ -24,7 +25,7 @@ class BookList extends Component {
 
   render() {
     const {
-      classes, books, selling, favorites, markSold, sellBook, loggedIn,
+      classes, books, selling, favorites, markSold, sellBook, loggedIn, onFavorite,
     } = this.props;
 
     if (!books || books.length === 0) {
@@ -44,6 +45,7 @@ class BookList extends Component {
                 favorite={favorites.map(f => f.id).includes(b.id)}
                 onMarkSoldClick={markSold}
                 onSellClick={sellBook}
+                onFavoriteClick={onFavorite}
               />
             </GridListTile>
           ))

@@ -39,6 +39,9 @@ const serializeUser = (user, opts) => (new Serializer('user', {
 
 const deserializeUser = (user, opts) => (new Deserializer({
   keyForAttribute: 'snake_case',
+  book: {
+    valueForRelationship: relationship => relationship,
+  },
 })).deserialize(user);
 
 export {

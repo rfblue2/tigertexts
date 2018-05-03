@@ -12,7 +12,13 @@ import {
   USER_POST_SELL_RES,
   USER_ERROR,
   USER_DELETE_SELL_REQ,
-  USER_DELETE_SELL_RES, USER_SELL_DIALOG, USER_SELL_DIALOG_CANCEL,
+  USER_DELETE_SELL_RES,
+  USER_SELL_DIALOG,
+  USER_SELL_DIALOG_CANCEL,
+  USER_POST_FAV_REQ,
+  USER_POST_FAV_RES,
+  USER_DELETE_FAV_REQ,
+  USER_DELETE_FAV_RES,
 } from '../constants/users.constants';
 import {
   handleFbResponse,
@@ -21,6 +27,8 @@ import {
   postSelling,
   deleteSelling,
   getAndVerifyJwt,
+  postFavorite,
+  deleteFavorite,
 } from '../services/users.service';
 import { deserializeBook } from '../serializers/bookSerializer';
 
@@ -34,7 +42,7 @@ export const getJwt = () => {
     const token = await getAndVerifyJwt();
     console.log(token);
     dispatch(success(token));
-    dispatch(getUserInfo(token, ['favorite', 'selling']));
+    dispatch(getUserInfo(token));
   };
 };
 
@@ -70,6 +78,7 @@ export const facebookResponse = (res) => {
         const jwtToken = loginRes.headers.get('x-auth-token');
         localStorage.setItem('jwtToken', jwtToken);
         dispatch(success(jwtToken));
+        dispatch(getUserInfo(jwtToken));
       } else {
         dispatch(userError('Login res'));
       }
@@ -184,6 +193,57 @@ export const userDeleteSellBook = (tok, bookId) => {
     dispatch(request, tok, bookId);
     try {
       const res = await deleteSelling(tok, bookId);
+      const resjson = await res.json();
+      const book = await deserializeBook(resjson);
+      dispatch(success(book));
+    } catch (err) {
+      dispatch(userError(err));
+    }
+  };
+};
+
+export const userPostFavorite = (tok, user, bookId) => {
+  const request = (token, usr, id) => ({
+    type: USER_POST_FAV_REQ,
+    token,
+    user: usr,
+    bookIds: id,
+  });
+
+  const success = book => ({
+    type: USER_POST_FAV_RES,
+    book,
+  });
+
+  return async (dispatch) => {
+    dispatch(request, tok, user, bookId);
+    try {
+      const res = await postFavorite(tok, user, bookId);
+      const resjson = await res.json();
+      const book = await deserializeBook(resjson);
+      dispatch(success(book[0]));
+    } catch (err) {
+      dispatch(userError(err));
+    }
+  };
+};
+
+export const userDeleteFavorite = (tok, bookId) => {
+  const request = (token, id) => ({
+    type: USER_DELETE_FAV_REQ,
+    token,
+    bookId: id,
+  });
+
+  const success = book => ({
+    type: USER_DELETE_FAV_RES,
+    book,
+  });
+
+  return async (dispatch) => {
+    dispatch(request, tok, bookId);
+    try {
+      const res = await deleteFavorite(tok, bookId);
       const resjson = await res.json();
       const book = await deserializeBook(resjson);
       dispatch(success(book));

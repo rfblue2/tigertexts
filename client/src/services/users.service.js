@@ -28,16 +28,19 @@ export const handleFbResponse = res =>
 
 export const getUser = async (token, fields) => {
   // get user from token
-  const res = await fetch(`/api/users/me?include=${fields.join(',')}`, {
+  const res = await fetch(`/api/users/me?include=${fields ? fields.join(',') : ''}`, {
     headers: { 'x-auth-token': token },
   });
 
   // get listings for user favorites and selling
   const getBookWithListings = async (b) => {
+    const bres = await fetch(`api/books/${b.id}`);
+    const bjson = await bres.json();
+    const book = await deserializeBook(bjson);
     const lres = await fetch(`api/books/${b.id}/listings`);
     const ljson = await lres.json();
     const listings = await deserializeListing(ljson);
-    return { ...b, listings };
+    return { ...book, listings };
   };
 
   // token probably expired
@@ -52,8 +55,8 @@ export const getUser = async (token, fields) => {
   if (user.selling) {
     user.selling = await Promise.all(user.selling.map(getBookWithListings));
   }
-  if (user.favorites) {
-    user.favorites = await Promise.all(user.favorites.map(getBookWithListings));
+  if (user.favorite) {
+    user.favorite = await Promise.all(user.favorite.map(getBookWithListings));
   }
 
   return user;
@@ -117,6 +120,35 @@ export const postSelling = async (token, user, bookIds, sellData) => {
 
 export const deleteSelling = async (token, bookId) =>
   fetch(`/api/users/selling/${bookId}`, {
+    method: 'DELETE',
+    headers: { 'x-auth-token': token },
+  });
+
+export const postFavorite = async (token, user, bookId) => {
+  const userObj = {
+    data: {
+      type: 'user',
+      id: user.id,
+      attributes: {},
+      relationships: {
+        favorite: {
+          data: [{
+            type: 'book',
+            id: bookId,
+          }],
+        },
+      },
+    },
+  };
+  return fetch('api/users/favorites', {
+    method: 'POST',
+    headers: { 'x-auth-token': token, 'Content-Type': 'application/json' },
+    body: JSON.stringify(userObj),
+  });
+};
+
+export const deleteFavorite = async (token, bookId) =>
+  fetch(`/api/users/favorites/${bookId}`, {
     method: 'DELETE',
     headers: { 'x-auth-token': token },
   });

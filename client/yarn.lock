@@ -1471,7 +1471,7 @@ class-utils@^0.3.5:
 
 classnames@^2.2.5:
   version "2.2.5"
-  resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.5.tgz#fb3801d453467649ef3603c7d61a02bd129bde6d"
+  resolved "https://registry.yarnpkg.com/classNames/-/classNames-2.2.5.tgz#fb3801d453467649ef3603c7d61a02bd129bde6d"
 
 clean-css@4.1.x:
   version "4.1.11"
@@ -4563,7 +4563,7 @@ material-ui@^1.0.0-beta.41:
     "@types/react-transition-group" "^2.0.6"
     babel-runtime "^6.26.0"
     brcast "^3.0.1"
-    classnames "^2.2.5"
+    classNames "^2.2.5"
     deepmerge "^2.0.1"
     dom-helpers "^3.2.1"
     hoist-non-react-statics "^2.5.0"

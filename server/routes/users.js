@@ -143,8 +143,9 @@ router.route('/favorites')
     const data = await deserializeUser(req.body);
     await User.findOneAndUpdate({
       _id: req.user._id,
-    }, { $push: { favorite: { $each: data.favorite } } }, { new: true });
-    res.status(200).end();
+    }, { $push: { favorite: { $each: data.favorite.map(f => f.id) } } }, { new: true });
+    const books = await Book.find({ _id: { $in: data.favorite.map(f => f.id) } });
+    res.json(serializeBook(books));
   }));
 
 router.route('/favorites/:id')
@@ -155,7 +156,8 @@ router.route('/favorites/:id')
     await User.findOneAndUpdate({
       _id: req.user._id,
     }, { favorite: user.favorite }, { new: true });
-    res.status(200).end();
+    const book = await Book.findById(req.params.id);
+    res.json(serializeBook(book));
   }));
 
 // Convenience method for viewing (get) and adding (post) books being sold
