@@ -130,7 +130,10 @@ class App extends Component {
           >
             <AutoComplete
               executeSearch={this.handleSearch}
-              courseList={courses}
+              courseList={courses.map(course => ({
+                            value: course,
+                            label: course.numbers.join('/'),
+                          }))}
             />
           </Navbar>
           <Sidebar
