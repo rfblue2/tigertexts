@@ -1,212 +1,244 @@
-import React, { Component } from 'react';
+/* eslint-disable react/prop-types */
+
+import React from 'react';
 import PropTypes from 'prop-types';
-import keycode from 'keycode';
-import Downshift from 'downshift';
 import { withStyles } from 'material-ui/styles';
+import Typography from 'material-ui/Typography';
+import Input from 'material-ui/Input';
 import TextField from 'material-ui/TextField';
-import Paper from 'material-ui/Paper';
 import { MenuItem } from 'material-ui/Menu';
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import CancelIcon from '@material-ui/icons/Cancel';
+import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
+import ClearIcon from '@material-ui/icons/Clear';
 import Chip from 'material-ui/Chip';
+import Select from 'react-select';
+import VirtualizedSelect from 'react-virtualized-select';
+import 'react-select/dist/react-select.css';
+import 'react-virtualized-select/styles.css';
 
-class AutoComplete extends Component {
-  static propTypes = {
-    classes: PropTypes.object.isRequired,
-    executeSearch: PropTypes.func.isRequired,
-    courseList: PropTypes.arrayOf(PropTypes.object),
+
+class Option extends React.Component {
+  handleClick = event => {
+    this.props.onSelect(this.props.option, event);
   };
 
-  static defaultProps = {
-    courseList: [],
-  }
-
-  state = {
-    inputValue: '',
-    selectedItems: [],
-  };
-
-  handleKeyDown = (event) => {
-    const { inputValue, selectedItems } = this.state;
-    const { executeSearch } = this.props;
-
-    if (selectedItems.length && !inputValue.length && keycode(event) === 'backspace') {
-      this.setState({
-        selectedItems: selectedItems.slice(0, selectedItems.length - 1),
-      });
-    } else if (selectedItems.length && !inputValue.length && keycode(event) === 'enter') {
-      executeSearch(selectedItems);
-    }
-  };
-
-  handleInputChange = (event) => {
-    this.setState({ inputValue: event.target.value });
-  };
-
-  handleChange = (item) => {
-    let { selectedItems } = this.state;
-
-    if (selectedItems.indexOf(item) === -1) {
-      selectedItems = [...selectedItems, item];
-    }
-
-    this.setState({
-      inputValue: '',
-      selectedItems,
-    });
-  };
-
-  handleDelete = item => () => {
-    const selectedItems = [...this.state.selectedItems];
-    selectedItems.splice(selectedItems.indexOf(item), 1);
-
-    this.setState({ selectedItems });
-  };
-
-  renderInput(inputProps) {
-    const {
-      InputProps, classes, ref, ...other
-    } = inputProps;
-
-    return (
-      <TextField className={classes.textfield} InputProps={{
-          inputRef: ref,
-          classes: {
-            root: classes.inputRoot,
-          },
-          ...InputProps,
-        }}
-        {...other}
-      />
-    );
-  }
-
-  renderSuggestion({
-    suggestion, index, itemProps, highlightedIndex, selectedItems,
-  }) {
-    const isHighlighted = highlightedIndex === index;
-    const isSelected = (selectedItems || '').indexOf(suggestion) > -1;
-
+  render() {
+    const { children, isFocused, isSelected, onFocus } = this.props;
     return (
       <MenuItem
-        {...itemProps}
-        key={suggestion.id}
-        selected={isHighlighted}
+        onFocus={onFocus}
+        selected={isFocused}
+        onClick={this.handleClick}
         component="div"
         style={{
           fontWeight: isSelected ? 500 : 400,
         }}
       >
-        {suggestion.numbers.join('/')}
+        {children}
       </MenuItem>
     );
   }
+}
 
-  getSuggestions(inputValue, courseList) {
-    let count = 0;
+const SelectWrapped = (props) => {
+  const { classes, ...other } = props;
 
-    return courseList.filter((suggestion) => {
-      const nums = suggestion.numbers;
-      let keep = nums.reduce((p, n) =>
-        p || n.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1, false);
+  return (
+    <VirtualizedSelect
+      optionComponent={Option}
+      noResultsText={<Typography>{'No results found'}</Typography>}
+      arrowRenderer={arrowProps => {
+        return arrowProps.isOpen ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />;
+      }}
+      clearRenderer={() => <ClearIcon />}
+      valueComponent={valueProps => {
+        const { value, children, onRemove } = valueProps;
 
-      keep = keep && count < 5;
+        const onDelete = event => {
+          event.preventDefault();
+          event.stopPropagation();
+          onRemove(value);
+        };
 
-      if (keep) {
-        count += 1;
-      }
+        if (onRemove) {
+          return (
+            <Chip
+              tabIndex={-1}
+              label={children}
+              className={classes.chip}
+              deleteIcon={<CancelIcon onTouchEnd={onDelete} />}
+              onDelete={onDelete}
+            />
+          );
+        }
 
-      return keep;
+        return <div className="Select-value">{children}</div>;
+      }}
+      {...other}
+    />
+  );
+}
+
+const ITEM_HEIGHT = 48;
+
+const styles = theme => ({
+  root: {
+    flexGrow: 1,
+  },
+  chip: {
+    margin: theme.spacing.unit / 4,
+  },
+  // We had to use a lot of global selectors in order to style react-select.
+  // We are waiting on https://github.com/JedWatson/react-select/issues/1679
+  // to provide a much better implementation.
+  // Also, we had to reset the default style injected by the library.
+  '@global': {
+    '.VirtualizedSelectFocusedOption': {
+      backgroundColor: 'rgba(200, 200, 200)',
+    },
+    '.Select-control': {
+      display: 'flex',
+      alignItems: 'center',
+      border: 0,
+      height: 'auto',
+      //background: 'transparent',
+      '&:hover': {
+        boxShadow: 'none',
+      },
+    },
+    '.Select-multi-value-wrapper': {
+      flexGrow: 1,
+      display: 'flex',
+      flexWrap: 'wrap',
+    },
+    '.Select--multi .Select-input': {
+      margin: 0,
+    },
+    '.Select.has-value.is-clearable.Select--single > .Select-control .Select-value': {
+      padding: 0,
+    },
+    '.Select-noresults': {
+      padding: theme.spacing.unit * 2,
+    },
+    '.Select-input': {
+      display: 'inline-flex !important',
+      padding: 0,
+      //height: 'auto',
+    },
+    '.Select-input input': {
+      //background: 'transparent',
+      border: 0,
+      padding: 0,
+      cursor: 'default',
+      display: 'inline-block',
+      fontFamily: 'inherit',
+      fontSize: 'inherit',
+      margin: 0,
+      outline: 0,
+    },
+    '.Select-placeholder, .Select--single .Select-value': {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      display: 'flex',
+      alignItems: 'center',
+      fontFamily: theme.typography.fontFamily,
+      fontSize: theme.typography.pxToRem(16),
+      padding: 0,
+    },
+    '.Select-placeholder': {
+      opacity: 0.42,
+      color: theme.palette.common.black,
+    },
+    '.Select-menu-outer': {
+      //backgroundColor: theme.palette.background.paper,
+      boxShadow: theme.shadows[2],
+      position: 'absolute',
+      left: 0,
+      top: `calc(100% + ${theme.spacing.unit}px)`,
+      width: '100%',
+      zIndex: 2,
+      maxHeight: ITEM_HEIGHT * 4.5,
+    },
+    '.Select.is-focused:not(.is-open) > .Select-control': {
+      boxShadow: 'none',
+    },
+    '.Select-menu': {
+      maxHeight: ITEM_HEIGHT * 4.5,
+      overflowY: 'auto',
+    },
+    '.Select-menu div': {
+      boxSizing: 'content-box',
+    },
+    '.Select-arrow-zone, .Select-clear-zone': {
+      color: theme.palette.action.active,
+      cursor: 'pointer',
+      height: 21,
+      width: 21,
+      zIndex: 1,
+    },
+    // Only for screen readers. We can't use display none.
+    '.Select-aria-only': {
+      position: 'absolute',
+      overflow: 'hidden',
+      clip: 'rect(0 0 0 0)',
+      height: 1,
+      width: 1,
+      margin: -1,
+    },
+  },
+});
+
+class IntegrationReactSelect extends React.Component {
+  state = {
+    selectedItems: null,
+  };
+
+  handleChange = (value) => {
+    const { executeSearch } = this.props;
+    const { courseList } = this.props;
+
+    this.setState({
+      selectedItems: value,
     });
-  }
+    executeSearch(value.map(course => (course.value)))
+  };
 
   render() {
     const { classes, courseList } = this.props;
-    const { inputValue, selectedItems } = this.state;
 
     return (
       <div className={classes.root}>
-        <Downshift inputValue={inputValue} onChange={this.handleChange} selectedItems={selectedItems}>
-          {({
-            getInputProps,
-            getItemProps,
-            isOpen,
-            inputValue: inputValue2,
-            selectedItems: selectedItems2,
-            highlightedIndex,
-          }) => (
-            <div className={classes.container}>
-              {this.renderInput({
-                fullWidth: true,
-                classes,
-                InputProps: getInputProps({
-                  startAdornment: selectedItems.map(item => (
-                    <Chip
-                      key={item.id}
-                      tabIndex={-1}
-                      label={item.numbers.join('/')}
-                      className={classes.chip}
-                      onDelete={this.handleDelete(item)}
-                    />
-                  )),
-                  onChange: this.handleInputChange,
-                  onKeyDown: this.handleKeyDown,
-                  placeholder: 'Enter course numbers',
-                  id: 'integration-downshift-multiple',
-                }),
-              })}
-              {isOpen ? (
-                <Paper className={classes.paper} square>
-                  {this.getSuggestions(inputValue2, courseList).map((suggestion, index) =>
-                    this.renderSuggestion({
-                      suggestion,
-                      index,
-                      itemProps: getItemProps({ item: suggestion }),
-                      highlightedIndex,
-                      selectedItems: selectedItems2,
-                    }))}
-                </Paper>
-              ) : null}
-            </div>
-          )}
-        </Downshift>
+        <TextField
+          fullWidth
+          value={this.state.selectedItems}
+          onChange={this.handleChange}
+          placeholder="Enter Course Numbers"
+          name="react-select-chip-label"
+          InputProps={{
+            inputComponent: SelectWrapped,
+            inputProps: {
+              classes,
+              multi: true,
+              instanceId: 'react-select-chip-label',
+              id: 'react-select-chip-label',
+              simpleValue: false,
+              options: courseList,
+            },
+          }}
+        />
       </div>
     );
   }
 }
 
-const styles = theme => ({
-  root: {
-    flexGrow: 0,
-    height: 50,
-  },
-  container: {
-    flexGrow: 0,
-    position: 'relative',
-    height: 50,
-  },
-  paper: {
-    position: 'absolute',
-    zIndex: 1,
-    marginTop: theme.spacing.unit,
-    left: 0,
-    right: 0,
-  },
-  textfield: {
-    marginTop: '8px',
-    backgroundColor: '#FFFFFF',
-    paddingLeft: '10px',
-    width: 'calc(100% - 15px)',
-    marginLeft: '5px',
-    marginRight: '5px',
-    boxShadow: '0px 0px 5px'
-  },
-  chip: {
-    margin: `${theme.spacing.unit / 2}px ${theme.spacing.unit / 4}px`,
-  },
-  inputRoot: {
-    flexWrap: 'wrap',
-    flexGrow: 0,
-    height: 50,
-  },
-});
+IntegrationReactSelect.propTypes = {
+  classes: PropTypes.object.isRequired,
+  executeSearch: PropTypes.func.isRequired,
+  courseList: PropTypes.arrayOf(PropTypes.object),
+};
 
-export default withStyles(styles)(AutoComplete);
+export default withStyles(styles)(IntegrationReactSelect);
