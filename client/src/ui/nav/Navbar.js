@@ -6,7 +6,7 @@ import Toolbar from 'material-ui/Toolbar';
 import IconButton from 'material-ui/IconButton';
 import Button from 'material-ui/Button';
 import MenuIcon from '@material-ui/icons/Menu';
-import FacebookLogin from 'react-facebook-login';
+import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props';
 
 class Navbar extends Component {
   static propTypes = {
@@ -48,9 +48,14 @@ class Navbar extends Component {
                 appId="1949273201750772"
                 callback={responseFacebook}
                 fields="name,email,picture"
-                icon="fa-facebook"
                 className={classes.loginButton}
                 size="small"
+                render={renderProps => (
+                  <Button
+                    color="inherit"
+                    onClick={renderProps.onClick}
+                  >Login</Button>
+                )}
               />
           }
         </Toolbar>
