@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import {
   BrowserRouter as Router,
   Route,
+  Redirect,
 } from 'react-router-dom';
 import { withStyles } from 'material-ui/styles';
 import {
@@ -32,6 +33,7 @@ class App extends Component {
   state = {
     courses: [],
     sidebarOpen: true,
+    showResults: false,
   }
 
   static propTypes = {
@@ -87,6 +89,7 @@ class App extends Component {
 
   _handleSearch(items) {
     this.props.dispatch(getBooksForClasses(items.map(i => i.id)));
+    this.setState({ showResults: true });
   }
 
   _handleMenu() {
@@ -117,11 +120,15 @@ class App extends Component {
     const {
       classes, isLoggedIn, showSellForm, sellingBook,
     } = this.props;
-    const { courses, sidebarOpen } = this.state;
+    const { courses, sidebarOpen, showResults } = this.state;
+    if (showResults) {
+      this.setState({showResults: false});
+    }
 
     return (
       <Router>
         <div className={classes.appFrame}>
+          { showResults ? <Redirect to='/' /> : '' }
           <Navbar
             isLoggedIn={isLoggedIn}
             responseFacebook={this.responseFacebook}

@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 import { withStyles } from 'material-ui/styles';
 import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
+import InfoIcon from '@material-ui/icons/Info';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import SearchIcon from '@material-ui/icons/Search';
@@ -45,30 +47,28 @@ class Sidebar extends Component {
       >
         <div className={classes.toolbar} />
         <List component="nav">
-          {/* <ListItem button component={Link} to="/about"> */}
-          {/* <ListItemIcon> */}
-          {/* <InfoIcon /> */}
-          {/* </ListItemIcon> */}
-          {/* <ListItemText primary="About" /> */}
-          {/* </ListItem> */}
-          {
-            <ListItem button onClick={showSearch}>
-              <ListItemIcon>
-                <SearchIcon />
-              </ListItemIcon>
-              <ListItemText primary="Search Results" />
-            </ListItem>
-          }
-          { loggedIn ?
-            <ListItem button onClick={showProfile}>
-              <ListItemIcon>
-                <AccountCircleIcon />
-              </ListItemIcon>
-              <ListItemText primary="Profile" />
-            </ListItem> : ''
-          }
+         <ListItem button component={Link} to="/about">
+           <ListItemIcon>
+             <InfoIcon />
+           </ListItemIcon>
+           <ListItemText primary="About" />
+         </ListItem>
+          <ListItem button component={Link} to="/" onClick={showSearch}>
+            <ListItemIcon>
+              <SearchIcon />
+            </ListItemIcon>
+            <ListItemText primary="Search Results" />
+          </ListItem>
+          {/*{ loggedIn ?*/}
+            {/*<ListItem button onClick={showProfile}>*/}
+              {/*<ListItemIcon>*/}
+                {/*<AccountCircleIcon />*/}
+              {/*</ListItemIcon>*/}
+              {/*<ListItemText primary="Profile" />*/}
+            {/*</ListItem> : ''*/}
+          {/*}*/}
           {loggedIn ?
-            <ListItem button onClick={showSelling}>
+            <ListItem button component={Link} to="/" onClick={showSelling}>
               <ListItemIcon>
                 <LibraryBooksIcon />
               </ListItemIcon>
@@ -76,7 +76,7 @@ class Sidebar extends Component {
             </ListItem> : ''
           }
           {loggedIn ?
-            <ListItem button onClick={showFavorites}>
+            <ListItem button component={Link} to="/" onClick={showFavorites}>
               <ListItemIcon>
                 <FavoriteIcon />
               </ListItemIcon>
