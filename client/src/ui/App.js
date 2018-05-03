@@ -132,7 +132,7 @@ class App extends Component {
               executeSearch={this.handleSearch}
               courseList={courses.map(course => ({
                             value: course,
-                            label: course.numbers.join('/'),
+                            label: `${course.numbers.join('/')} - ${course.title}`,
                           }))}
             />
           </Navbar>
