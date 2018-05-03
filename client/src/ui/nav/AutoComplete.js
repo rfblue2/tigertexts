@@ -67,7 +67,6 @@ const SelectWrapped = (props) => {
 
   return (
     <VirtualizedSelect
-      className={classes.suggestions}
       optionComponent={Option}
       optionHeight={40}
       noResultsText={<Typography>{'No results found'}</Typography>}
@@ -107,9 +106,6 @@ const SelectWrapped = (props) => {
 const styles = theme => ({
   root: {
     flexGrow: 1,
-  },
-  suggestions: {
-    fontSize: '10pt',
   },
   chip: {
     margin: theme.spacing.unit / 4,
