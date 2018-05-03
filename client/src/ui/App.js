@@ -6,6 +6,7 @@ import classNames from 'classnames';
 import {
   BrowserRouter as Router,
   Route,
+  Redirect,
 } from 'react-router-dom';
 import { withStyles } from 'material-ui/styles';
 import {
@@ -33,6 +34,7 @@ class App extends Component {
   state = {
     courses: [],
     sidebarOpen: true,
+    showResults: false,
   }
 
   static propTypes = {
@@ -88,6 +90,7 @@ class App extends Component {
 
   _handleSearch(items) {
     this.props.dispatch(getBooksForClasses(items.map(i => i.id)));
+    this.setState({ showResults: true });
   }
 
   _handleMenu() {
@@ -118,15 +121,19 @@ class App extends Component {
     const {
       classes, isLoggedIn, showSellForm, sellingBook,
     } = this.props;
-    const { courses, sidebarOpen } = this.state;
+    const { courses, sidebarOpen, showResults } = this.state;
     let isMobile = false;
     if (this.props.windowSize.windowWidth < 600) {
       isMobile = true;
+    }
+    if (showResults) {
+      this.setState({showResults: false});
     }
 
     return (
       <Router>
         <div className={classes.appFrame}>
+          { showResults ? <Redirect to='/' /> : '' }
           <Navbar
             isLoggedIn={isLoggedIn}
             responseFacebook={this.responseFacebook}
@@ -137,7 +144,7 @@ class App extends Component {
               executeSearch={this.handleSearch}
               courseList={courses.map(course => ({
                             value: course,
-                            label: course.numbers.join('/'),
+                            label: `${course.numbers.join('/')} - ${course.title}`,
                           }))}
             />
           </Navbar>
@@ -176,9 +183,6 @@ class App extends Component {
 }
 
 const styles = theme => ({
-  root: {
-    flexGrow: 1,
-  },
   dialog: {
     width: '100%',
     height: '100%',
@@ -203,6 +207,7 @@ const styles = theme => ({
   },
   content: {
     flexGrow: 1,
+    height: '100%',
     backgroundColor: theme.palette.background.default,
     padding: theme.spacing.unit * 3,
     transition: theme.transitions.create('margin', {

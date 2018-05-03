@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import GridList, { GridListTile } from 'material-ui/GridList';
+import Typography from 'material-ui/Typography';
+import Grow from 'material-ui/transitions/Grow';
 import Book from './Book';
 
 class BookList extends Component {
@@ -29,27 +31,29 @@ class BookList extends Component {
     } = this.props;
 
     if (!books || books.length === 0) {
-      return <div className={classes.empty}>No results to show</div>;
+      return <Typography className={classes.empty}>No results to show</Typography>;
     }
 
     return (
       <div>
         <GridList className={classes.list} cellHeight="100%" cols={1} >
-          { books.map(b =>
-          (
-            <GridListTile key={b.id}>
-              <Book
-                book={b}
-                loggedIn={loggedIn}
-                selling={selling.map(s => s.id).includes(b.id)}
-                favorite={favorites.map(f => f.id).includes(b.id)}
-                onMarkSoldClick={markSold}
-                onSellClick={sellBook}
-                onFavoriteClick={onFavorite}
-              />
-            </GridListTile>
-          ))
-        }
+          {
+            books.map((b, i) => (
+              <Grow in style={{ transitionDelay: i * 75 }}>
+                <GridListTile key={b.id}>
+                  <Book
+                    book={b}
+                    loggedIn={loggedIn}
+                    selling={selling.map(s => s.id).includes(b.id)}
+                    favorite={favorites.map(f => f.id).includes(b.id)}
+                    onMarkSoldClick={markSold}
+                    onSellClick={sellBook}
+                    onFavoriteClick={onFavorite}
+                  />
+                </GridListTile>
+              </Grow>
+            ))
+          }
         </GridList>
       </div>
     );

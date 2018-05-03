@@ -36,8 +36,10 @@ class Book extends Component {
   }
 
   generateAuthorString = (authors) => {
-    const numAuthors = authors.length;
-    if (numAuthors === 1) {
+    const numAuthors = authors ? authors.length : 0;
+    if (numAuthors === 0) {
+      return("");
+    } else if (numAuthors === 1) {
       return (authors[0]);
     } else if (numAuthors === 2) {
       return (`${authors[0]}; ${authors[1]}`);
