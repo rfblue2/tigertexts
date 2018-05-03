@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { withWindowSizeListener } from 'react-window-size-listener';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
@@ -118,6 +119,10 @@ class App extends Component {
       classes, isLoggedIn, showSellForm, sellingBook,
     } = this.props;
     const { courses, sidebarOpen } = this.state;
+    let isMobile = false;
+    if (this.props.windowSize.windowWidth < 600) {
+      isMobile = true;
+    }
 
     return (
       <Router>
@@ -147,8 +152,10 @@ class App extends Component {
           />
           <main
             className={classNames(classes.content, classes['content-left'], {
-              [classes.contentShift]: sidebarOpen,
-              [classes['contentShift-left']]: sidebarOpen,
+              [classes.contentShift]: sidebarOpen && !isMobile,
+              [classes['contentShift-left']]: sidebarOpen && !isMobile,
+              [classes['contentShift-down-loggedin']]: sidebarOpen && isMobile && isLoggedIn,
+              [classes['contentShift-down-notloggedin']]: sidebarOpen && isMobile && !isLoggedIn,
             })}
           >
             <SellDialog
@@ -215,6 +222,12 @@ const styles = theme => ({
   'contentShift-left': {
     marginLeft: drawerWidth,
   },
+  'contentShift-down-loggedin': {
+    marginTop: 215, // hard coded
+  },
+  'contentShift-down-notloggedin': {
+    marginTop: 75, // hard coded
+  },
   toolbar: theme.mixins.toolbar,
 });
 
@@ -230,7 +243,7 @@ const mapDispatchToProps = dispatch => ({
   dispatch,
 });
 
-export default connect(
+export default withWindowSizeListener(connect(
   mapStateToProps,
   mapDispatchToProps,
-)(withStyles(styles)(App));
+)(withStyles(styles)(App)));

@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
+import { withWindowSizeListener } from 'react-window-size-listener';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
+import className from 'classnames';
 import { withStyles } from 'material-ui/styles';
 import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
@@ -34,13 +37,21 @@ class Sidebar extends Component {
       showFavorites,
       loggedIn,
     } = this.props;
+    let toggle = "left";
+    let isMobile = false;
+    if (this.props.windowSize.windowWidth < 600) {
+      toggle = "top";
+      isMobile = true;
+    }
     return (
       <Drawer
         classes={{
-          paper: classes.drawerPaper,
-        }}
+          paper: classNames({
+            [classes.drawerPaper]: !isMobile,
+            [classes.drawerPaperMobile]: isMobile,
+        })}}
         variant="persistent"
-        anchor="left"
+        anchor={toggle}
         open={open}
       >
         <div className={classes.toolbar} />
@@ -94,7 +105,11 @@ const styles = theme => ({
     position: 'fixed',
     width: drawerWidth,
   },
+  drawerPaperMobile: {
+    position: 'fixed',
+    width: '100%',
+  },
   toolbar: theme.mixins.toolbar,
 });
 
-export default withStyles(styles)(Sidebar);
+export default withWindowSizeListener(withStyles(styles)(Sidebar));
