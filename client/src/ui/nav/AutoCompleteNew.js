@@ -13,10 +13,47 @@ import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import ClearIcon from '@material-ui/icons/Clear';
 import Chip from 'material-ui/Chip';
 import Select from 'react-select';
-import VirtualizedSelect from 'react-virtualized-select';
 import 'react-select/dist/react-select.css';
-import 'react-virtualized-select/styles.css';
 
+const suggestions = [
+  { label: 'Afghanistan' },
+  { label: 'Aland Islands' },
+  { label: 'Albania' },
+  { label: 'Algeria' },
+  { label: 'American Samoa' },
+  { label: 'Andorra' },
+  { label: 'Angola' },
+  { label: 'Anguilla' },
+  { label: 'Antarctica' },
+  { label: 'Antigua and Barbuda' },
+  { label: 'Argentina' },
+  { label: 'Armenia' },
+  { label: 'Aruba' },
+  { label: 'Australia' },
+  { label: 'Austria' },
+  { label: 'Azerbaijan' },
+  { label: 'Bahamas' },
+  { label: 'Bahrain' },
+  { label: 'Bangladesh' },
+  { label: 'Barbados' },
+  { label: 'Belarus' },
+  { label: 'Belgium' },
+  { label: 'Belize' },
+  { label: 'Benin' },
+  { label: 'Bermuda' },
+  { label: 'Bhutan' },
+  { label: 'Bolivia Plurinational State of' },
+  { label: 'Bonaire Sint Eustatius and Saba' },
+  { label: 'Bosnia and Herzegovina' },
+  { label: 'Botswana' },
+  { label: 'Bouvet Island' },
+  { label: 'Brazil' },
+  { label: 'British Indian Ocean Territory' },
+  { label: 'Brunei Darussalam' },
+].map(suggestion => ({
+  value: suggestion.label,
+  label: suggestion.label,
+}));
 
 class Option extends React.Component {
   handleClick = event => {
@@ -25,6 +62,7 @@ class Option extends React.Component {
 
   render() {
     const { children, isFocused, isSelected, onFocus } = this.props;
+
     return (
       <MenuItem
         onFocus={onFocus}
@@ -41,11 +79,12 @@ class Option extends React.Component {
   }
 }
 
-const SelectWrapped = (props) => {
+function SelectWrapped(props) {
   const { classes, ...other } = props;
 
+
   return (
-    <VirtualizedSelect
+    <Select
       optionComponent={Option}
       noResultsText={<Typography>{'No results found'}</Typography>}
       arrowRenderer={arrowProps => {
@@ -85,6 +124,7 @@ const ITEM_HEIGHT = 48;
 const styles = theme => ({
   root: {
     flexGrow: 1,
+    height: 50,
   },
   chip: {
     margin: theme.spacing.unit / 4,
@@ -94,15 +134,12 @@ const styles = theme => ({
   // to provide a much better implementation.
   // Also, we had to reset the default style injected by the library.
   '@global': {
-    '.VirtualizedSelectFocusedOption': {
-      backgroundColor: 'rgba(200, 200, 200)',
-    },
     '.Select-control': {
       display: 'flex',
       alignItems: 'center',
       border: 0,
       height: 'auto',
-      //background: 'transparent',
+      background: 'transparent',
       '&:hover': {
         boxShadow: 'none',
       },
@@ -124,10 +161,10 @@ const styles = theme => ({
     '.Select-input': {
       display: 'inline-flex !important',
       padding: 0,
-      //height: 'auto',
+      height: 'auto',
     },
     '.Select-input input': {
-      //background: 'transparent',
+      background: 'transparent',
       border: 0,
       padding: 0,
       cursor: 'default',
@@ -154,7 +191,7 @@ const styles = theme => ({
       color: theme.palette.common.black,
     },
     '.Select-menu-outer': {
-      //backgroundColor: theme.palette.background.paper,
+      backgroundColor: theme.palette.background.paper,
       boxShadow: theme.shadows[2],
       position: 'absolute',
       left: 0,
@@ -194,29 +231,27 @@ const styles = theme => ({
 
 class IntegrationReactSelect extends React.Component {
   state = {
-    selectedItems: null,
+    single: null,
+    multi: null,
+    multiLabel: null,
   };
 
-  handleChange = (value) => {
-    const { executeSearch } = this.props;
-    const { courseList } = this.props;
-
+  handleChange = name => value => {
     this.setState({
-      selectedItems: value,
+      [name]: value,
     });
-    executeSearch(value.map(course => (course.value)))
   };
 
   render() {
-    const { classes, courseList } = this.props;
+    const { classes } = this.props;
 
     return (
       <div className={classes.root}>
         <TextField
           fullWidth
-          value={this.state.selectedItems}
-          onChange={this.handleChange}
-          placeholder="Enter Course Numbers"
+          value={this.state.multiLabel}
+          onChange={this.handleChange('multiLabel')}
+          placeholder="Select multiple countries"
           name="react-select-chip-label"
           InputProps={{
             inputComponent: SelectWrapped,
@@ -225,8 +260,8 @@ class IntegrationReactSelect extends React.Component {
               multi: true,
               instanceId: 'react-select-chip-label',
               id: 'react-select-chip-label',
-              simpleValue: false,
-              options: courseList,
+              simpleValue: true,
+              options: suggestions,
             },
           }}
         />
@@ -237,8 +272,6 @@ class IntegrationReactSelect extends React.Component {
 
 IntegrationReactSelect.propTypes = {
   classes: PropTypes.object.isRequired,
-  executeSearch: PropTypes.func.isRequired,
-  courseList: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default withStyles(styles)(IntegrationReactSelect);
