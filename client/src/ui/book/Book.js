@@ -68,7 +68,7 @@ class Book extends Component {
 
   render() {
     const {
-      classes, book, onFavoriteClick, favorite,
+      classes, book, onFavoriteClick, favorite, loggedIn,
     } = this.props;
     return (
       <Card className={classes.card} >
@@ -78,15 +78,18 @@ class Book extends Component {
           subheader={this.generateAuthorString(book.authors)}
         />
         <CardActions>
-          <IconButton
-            onClick={() => onFavoriteClick(book.id, !favorite)}
-            aria-label="Add to favorites"
-            className={classNames(classes['favorite-icon'], {
-              [classes.favorite]: this.props.favorite,
-            })}
-          >
-            <FavoriteIcon />
-          </IconButton>
+          {
+            loggedIn ?
+              <IconButton
+                onClick={() => onFavoriteClick(book.id, !favorite)}
+                aria-label="Add to favorites"
+                className={classNames(classes['favorite-icon'], {
+                  [classes.favorite]: this.props.favorite,
+                })}
+              >
+                <FavoriteIcon />
+              </IconButton> : ''
+          }
           <IconButton
             className={classNames(classes.expand, {
               [classes.expandOpen]: this.state.expanded,
