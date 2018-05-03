@@ -4,5 +4,6 @@ build/
 node_modules/
 data/
 package-lock.json
+scripts/scrapy_venv/
 *.pyc
 fb_script.py
