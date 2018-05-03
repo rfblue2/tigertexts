@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import GridList, { GridListTile } from 'material-ui/GridList';
+import Typography from 'material-ui/Typography';
 import Grow from 'material-ui/transitions/Grow';
 import Book from './Book';
 
@@ -30,7 +31,7 @@ class BookList extends Component {
     } = this.props;
 
     if (!books || books.length === 0) {
-      return <div className={classes.empty}>No results to show</div>;
+      return <Typography className={classes.empty}>No results to show</Typography>;
     }
 
     return (

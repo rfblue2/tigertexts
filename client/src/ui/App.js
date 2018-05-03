@@ -176,9 +176,6 @@ class App extends Component {
 }
 
 const styles = theme => ({
-  root: {
-    flexGrow: 1,
-  },
   dialog: {
     width: '100%',
     height: '100%',
@@ -203,6 +200,7 @@ const styles = theme => ({
   },
   content: {
     flexGrow: 1,
+    height: '100%',
     backgroundColor: theme.palette.background.default,
     padding: theme.spacing.unit * 3,
     transition: theme.transitions.create('margin', {
