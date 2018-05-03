@@ -1471,7 +1471,7 @@ class-utils@^0.3.5:
 
 classnames@^2.2.3, classnames@^2.2.4, classnames@^2.2.5:
   version "2.2.5"
-  resolved "https://registry.yarnpkg.com/classNames/-/classNames-2.2.5.tgz#fb3801d453467649ef3603c7d61a02bd129bde6d"
+  resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.5.tgz#fb3801d453467649ef3603c7d61a02bd129bde6d"
 
 clean-css@4.1.x:
   version "4.1.11"
@@ -2174,10 +2174,6 @@ dotenv-expand@4.2.0:
 dotenv@4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-4.0.0.tgz#864ef1379aced55ce6f95debecdce179f7a0cd1d"
-
-downshift@^1.31.8:
-  version "1.31.8"
-  resolved "https://registry.yarnpkg.com/downshift/-/downshift-1.31.8.tgz#2f8f4b16472f41b48359ef62672c681b88477701"
 
 duplexer3@^0.1.4:
   version "0.1.4"
@@ -4563,7 +4559,7 @@ material-ui@^1.0.0-beta.41:
     "@types/react-transition-group" "^2.0.6"
     babel-runtime "^6.26.0"
     brcast "^3.0.1"
-    classNames "^2.2.5"
+    classnames "^2.2.5"
     deepmerge "^2.0.1"
     dom-helpers "^3.2.1"
     hoist-non-react-statics "^2.5.0"
@@ -5944,7 +5940,7 @@ react-scrollbar-size@^2.0.2:
     react-event-listener "^0.5.1"
     stifle "^1.0.2"
 
-react-select@^1.0.0-rc.2:
+react-select@^1.0.0-rc.2, react-select@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/react-select/-/react-select-1.2.1.tgz#a2fe58a569eb14dcaa6543816260b97e538120d1"
   dependencies:
