@@ -26,6 +26,9 @@ const theme = createMuiTheme({
       light: orange[500],
     },
   },
+  typography: {
+    fontFamily: 'Lato'
+  }
 });
 
 render(

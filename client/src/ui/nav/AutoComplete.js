@@ -104,10 +104,10 @@ const SelectWrapped = (props) => {
       optionHeight={40}
       noResultsText={<Typography>{'No results found'}</Typography>}
       arrowRenderer={arrowProps => {
-        return arrowProps.isOpen ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />;
+        return arrowProps.isOpen ? <ArrowDropUpIcon className={classes.arrowIcon}/> : <ArrowDropDownIcon className={classes.arrowIcon} />;
       }}
       filterOptions={filterOptions}
-      clearRenderer={() => <ClearIcon />}
+      clearRenderer={() => <ClearIcon className={classes.clearIcon} />}
       valueComponent={valueProps => {
         const { value, children, onRemove } = valueProps;
 
@@ -144,6 +144,12 @@ const styles = theme => ({
   },
   chip: {
     margin: theme.spacing.unit / 4,
+  },
+  arrowIcon: {
+    marginTop: '4px'
+  },
+  clearIcon: {
+    marginTop: '4px'
   },
   // We had to use a lot of global selectors in order to style react-select.
   // We are waiting on https://github.com/JedWatson/react-select/issues/1679
