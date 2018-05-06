@@ -44,27 +44,60 @@ class Option extends React.Component {
 const filterOptions = (options, filter, currentVals) => {
   const q = filter.trim();
   const deduped = options.filter(o => currentVals.reduce(
-    (t, a) => t && (a.label !== o.label), true));
+    (t, a) => t && (a.labelnum !== o.labelnum), true));
   let numRes = [];
+  // search by course number
   if (q.length < 4 &&
-      q.slice(0, 3).match(/^[a-z]+$/i) !== null ||
-      q.length < 7 &&
-      q.slice(3, 6).match(/^[0-9]+$/i) !== null) {
+      q.slice(0, 3).match(/^[a-z]+$/i) !== null 
+      ||
+      q.length < 7 && 
+      q.slice(0, 3).match(/^[a-z]+$/i) !== null &&
+      q.slice(3, 6).match(/^[0-9]+$/i) !== null 
+      ||
+      q.length < 8 && 
+      q.slice(0, 3).match(/^[a-z]+$/i) !== null &&
+      q.slice(3, 6).match(/^[0-9]+$/i) !== null &&
+      q.slice(6, 7).match(/^[a-z]+$/i) !== null
+
+      ||
+      q.length < 8 && 
+      q.slice(0, 3).match(/^[a-z]+$/i) !== null &&
+      q.slice(3, 4).match(/\s/) &&
+      q.slice(4, 7).match(/^[0-9]+$/i) !== null
+      ||
+      q.length < 9 && 
+      q.slice(0, 3).match(/^[a-z]+$/i) !== null &&
+      q.slice(3, 4).match(/\s/) &&
+      q.slice(4, 7).match(/^[0-9]+$/i) !== null &&
+      q.slice(7, 8).match(/^[a-z]+$/i) !== null
+      ) {
     numRes = deduped.filter(o =>
-      o.label.split('/').reduce((t, a) =>
-        t || a.toLowerCase().startsWith(q.toLowerCase()), false));
+      o.labelnum.split('/').reduce((t, a) =>
+        t || a.replace(/\s+/g, '').toLowerCase().startsWith(q.replace(/\s+/g, '').toLowerCase()), false));
     // if course numbers match, return those
+    if (numRes.length > 0) return numRes;
+  }
+  // search by course number (numerical component)
+  else if ( q.length < 4 && q.slice(0, 3).match(/^[0-9]+$/i) !== null ||
+            q.length < 5 && q.slice(0, 3).match(/^[0-9]+$/i) !== null && q.slice(3, 4).match(/^[a-z]+$/i) !== null
+          ) {
+    numRes = deduped.filter(o =>
+      o.labelnum.split('/').reduce((t, a) =>
+        t || a.slice(3,7).toLowerCase().startsWith(q.slice(0,4).toLowerCase()), false));
     if (numRes.length > 0) return numRes;
   }
 
   // match by course title
   return deduped.filter(d =>
     d.value.title.toLowerCase().includes(filter.toLowerCase()));
+
+
 };
 
 const SelectWrapped = (props) => {
   const { classes, ...other } = props;
 
+  console.log(classes);
   return (
     <VirtualizedSelect
       optionComponent={Option}
@@ -84,11 +117,13 @@ const SelectWrapped = (props) => {
           onRemove(value);
         };
 
+        console.log(value.labelnum);
+        console.log(children);
         if (onRemove) {
           return (
             <Chip
               tabIndex={-1}
-              label={children}
+              label={value.labelnum}
               className={classes.chip}
               deleteIcon={<CancelIcon onTouchEnd={onDelete} />}
               onDelete={onDelete}
@@ -119,7 +154,6 @@ const styles = theme => ({
       backgroundColor: 'rgba(200, 200, 200)',
     },
     '.VirtualizedSelectOption': {
-      padding: '0 .7rem',
       fontSize: '10pt',
     },
     '.Select-control': {

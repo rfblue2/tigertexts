@@ -27,7 +27,7 @@ class Navbar extends Component {
     } = this.props;
     return (
       <AppBar className={classes.appBar} position="static">
-        <Toolbar>
+        <Toolbar className={classes.ToolbarRoot}>
           <IconButton
             color="inherit"
             aria-label="Menu"
@@ -85,6 +85,9 @@ const styles = theme => ({
   },
   loginButton: {
     textAlign: 'right',
+  },
+  'ToolbarRoot': {
+    minHeight: '51px',
   },
 });
 
