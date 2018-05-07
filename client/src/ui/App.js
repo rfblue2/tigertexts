@@ -35,6 +35,7 @@ class App extends Component {
     courses: [],
     sidebarOpen: true,
     showResults: false,
+    navBarHeight: 51,
   }
 
   static propTypes = {
@@ -66,6 +67,7 @@ class App extends Component {
     this.showFavorites = this._showFavorites.bind(this);
     this.sellBook = this._sellBook.bind(this);
     this.trimLabel = this._trimLabel.bind(this);
+    this.retrieveNavBarHeight = this._retrieveNavBarHeight.bind(this);
 
     // TODO move this into redux (maybe)
     const cres = await fetch('/api/classes');
@@ -127,6 +129,10 @@ class App extends Component {
     return(label.substring(0,maxLength - 3) + "...");
   }
 
+  _retrieveNavBarHeight(height) {
+    this.setState({ navBarHeight: height});
+  }
+  
   render() {
     const {
       classes, isLoggedIn, showSellForm, sellingBook, windowSize, 
@@ -149,6 +155,7 @@ class App extends Component {
             responseFacebook={this.responseFacebook}
             handleLogout={this.handleLogout}
             handleMenu={this.handleMenu}
+            retrieveNavBarHeight={this.retrieveNavBarHeight}
           >
             <AutoComplete
               executeSearch={this.handleSearch}
@@ -237,6 +244,7 @@ const styles = theme => ({
   },
   'contentShift-left': {
     marginLeft: drawerWidth,
+    //marginTop: 100 + this.state.memes,
   },
   'contentShift-down-loggedin': {
     marginTop: 215, // hard coded

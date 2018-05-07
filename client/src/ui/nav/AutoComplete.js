@@ -96,13 +96,11 @@ const filterOptions = (options, filter, currentVals) => {
 
 const SelectWrapped = (props) => {
   const { classes, ...other } = props;
-
-  console.log(classes);
   return (
     <VirtualizedSelect
       optionComponent={Option}
-      optionHeight={40}
-      noResultsText={<Typography>{'No results found'}</Typography>}
+      optionHeight={36}
+      noResultsText={<Typography className={classes.noResultsText}>{'No results found'}</Typography>}
       arrowRenderer={arrowProps => {
         return arrowProps.isOpen ? <ArrowDropUpIcon className={classes.arrowIcon}/> : <ArrowDropDownIcon className={classes.arrowIcon} />;
       }}
@@ -117,8 +115,6 @@ const SelectWrapped = (props) => {
           onRemove(value);
         };
 
-        console.log(value.labelnum);
-        console.log(children);
         if (onRemove) {
           return (
             <Chip
@@ -146,10 +142,13 @@ const styles = theme => ({
     margin: theme.spacing.unit / 4,
   },
   arrowIcon: {
-    marginTop: '4px'
+    marginTop: '4px',
   },
   clearIcon: {
-    marginTop: '4px'
+    marginTop: '4px',
+  },
+  noResultsText: {
+    marginTop: '4px',
   },
   // We had to use a lot of global selectors in order to style react-select.
   // We are waiting on https://github.com/JedWatson/react-select/issues/1679
@@ -166,6 +165,10 @@ const styles = theme => ({
       borderRadius: '3px',
       border: '1px solid #ccc',
       borderSpacing: '0',
+    },
+    '.Select-placeholder': {
+    },
+    '.Select-multi-value-wrapper': {
     }
   },
 });
@@ -182,6 +185,8 @@ class IntegrationReactSelect extends React.Component {
     });
     this.props.executeSearch(value.map(course => (course.value)));
   };
+
+
 
   render() {
     const { classes, courseList } = this.props;

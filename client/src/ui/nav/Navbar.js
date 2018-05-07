@@ -7,6 +7,7 @@ import IconButton from 'material-ui/IconButton';
 import Button from 'material-ui/Button';
 import MenuIcon from '@material-ui/icons/Menu';
 import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props';
+import sizeMe from 'react-sizeme' 
 
 class Navbar extends Component {
   static propTypes = {
@@ -15,16 +16,35 @@ class Navbar extends Component {
     responseFacebook: PropTypes.func.isRequired,
     handleLogout: PropTypes.func.isRequired,
     handleMenu: PropTypes.func.isRequired,
+    retrieveNavBarHeight: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
     isLoggedIn: false,
   }
 
+  state = {
+   // navBarHeight: 0,
+  }
+
+  onHeightChange(height) {
+    
+
+    
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { retrieveNavBarHeight } = this.props;
+    if (this.props.size.height !== nextProps.size.height) {
+      retrieveNavBarHeight(nextProps.size.height);
+    }
+  }
+
   render() {
     const {
-      classes, isLoggedIn, responseFacebook, handleLogout, handleMenu,
+      classes, isLoggedIn, responseFacebook, handleLogout, handleMenu, navBarHeight //retrieveNavBarHeight
     } = this.props;
+
     return (
       <AppBar className={classes.appBar} position="static">
         <Toolbar className={classes.ToolbarRoot}>
@@ -91,4 +111,4 @@ const styles = theme => ({
   },
 });
 
-export default withStyles(styles)(Navbar);
+export default sizeMe({ monitorHeight: true })(withStyles(styles)(Navbar));
