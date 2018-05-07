@@ -99,7 +99,7 @@ const SelectWrapped = (props) => {
   return (
     <VirtualizedSelect
       optionComponent={Option}
-      optionHeight={36}
+      optionHeight={40}
       noResultsText={<Typography className={classes.noResultsText}>{'No results found'}</Typography>}
       arrowRenderer={arrowProps => {
         return arrowProps.isOpen ? <ArrowDropUpIcon className={classes.arrowIcon}/> : <ArrowDropDownIcon className={classes.arrowIcon} />;

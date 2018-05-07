@@ -24,10 +24,12 @@ class Sidebar extends Component {
     showFavorites: PropTypes.func.isRequired,
     showSearch: PropTypes.func.isRequired,
     loggedIn: PropTypes.bool.isRequired,
+    navBarHeight: PropTypes.number.isRequired,
   }
 
   static defaultProps = {
   }
+
 
   render() {
     const {
@@ -38,6 +40,7 @@ class Sidebar extends Component {
       showSelling,
       showFavorites,
       loggedIn,
+      navBarHeight,
     } = this.props;
     let toggle = "left";
     let isMobile = false;
@@ -45,6 +48,7 @@ class Sidebar extends Component {
       toggle = "top";
       isMobile = true;
     }
+
     return (
       <Drawer
         classes={{
@@ -55,7 +59,8 @@ class Sidebar extends Component {
         variant="persistent"
         anchor={toggle}
         open={open}
-      >
+      > 
+      <div style={{paddingTop: navBarHeight - 51}} />
         <div className={classes.toolbar} />
         <List component="nav">
          <ListItem button component={Link} to="/about">

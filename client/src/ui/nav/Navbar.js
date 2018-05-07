@@ -23,16 +23,6 @@ class Navbar extends Component {
     isLoggedIn: false,
   }
 
-  state = {
-   // navBarHeight: 0,
-  }
-
-  onHeightChange(height) {
-    
-
-    
-  }
-
   componentWillReceiveProps(nextProps) {
     const { retrieveNavBarHeight } = this.props;
     if (this.props.size.height !== nextProps.size.height) {
@@ -42,7 +32,7 @@ class Navbar extends Component {
 
   render() {
     const {
-      classes, isLoggedIn, responseFacebook, handleLogout, handleMenu, navBarHeight //retrieveNavBarHeight
+      classes, isLoggedIn, responseFacebook, handleLogout, handleMenu
     } = this.props;
 
     return (
@@ -111,4 +101,4 @@ const styles = theme => ({
   },
 });
 
-export default sizeMe({ monitorHeight: true })(withStyles(styles)(Navbar));
+export default sizeMe({ monitorHeight: true, refreshRate: 16 })(withStyles(styles)(Navbar));

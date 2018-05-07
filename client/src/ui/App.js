@@ -132,12 +132,12 @@ class App extends Component {
   _retrieveNavBarHeight(height) {
     this.setState({ navBarHeight: height});
   }
-  
+
   render() {
     const {
       classes, isLoggedIn, showSellForm, sellingBook, windowSize, 
     } = this.props;
-    const { courses, sidebarOpen, showResults } = this.state;
+    const { courses, sidebarOpen, showResults, navBarHeight } = this.state;
     let isMobile = false;
     if (windowSize.windowWidth < 600) {
       isMobile = true;
@@ -174,6 +174,7 @@ class App extends Component {
             sellBook={this.sellBook}
             showSelling={this.showSelling}
             showFavorites={this.showFavorites}
+            navBarHeight={navBarHeight}
           />
           <main
             className={classNames(classes.content, classes['content-left'], {
@@ -182,6 +183,7 @@ class App extends Component {
               [classes['contentShift-down-loggedin']]: sidebarOpen && isMobile && isLoggedIn,
               [classes['contentShift-down-notloggedin']]: sidebarOpen && isMobile && !isLoggedIn,
             })}
+            style={{paddingTop: navBarHeight - 51}}
           >
             <SellDialog
               className={classes.dialog}
@@ -244,7 +246,6 @@ const styles = theme => ({
   },
   'contentShift-left': {
     marginLeft: drawerWidth,
-    //marginTop: 100 + this.state.memes,
   },
   'contentShift-down-loggedin': {
     marginTop: 215, // hard coded
