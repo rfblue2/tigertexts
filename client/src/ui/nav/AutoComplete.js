@@ -187,7 +187,7 @@ class IntegrationReactSelect extends Component {
         <TextField
           fullWidth
           onChange={this.handleChange}
-          placeholder="Enter Course Numbers"
+          placeholder="Search by Course"
           name="react-select-chip-label"
           InputProps={{
             disableUnderline: true,

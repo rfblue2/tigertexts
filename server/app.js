@@ -1,7 +1,6 @@
 import express from 'express';
 import sslRedirect from 'heroku-ssl-redirect';
 import path from 'path';
-import favicon from 'serve-favicon';
 import logger from 'morgan';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
@@ -21,8 +20,6 @@ const app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-// uncomment after placing your favicon in /public
-// app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -44,7 +41,9 @@ db.on('error', console.error.bind(console, 'connection error:'));
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '../client/build')));
 
-app.get("/privacy", function(req, res){ res.send("We only store the email address linked to your Facebook account. This helps us follow up when transactions are complete."); });
+app.get('/privacy', (req, res) =>
+  res.send(`We only store the email address linked to your Facebook account.  
+  This helps us follow up when transactions are complete.`));
 
 // Route for API endpoints
 app.use('/api/users', Users);
