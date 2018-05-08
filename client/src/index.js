@@ -17,15 +17,19 @@ const store = createStore(
 
 const theme = createMuiTheme({
   palette: {
-    secondary: {
-      main: grey[900],
-      light: grey[600],
-    },
     primary: {
       main: orange[800],
       light: orange[500],
     },
+    secondary: {
+      main: grey[900],
+      light: grey[500],
+    },
+    background: {
+      default: grey[300]
+    },
   },
+  
   typography: {
     fontFamily: 'Lato'
   }
