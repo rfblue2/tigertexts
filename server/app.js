@@ -13,7 +13,6 @@ import Users from './routes/users';
 import Classes from './routes/classes';
 import Books from './routes/books';
 import Listings from './routes/listings';
-import Transactions from './routes/transactions';
 import Admin from './routes/admin';
 
 const app = express();
@@ -52,8 +51,8 @@ app.use('/api/users', Users);
 app.use('/api/classes', Classes);
 app.use('/api/books', Books);
 app.use('/api/listings', Listings);
-app.use('/api/transactions', Transactions);
 app.use('/admin', Admin);
+
 // render react app for anything else
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/build/index.html'));

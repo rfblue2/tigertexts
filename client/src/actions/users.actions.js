@@ -6,8 +6,6 @@ import {
   NOT_LOGGED_IN,
   GET_USER_REQ,
   GET_USER_RES,
-  USER_ACTIVITY_REQ,
-  USER_ACTIVITY_RES,
   USER_POST_SELL_REQ,
   USER_POST_SELL_RES,
   USER_ERROR,
@@ -19,11 +17,11 @@ import {
   USER_POST_FAV_RES,
   USER_DELETE_FAV_REQ,
   USER_DELETE_FAV_RES,
+  CLOSE_SNACK,
 } from '../constants/users.constants';
 import {
   handleFbResponse,
   getUser,
-  fetchUserActivity,
   postSelling,
   deleteSelling,
   getAndVerifyJwt,
@@ -31,6 +29,43 @@ import {
   deleteFavorite,
 } from '../services/users.service';
 import { deserializeBook } from '../serializers/bookSerializer';
+
+export const closeSnack = () => ({
+  type: CLOSE_SNACK,
+});
+
+export const getUserInfo = (tok, fields) => {
+  const request = (token, queryFields) => ({
+    type: GET_USER_REQ,
+    token,
+    fields: queryFields,
+  });
+
+  const success = (user, token) => ({
+    type: GET_USER_RES,
+    token,
+    user,
+  });
+
+  const notLoggedIn = () => ({
+    type: NOT_LOGGED_IN,
+  });
+
+  return async (dispatch) => {
+    dispatch(request(tok, fields));
+    try {
+      const user = await getUser(tok, fields);
+
+      if (!user) {
+        dispatch(notLoggedIn());
+      }
+
+      dispatch(success(user, tok));
+    } catch (err) {
+      dispatch(userError(err));
+    }
+  };
+};
 
 export const getJwt = () => {
   const success = token => ({
@@ -82,61 +117,6 @@ export const facebookResponse = (res) => {
       } else {
         dispatch(userError('Login res'));
       }
-    } catch (err) {
-      dispatch(userError(err));
-    }
-  };
-};
-
-export const getUserInfo = (tok, fields) => {
-  const request = (token, queryFields) => ({
-    type: GET_USER_REQ,
-    token,
-    fields: queryFields,
-  });
-
-  const success = (user, token) => ({
-    type: GET_USER_RES,
-    token,
-    user,
-  });
-
-  const notLoggedIn = () => ({
-    type: NOT_LOGGED_IN,
-  });
-
-  return async (dispatch) => {
-    dispatch(request(tok, fields));
-    try {
-      const user = await getUser(tok, fields);
-
-      if (!user) {
-        dispatch(notLoggedIn());
-      }
-
-      dispatch(success(user, tok));
-    } catch (err) {
-      dispatch(userError(err));
-    }
-  };
-};
-
-export const getUserActivity = (tok) => {
-  const request = token => ({
-    type: USER_ACTIVITY_REQ,
-    token,
-  });
-
-  const success = activity => ({
-    type: USER_ACTIVITY_RES,
-    activity,
-  });
-
-  return async (dispatch) => {
-    dispatch(request(tok));
-    try {
-      const activity = await fetchUserActivity(tok);
-      dispatch(success(activity));
     } catch (err) {
       dispatch(userError(err));
     }
