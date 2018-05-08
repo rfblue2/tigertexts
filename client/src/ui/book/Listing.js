@@ -20,7 +20,7 @@ class Listing extends Component {
       case 'good': return '(Used - Good)';
       case 'fair': return '(Used - Fair)';
       case 'poor': return '(Used - Poor)';
-      default: return `(${(type).charAt(0).toUpperCase() + (type).slice(1)})`
+      default: return `(${(type).charAt(0).toUpperCase() + (type).slice(1)})`;
     }
   }
 

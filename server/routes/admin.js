@@ -1,7 +1,8 @@
 const express = require('express');
+
 const router = express.Router();
-var cmd = require('node-cmd');
-var PythonShell = require('python-shell');
+const cmd = require('node-cmd');
+const PythonShell = require('python-shell');
 
 /* GET home page. */
 router.get('/', (req, res) => {
@@ -31,10 +32,10 @@ router.get('/update', (req, res) => {
     //   if (err) throw err;
     //   console.log('results: %j', results);
     // });
-  };
+  }
   updateClasses();
   // Figure out how to make dynamic
-  res.render('update', { title: 'Updating Database', status: 'Updated classes'});
+  res.render('update', { title: 'Updating Database', status: 'Updated classes' });
 });
 
 module.exports = router;

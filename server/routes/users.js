@@ -184,9 +184,9 @@ router.route('/selling')
       if (s.price && s.price !== '') listingObj.price = s.price;
       if (s.comment && s.comment !== '') listingObj.detail = s.comment;
       if (s.price_type && s.price_type !== '') listingObj.price_type = s.price_type;
-      console.log(listingObj )
+      console.log(listingObj);
       const listing = new Listing(listingObj);
-      console.log("AAAAA\n" + listing)
+      console.log(`AAAAA\n${listing}`);
       await listing.save();
     }));
     const books = await Book.find({ _id: { $in: data.selling.map(s => s.id) } });
@@ -301,7 +301,6 @@ router.route('/offers/:id')
       };
       sgMail.setApiKey(process.env.SENDGRID_API_KEY);
       sgMail.send(offerMsg);
-
     }
     res.json(serializeOffer(offer));
   }));
