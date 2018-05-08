@@ -13,10 +13,9 @@ import Drawer from 'material-ui/Drawer';
 import Divider from 'material-ui/Divider';
 
 const drawerWidth = 240;
-const drawerColor = '#282828'
-const dividerColor = '#282828'
+const drawerColor = '#222222'
 const drawerLabelColor = '#F0F0F0'
-const drawerHighlightColor = '#434343'
+const drawerHighlightColor = '#404040'
 
 
 class Sidebar extends Component {
@@ -102,9 +101,6 @@ class Sidebar extends Component {
 }
 
 const styles = theme => ({
-  divider: {
-    background: dividerColor,
-  },
   button: {
     '&:hover': {
       background: drawerHighlightColor,
