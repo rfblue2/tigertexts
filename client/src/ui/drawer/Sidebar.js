@@ -98,11 +98,11 @@ class Sidebar extends Component {
             </ListItem> : ''
           }
           {loggedIn ?
-            <ListItem button component={Link} to="/offers" onClick={showOffers}>
+            <ListItem button component={Link} to="/offers" onClick={showOffers} className={classes.button}>
               <ListItemIcon>
-                <AssignmentIcon />
+                <AssignmentIcon className={classes.icon}/>
               </ListItemIcon>
-              <ListItemText primary="Offers" />
+              <ListItemText primary="Offers" classes={{primary: classes.text }} />
             </ListItem> : ''
           }
         </List>
