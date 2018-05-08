@@ -50,7 +50,7 @@ app.use('/api/users', Users);
 app.use('/api/classes', Classes);
 app.use('/api/books', Books);
 app.use('/api/listings', Listings);
-app.use('/admin', Admin);
+// app.use('/admin', Admin);
 
 // render react app for anything else
 app.get('*', (req, res) => {
