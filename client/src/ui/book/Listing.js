@@ -14,6 +14,15 @@ class Listing extends Component {
     onClick: PropTypes.func,
   };
 
+  static getPriceTypeString(type) {
+    switch (type) {
+      case 'good': return '(Used - Good)';
+      case 'fair': return '(Used - Fair)';
+      case 'poor': return '(Used - Poor)';
+      default: return `(${(type).charAt(0).toUpperCase() + (type).slice(1)})`
+    }
+  }
+
   render() {
     const { classes, listing, onClick } = this.props;
     // If not platform listing, link to URL, o/w use programmatic click handler
@@ -44,7 +53,7 @@ class Listing extends Component {
               {listing.price ?
                 <ListItemText
                   className={classes.bookPrice}
-                  primary={listing.price_type}
+                  primary={Listing.getPriceTypeString(listing.price_type)}
                   secondary={`$${formatNumber(listing.price)}`}
                 /> : '' }
             </Grid>

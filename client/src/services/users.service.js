@@ -68,6 +68,7 @@ export const postSelling = async (token, user, bookIds, sellData) => {
       attributes: {
         price: sd.price,
         comment: sd.comment,
+        priceType: sd.type,
       },
     })),
     data: {

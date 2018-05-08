@@ -6,8 +6,10 @@ import Dialog, {
   DialogContent,
   DialogActions,
 } from 'material-ui/Dialog';
-import TextField from 'material-ui/TextField';
+import { MenuItem } from 'material-ui/Menu';
 import { FormControl } from 'material-ui/Form';
+import Select from 'material-ui/Select';
+import TextField from 'material-ui/TextField';
 import Input, { InputAdornment, InputLabel } from 'material-ui/Input';
 import Button from 'material-ui/Button';
 
@@ -27,6 +29,7 @@ class SellDialog extends Component {
   state = {
     comment: '',
     price: '',
+    type: 'good',
   }
 
   onPriceChange = (e) => {
@@ -37,10 +40,15 @@ class SellDialog extends Component {
     this.setState({ comment: e.target.value });
   }
 
+  onTypeChange = (e) => {
+    this.setState({ type: e.target.value });
+  }
+
   handleSubmit = () => {
     const newBook = this.props.book;
     newBook.price = this.state.price;
     newBook.comment = this.state.comment;
+    newBook.type = this.state.type;
     this.props.onSubmit(newBook);
   }
 
@@ -72,6 +80,23 @@ class SellDialog extends Component {
             />
           </FormControl>
           <br />
+          <FormControl className={classes.formControl}>
+            <InputLabel htmlFor="type-select">Condition</InputLabel>
+            <Select
+              value={this.state.type}
+              onChange={this.onTypeChange.bind(this)}
+              inputProps={{
+                name: 'type',
+                id: 'type-select',
+              }}
+            >
+              <MenuItem value="new">New</MenuItem>
+              <MenuItem value="good">Good</MenuItem>
+              <MenuItem value="fair">Fair</MenuItem>
+              <MenuItem value="poor">Poor</MenuItem>
+            </Select>
+          </FormControl>
+          <br />
           <TextField
             id={`comment-${book.id}`}
             label="Comment"
@@ -93,6 +118,10 @@ class SellDialog extends Component {
 
 const styles = {
   dialog: {
+  },
+  formControl: {
+    marginTop: '5px',
+    marginBottom: '5px',
   },
   content: {
     height: '200px',

@@ -131,11 +131,15 @@ class App extends Component {
     this.setState({ sidebarOpen: !this.state.sidebarOpen });
   }
 
-  _sellBook({ id, price, comment }) {
+  _sellBook({
+    id, price, comment, type,
+  }) {
     const { token, user } = this.props;
     this.props.dispatch(userPostSellBooks(
       token, user, [id],
-      [{ id, price, comment }],
+      [{
+        id, price, comment, type,
+      }],
     ));
   }
 
