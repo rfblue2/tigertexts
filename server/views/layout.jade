@@ -2,6 +2,14 @@ doctype html
 html
   head
     title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
+    meta(charset="utf-8")
+    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css')
+    link(rel='stylesheet', href='https://use.fontawesome.com/4d03c06201.js')
+    link(rel='stylesheet', href='https://fonts.googleapis.com/css?family=Lato:300,400,700,900')
+    link(rel='stylesheet', type='text/css', href='/public/stylesheets/style.css')
+    link(rel='text/javascript', href='https://code.jquery.com/jquery-3.2.1.min.js')
+    link(rel='text/javascript', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js')
+
   body
-    block content
+    .container
+      block content

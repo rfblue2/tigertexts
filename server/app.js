@@ -13,6 +13,7 @@ import Users from './routes/users';
 import Classes from './routes/classes';
 import Books from './routes/books';
 import Listings from './routes/listings';
+import Admin from './routes/admin';
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.set('view engine', 'jade');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use("/public", express.static(path.join(__dirname, 'public')));
 
 app.use(sslRedirect([
   'production',
@@ -49,6 +51,7 @@ app.use('/api/users', Users);
 app.use('/api/classes', Classes);
 app.use('/api/books', Books);
 app.use('/api/listings', Listings);
+app.use('/admin', Admin);
 
 // render react app for anything else
 app.get('*', (req, res) => {

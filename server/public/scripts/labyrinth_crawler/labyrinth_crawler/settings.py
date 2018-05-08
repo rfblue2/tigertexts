@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Scrapy settings for description project
+# Scrapy settings for labyrinth_crawler project
 #
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -9,27 +9,25 @@
 #     http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 #     http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'description'
+BOT_NAME = 'labyrinth_crawler'
 
-SPIDER_MODULES = ['description.spiders']
-NEWSPIDER_MODULE = 'description.spiders'
+SPIDER_MODULES = ['labyrinth_crawler.spiders']
+NEWSPIDER_MODULE = 'labyrinth_crawler.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = 'description (+http://www.yourdomain.com)'
+#USER_AGENT = 'labyrinth_crawler (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = False
+ROBOTSTXT_OBEY = True
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS = 8
+#CONCURRENT_REQUESTS = 32
 
 # Configure a delay for requests for the same website (default: 0)
 # See http://scrapy.readthedocs.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 2
-# Force utf-8 encoding so you don't get unicode stuff like \u2014 in the output
-FEED_EXPORT_ENCODING = 'utf-8'
+#DOWNLOAD_DELAY = 3
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
 #CONCURRENT_REQUESTS_PER_IP = 16
@@ -49,13 +47,13 @@ FEED_EXPORT_ENCODING = 'utf-8'
 # Enable or disable spider middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
 #SPIDER_MIDDLEWARES = {
-#    'description.middlewares.DescriptionSpiderMiddleware': 543,
+#    'labyrinth_crawler.middlewares.LabyrinthCrawlerSpiderMiddleware': 543,
 #}
 
 # Enable or disable downloader middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 #DOWNLOADER_MIDDLEWARES = {
-#    'description.middlewares.MyCustomDownloaderMiddleware': 543,
+#    'labyrinth_crawler.middlewares.MyCustomDownloaderMiddleware': 543,
 #}
 
 # Enable or disable extensions
@@ -67,7 +65,7 @@ FEED_EXPORT_ENCODING = 'utf-8'
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 #ITEM_PIPELINES = {
-#    'description.pipelines.DescriptionPipeline': 300,
+#    'labyrinth_crawler.pipelines.LabyrinthCrawlerPipeline': 300,
 #}
 
 # Enable and configure the AutoThrottle extension (disabled by default)

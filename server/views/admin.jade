@@ -1,0 +1,10 @@
+extends layout
+
+style.
+  p {
+    font-family: 'Lato'
+  }
+block content
+  h1= title
+  p Welcome to #{title}
+  a(href='/admin/update'): button().btn.btn-primary Submit
