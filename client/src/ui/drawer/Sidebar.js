@@ -69,20 +69,20 @@ class Sidebar extends Component {
         <div className={classes.toolbar} />
         <div style={{paddingTop: navBarHeight - 51}} />
         <List component="nav">
-         <ListItem button component={Link} to="/about" className={classes.button}>
+         <ListItem button component={Link} to="/" className={classes.button}>
            <ListItemIcon>
              <InfoIcon className={classes.icon}/>
            </ListItemIcon>
            <ListItemText primary="About" classes={{primary: classes.text }} />
          </ListItem>
-          <ListItem button component={Link} to="/" onClick={showSearch} className={classes.button}>
+          <ListItem button component={Link} to="/books" onClick={showSearch} className={classes.button}>
             <ListItemIcon>
               <SearchIcon className={classes.icon}/>
             </ListItemIcon>
             <ListItemText primary="Search Results" classes={{primary: classes.text }} />
           </ListItem>
           {loggedIn ?
-            <ListItem button component={Link} to="/" onClick={showSelling} className={classes.button}>
+            <ListItem button component={Link} to="/books" onClick={showSelling} className={classes.button}>
               <ListItemIcon>
                 <LibraryBooksIcon className={classes.icon}/>
               </ListItemIcon>
@@ -90,7 +90,7 @@ class Sidebar extends Component {
             </ListItem> : ''
           }
           {loggedIn ?
-            <ListItem button component={Link} to="/" onClick={showFavorites} className={classes.button}>
+            <ListItem button component={Link} to="/books" onClick={showFavorites} className={classes.button}>
               <ListItemIcon>
                 <FavoriteIcon className={classes.icon}/>
               </ListItemIcon>

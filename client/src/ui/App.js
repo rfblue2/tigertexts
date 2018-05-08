@@ -215,7 +215,7 @@ class App extends Component {
     return (
       <Router>
         <div className={classes.appFrame}>
-          { showResults ? <Redirect to="/" /> : '' }
+          { showResults ? <Redirect to="/books" /> : '' }
           <Navbar
             isLoggedIn={isLoggedIn}
             responseFacebook={this.responseFacebook}
@@ -268,8 +268,8 @@ class App extends Component {
               onClose={this.handleCloseListingDialog}
             />
             <div className={classes.toolbar} />
-            <Route exact path="/" component={BookListContainer} />
-            <Route exact path="/about" component={About} />
+            <Route exact path="/" component={About} />
+            <Route exact path="/books" component={BookListContainer} />
             <Route exact path="/offers" component={OffersContainer} />
           </main>
           <Snackbar
