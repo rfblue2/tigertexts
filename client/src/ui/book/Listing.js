@@ -15,6 +15,7 @@ class Listing extends Component {
   };
 
   static getPriceTypeString(type) {
+    if (!type) return '';
     switch (type) {
       case 'good': return '(Used - Good)';
       case 'fair': return '(Used - Fair)';

@@ -31,6 +31,16 @@ class ListingDialog extends Component {
     price: 0,
   }
 
+  static getPriceTypeString(type) {
+    if (!type) return '';
+    switch (type) {
+      case 'good': return '(Used - Good)';
+      case 'fair': return '(Used - Fair)';
+      case 'poor': return '(Used - Poor)';
+      default: return `(${(type).charAt(0).toUpperCase() + (type).slice(1)})`
+    }
+  }
+
   onPriceChange = (e) => {
     this.setState({ price: e.target.value });
   }
@@ -61,6 +71,11 @@ class ListingDialog extends Component {
                     Sold by {listing.seller ? listing.seller.name : ''}
                     {listing.price ? ` for $${listing.price}` : ''}
                   </Typography>
+                  <Typography variant="subheading">
+                    {listing.price_type ?
+                      ListingDialog.getPriceTypeString(listing.price_type) : ''}
+                  </Typography>
+                  <br />
                   <Typography variant="body1">
                     {listing.detail}
                   </Typography>
