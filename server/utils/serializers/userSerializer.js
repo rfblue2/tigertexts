@@ -37,13 +37,20 @@ const serializeUser = (user, opts) => (new Serializer('user', {
   },
 })).serialize(user);
 
-// TODO get rid of thsi hack for inclusion/noninclusion of resources
-const deserializeUser = (user, opts) => opts.special ? (new Deserializer()).deserialize(user) : (new Deserializer({
-  keyForAttribute: 'snake_case',
-  book: {
-    valueForRelationship: relationship => relationship,
-  },
-})).deserialize(user);
+const deserializeUser = (user, opts) => {
+  let deserializer = new Deserializer({
+    keyForAttribute: 'snake_case',
+    book: {
+      valueForRelationship: relationship => relationship.id,
+    },
+  });
+  if (opts && opts.included) {
+    deserializer = new Deserializer({
+      keyForAttribute: 'snake_case',
+    });
+  }
+  return deserializer.deserialize(user);
+};
 
 export {
   serializeUser,

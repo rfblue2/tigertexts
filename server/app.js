@@ -1,7 +1,6 @@
 import express from 'express';
 import sslRedirect from 'heroku-ssl-redirect';
 import path from 'path';
-import favicon from 'serve-favicon';
 import logger from 'morgan';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
@@ -13,7 +12,7 @@ import Users from './routes/users';
 import Classes from './routes/classes';
 import Books from './routes/books';
 import Listings from './routes/listings';
-import Transactions from './routes/transactions';
+import Admin from './routes/admin';
 
 const app = express();
 
@@ -21,11 +20,10 @@ const app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-// uncomment after placing your favicon in /public
-// app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use("/public", express.static(path.join(__dirname, 'public')));
 
 app.use(sslRedirect([
   'production',
@@ -43,14 +41,16 @@ db.on('error', console.error.bind(console, 'connection error:'));
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '../client/build')));
 
-app.get("/privacy", function(req, res){ res.send("We only store the email address linked to your Facebook account. This helps us follow up when transactions are complete."); });
+app.get('/privacy', (req, res) =>
+  res.send(`We only store the email address linked to your Facebook account.  
+  This helps us follow up when transactions are complete.`));
 
 // Route for API endpoints
 app.use('/api/users', Users);
 app.use('/api/classes', Classes);
 app.use('/api/books', Books);
 app.use('/api/listings', Listings);
-app.use('/api/transactions', Transactions);
+app.use('/admin', Admin);
 
 // render react app for anything else
 app.get('*', (req, res) => {

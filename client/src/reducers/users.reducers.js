@@ -6,8 +6,6 @@ import {
   NOT_LOGGED_IN,
   GET_USER_REQ,
   GET_USER_RES,
-  USER_ACTIVITY_REQ,
-  USER_ACTIVITY_RES,
   USER_POST_SELL_REQ,
   USER_POST_SELL_RES,
   USER_ERROR,
@@ -19,8 +17,10 @@ import {
   USER_DELETE_FAV_REQ,
   USER_POST_FAV_RES,
   USER_POST_FAV_REQ,
+  CLOSE_SNACK,
 } from '../constants/users.constants';
 import { GET_USER_FAVORITES_RES, GET_USER_SELLING_RES } from '../constants/books.constants';
+import { DELETE_OFFER_RES, POST_OFFER_RES } from '../constants/offers.constants';
 
 const defaultuser = {
   selling: [],
@@ -35,9 +35,15 @@ const userReducer = (state = {
   },
   user: defaultuser,
   token: '',
+  sellBookSnack: false,
+  soldSnack: false,
+  notifySellerSnack: false,
+  updateOfferSnack: false,
+  favoritedSnack: false,
+  openSnack: false,
 }, action) => {
   const {
-    type, token, user, activity, error, books, book,
+    type, token, user, error, books, book,
   } = action;
   switch (type) {
     case GET_JWT:
@@ -58,15 +64,7 @@ const userReducer = (state = {
       return { ...state, error: null };
     case GET_USER_RES:
       return {
-        ...state, user, error: null,
-      };
-    case USER_ACTIVITY_REQ:
-      return {
-        ...state, error: null,
-      };
-    case USER_ACTIVITY_RES:
-      return {
-        ...state, user: { ...state.user, activity }, error: null,
+        ...state, user: user || defaultuser, error: null,
       };
     case USER_SELL_DIALOG:
       return { ...state, sellDialog: { isSelling: true, book }, error: null };
@@ -83,6 +81,8 @@ const userReducer = (state = {
         },
         sellDialog: { isSelling: false, book: {} },
         error: null,
+        sellBookSnack: true,
+        openSnack: true,
       };
     case USER_DELETE_SELL_REQ:
       return state;
@@ -94,6 +94,8 @@ const userReducer = (state = {
           selling: state.user.selling.filter(b => b.id !== book.id),
         },
         error: null,
+        soldSnack: true,
+        openSnack: true,
       };
     case USER_POST_FAV_REQ:
       return { ...state, error: null };
@@ -105,6 +107,8 @@ const userReducer = (state = {
           favorite: [...state.user.favorite, book],
         },
         error: null,
+        favoritedSnack: true,
+        openSnack: true,
       };
     case USER_DELETE_FAV_REQ:
       return state;
@@ -116,6 +120,8 @@ const userReducer = (state = {
           favorite: state.user.favorite.filter(b => b.id !== book.id),
         },
         error: null,
+        favoritedSnack: true,
+        openSnack: true,
       };
     case GET_USER_SELLING_RES:
       return {
@@ -133,9 +139,28 @@ const userReducer = (state = {
           favorite: action.books,
         },
       };
+    case POST_OFFER_RES:
+      return {
+        ...state, error: null, notifySellerSnack: true, openSnack: true,
+      };
+    case DELETE_OFFER_RES:
+      return {
+        ...state, error: null, updateOfferSnack: true, openSnack: true,
+      };
     case NOT_LOGGED_IN:
       return {
         ...state, token: '', user: defaultuser, error: null, loggedIn: false,
+      };
+    case CLOSE_SNACK:
+      return {
+        ...state,
+        error: null,
+        favoritedSnack: false,
+        sellBookSnack: false,
+        soldSnack: false,
+        notifySellerSnack: false,
+        updateOfferSnack: false,
+        openSnack: false,
       };
     case USER_ERROR:
       console.log(`ERROR: ${JSON.stringify(error, null, 2)}`);

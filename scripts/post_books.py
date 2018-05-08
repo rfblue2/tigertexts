@@ -7,6 +7,7 @@ def post_books():
   urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
   raw = json.load(open('blackboard_crawler/results.json'))
   labyrinth_raw = json.load(open('labyrinth_crawler/results.json'))
+  description_raw = json.load(open('description/descriptionResults.json'))
 
   # Delete classes without book
   for i in range(len(raw) - 1, -1, -1):
@@ -17,6 +18,10 @@ def post_books():
   labyrinth_dict = dict()
   for entry in labyrinth_raw:
     labyrinth_dict[entry['isbn']] = entry
+
+  description_dict = dict()
+  for entry in description_raw:
+    description_dict[entry['isbn']] = entry
 
   host = ''
   if sys.argv[1] == 'local':
@@ -46,10 +51,14 @@ def post_books():
     for book in line['bookList']:
       # Some books might appear in multiple listings (like Practice of Programming in COS333/217)
       if book['title'] not in book_dict.keys():
-        book_attributes = {'title': book['title'], 'authors': book['author'],
+        book_attributes = {'title': book['title'], 'authors': [x.strip() for x in book['author'].split(';')] if book['author'] is not None else book['author'],
         'isbn': book['ISBN']}
+        # Try bigwords.com picture first
+        if book['ISBN'] in description_dict:
+          book_attributes['image'] = description_dict[book['ISBN']]['imageLink']
+          book_attributes['description'] = description_dict[book['ISBN']]['description']
         # Try labyrinth image first
-        if book['ISBN'] in labyrinth_dict:
+        elif book['ISBN'] in labyrinth_dict:
           book_attributes['image'] = labyrinth_dict[book['ISBN']]['imageLink']
         elif 'image' in book.keys():
           book_attributes['image'] = book['image']

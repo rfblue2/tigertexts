@@ -1,4 +1,3 @@
-import { deserializeTransaction } from '../serializers/transactionSerializer';
 import { deserializeBook } from '../serializers/bookSerializer';
 import { deserializeListing } from '../serializers/listingSerializer';
 import { deserializeUser } from '../serializers/userSerializer';
@@ -23,7 +22,6 @@ export const getAndVerifyJwt = async () => {
 };
 
 export const handleFbResponse = res =>
-  // console.log(`Facebook response: ${JSON.stringify(res)}`);
   fetch(`/api/users/login?token=${res.accessToken}&email=${res.email}&name=${res.name}&userId=${res.id}`);
 
 export const getUser = async (token, fields) => {
@@ -60,22 +58,6 @@ export const getUser = async (token, fields) => {
   }
 
   return user;
-};
-
-export const fetchUserActivity = async (token) => {
-  const actres = await fetch('api/users/activity', {
-    headers: { 'x-auth-token': token },
-  });
-  const actresjson = await actres.json();
-  let activity = await deserializeTransaction(actresjson);
-  activity = await Promise.all(activity.map(async (t) => {
-    const bookRes = await fetch(`/api/books/${t.book}`);
-    const bookResjson = await bookRes.json();
-    const transact = { ...t };
-    transact.book = await deserializeBook(bookResjson);
-    return transact;
-  }));
-  return activity;
 };
 
 export const postSelling = async (token, user, bookIds, sellData) => {

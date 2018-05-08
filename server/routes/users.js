@@ -3,7 +3,8 @@ import express from 'express';
 import fetch from 'isomorphic-fetch';
 import jwt from 'jsonwebtoken';
 import expressJwt from 'express-jwt';
-import { serializeTransaction } from '../utils/serializers/transactionSerializer';
+import mongoose from 'mongoose';
+import sgMail from '@sendgrid/mail';
 import {
   serializeUser,
   deserializeUser,
@@ -12,9 +13,10 @@ import { serializeBook } from '../utils/serializers/bookSerializer';
 import User from '../models/user';
 import Book from '../models/book';
 import Listing from '../models/listing';
-import Transaction from '../models/transaction';
+import Offer from '../models/offer';
 import wrap from '../utils/wrap';
 import { parseInclude, populateQuery } from '../utils/queryparse';
+import { deserializeOffer, serializeOffer } from '../utils/serializers/offerSerializer';
 
 const router = express.Router();
 
@@ -67,6 +69,19 @@ router.get('/login', wrap(async (req, res) => {
       role: 'Member',
     });
     savedUser = await user.save();
+    const welcomeMsg = {
+      to: email,
+      from: 'rfong@princeton.edu',
+      subject: 'Welcome to TigerTexts',
+      text: `Thank you for choosing TigerTexts as your one stop shop for all
+             your coursebook needs.  We are excited to have you!  Head over to 
+             tigertexts.herokuapp.com to start.`,
+      html: `<p>Thank you for choosing TigerTexts as your one stop shop for all
+             your coursebook needs.  We are excited to have you!  Head over to 
+             <a href="tigertexts.herokuapp.com">TigerTexts</a> to start.</p>`,
+    };
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    sgMail.send(welcomeMsg);
   } else {
     savedUser = await User.findOneAndUpdate({
       _id: user._id,
@@ -98,8 +113,8 @@ const authenticate = expressJwt({
 });
 
 const getCurrentUser = wrap(async (req, res, next) => {
-  req.query = User.findById(req.auth.id);
-  req.user = await req.query.exec();
+  req.q = User.findById(req.auth.id);
+  req.user = await req.q.exec();
   next();
 });
 
@@ -114,22 +129,7 @@ router.route('/me')
 
 /**
  * API Routes
- * TODO Secure all these API routes with jwt so that the correct user can access them
- * TODO currently checks query param for mongo id
  */
-
-router.route('/activity')
-
-  .get(authenticate, getCurrentUser, wrap(async (req, res) => {
-    const id = req.user._id;
-    const activity = await Transaction.find({
-      $or: [
-        { seller: id },
-        { buyer: id },
-      ],
-    });
-    res.json(serializeTransaction(activity));
-  }));
 
 // Convenience method for viewing (get) and adding (post) favorites
 router.route('/favorites')
@@ -143,8 +143,8 @@ router.route('/favorites')
     const data = await deserializeUser(req.body);
     await User.findOneAndUpdate({
       _id: req.user._id,
-    }, { $push: { favorite: { $each: data.favorite.map(f => f.id) } } }, { new: true });
-    const books = await Book.find({ _id: { $in: data.favorite.map(f => f.id) } });
+    }, { $push: { favorite: { $each: data.favorite } } }, { new: true });
+    const books = await Book.find({ _id: { $in: data.favorite } });
     res.json(serializeBook(books));
   }));
 
@@ -169,22 +169,22 @@ router.route('/selling')
   }))
 
   .post(authenticate, getCurrentUser, wrap(async (req, res) => {
-    const data = await deserializeUser(req.body, { special: true });
+    const data = await deserializeUser(req.body, { included: true });
     await User.findOneAndUpdate({
       _id: req.user._id,
     }, { $push: { selling: { $each: data.selling.map(s => s.id) } } }, { new: true });
     await Promise.all(data.selling.map(async (s) => {
+      // create a new listing
       const listingObj = {
         kind: 'platform',
         title: `Seller: ${req.user.name}`,
         book: s.id,
         seller: req.user._id,
       };
-      console.log(JSON.stringify(s, null,2))
       if (s.price && s.price !== '') listingObj.price = s.price;
       if (s.comment && s.comment !== '') listingObj.detail = s.comment;
       const listing = new Listing(listingObj);
-      listing.save();
+      await listing.save();
     }));
     const books = await Book.find({ _id: { $in: data.selling.map(s => s.id) } });
     res.json(serializeBook(books));
@@ -199,8 +199,108 @@ router.route('/selling/:id')
     await User.findOneAndUpdate({
       _id: req.user._id,
     }, { selling: user.selling }, { new: true });
-    await Listing.findOneAndRemove({ seller: req.user._id, book: req.params.id });
+    const listing = await Listing.findOneAndRemove({ seller: req.user._id, book: req.params.id });
+    await Offer.remove({ listing: mongoose.Types.ObjectId(listing._id) });
     res.json(serializeBook(book));
+  }));
+
+// Convenience method for getting and adding (post) offers for buying books
+// When retrieving offers, retrieves both user initiated and interested user offers
+router.route('/offers')
+  .get(parseInclude, authenticate, getCurrentUser, wrap(async (req, res) => {
+    const userOffersQuery = Offer.find({
+      buyer: mongoose.Types.ObjectId(req.user._id.toString()),
+    });
+    req.fields.forEach((f) => {
+      if (f.includes('.')) {
+        const [field, sub] = f.split('.');
+        userOffersQuery.populate(field, sub);
+      } else {
+        userOffersQuery.populate(f);
+      }
+    });
+    const userOffers = await userOffersQuery.exec();
+    const listings = await Listing.find({ seller: req.user._id });
+    let otherOffers = await Promise.all(listings.map(async (l) => {
+      const otherOfferQuery = Offer.find({ listing: l._id });
+      req.fields.forEach((f) => {
+        if (f.includes('.')) {
+          const [field, sub] = f.split('.');
+          otherOfferQuery.populate(field, sub);
+        } else {
+          otherOfferQuery.populate(f);
+        }
+      });
+      return otherOfferQuery.exec();
+    }));
+    otherOffers = otherOffers.reduce((a, b) => a.concat(b), []);
+    res.json(serializeOffer([...userOffers, ...otherOffers]));
+  }))
+
+  .post(authenticate, getCurrentUser, wrap(async (req, res) => {
+    const data = await deserializeOffer(req.body);
+    const offer = new Offer({ ...data });
+    const newOffer = await offer.save();
+    const listing = await Listing.findById(data.listing)
+      .populate('seller')
+      .populate('book');
+    const buyer = await User.findById(data.buyer);
+    const offerMsg = {
+      to: listing.seller.email,
+      from: 'rfong@princeton.edu',
+      subject: 'Someone is interested in purchasing your books!',
+      text: `${buyer.name} has offered to purchase ${listing.book.title}
+             for $${data.price}. Go to tigertexts.herokuapp.com to view
+             the offer. Buyer can be contacted at ${buyer.email}.`,
+      html: `<p>${buyer.name} has offered to purchase ${listing.book.title}
+             for $${data.price}. Buyer can be contacted at ${buyer.email}.
+             <a href="tigertexts.herokuapp.com">View the offer</a>.
+             </p>`,
+    };
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    sgMail.send(offerMsg);
+    res.status(201).json(serializeOffer(newOffer));
+  }));
+
+router.route('/offers/:id')
+
+  .delete(authenticate, getCurrentUser, wrap(async (req, res) => {
+    const offer = await Offer.findByIdAndRemove(req.params.id);
+    const buyer = await User.findById(offer.buyer);
+    const listing = await Listing.findById(offer.listing)
+      .populate('seller')
+      .populate('book');
+    if (req.query.action === 'accept') {
+      const offerMsg = {
+        to: buyer.email,
+        from: 'rfong@princeton.edu',
+        subject: 'Your TigerTexts offer has been updated',
+        text: `${listing.seller.name} has accepted your offer to purchase
+             ${listing.book.title} for $${offer.price}! Contact the seller
+             at ${listing.seller.email}`,
+        html: `<p>${listing.seller.name} has accepted your offer to purchase
+             ${listing.book.title} for $${offer.price}! Contact the seller
+             at ${listing.seller.email}.
+             </p>`,
+      };
+      sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+      sgMail.send(offerMsg);
+    } else if (req.query.action === 'decline') {
+      const offerMsg = {
+        to: buyer.email,
+        from: 'rfong@princeton.edu',
+        subject: 'Your TigerTexts offer has been updated',
+        text: `${listing.seller.name} has declined your offer to purchase
+             ${listing.book.title} for $${offer.price}.`,
+        html: `<p>${listing.seller.name} has declined your offer to purchase
+             ${listing.book.title} for $${offer.price}.
+             </p>`,
+      };
+      sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+      sgMail.send(offerMsg);
+
+    }
+    res.json(serializeOffer(offer));
   }));
 
 export default router;

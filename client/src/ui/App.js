@@ -9,10 +9,13 @@ import {
   Redirect,
 } from 'react-router-dom';
 import { withStyles } from 'material-ui/styles';
+import Snackbar from 'material-ui/Snackbar';
+import IconButton from 'material-ui/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 import {
   getJwt,
   removeJwt,
-  facebookResponse, userPostSellBooks, userCancelSellDialog,
+  facebookResponse, userPostSellBooks, userCancelSellDialog, closeSnack,
 } from '../actions/users.actions';
 import {
   getBooksForClasses,
@@ -26,7 +29,11 @@ import Sidebar from './drawer/Sidebar';
 import Navbar from './nav/Navbar';
 import { deserializeClass } from '../serializers/classSerializer';
 import About from './About';
-import SellDialog from './dashboard/SellDialog';
+import SellDialog from './book/SellDialog';
+import { closeListingDialog } from '../actions/listings.actions';
+import ListingDialog from './book/ListingDialog';
+import OffersContainer from './offer/OfferContainer';
+import { getUserOffers, postOffer } from '../actions/offers.actions';
 
 const drawerWidth = 240;
 
@@ -46,6 +53,14 @@ class App extends Component {
     user: PropTypes.object,
     token: PropTypes.string,
     showSellForm: PropTypes.bool.isRequired,
+    listing: PropTypes.object,
+    showListingDialog: PropTypes.bool.isRequired,
+    sellBookSnack: PropTypes.bool.isRequired,
+    soldSnack: PropTypes.bool.isRequired,
+    notifySellerSnack: PropTypes.bool.isRequired,
+    updateOfferSnack: PropTypes.bool.isRequired,
+    favoritedSnack: PropTypes.bool.isRequired,
+    openSnack: PropTypes.bool.isRequired,
     windowSize: PropTypes.object.isRequired,
   }
 
@@ -54,6 +69,7 @@ class App extends Component {
     sellingBook: null,
     user: {},
     token: '',
+    listing: {},
   }
 
   async componentWillMount() {
@@ -62,10 +78,14 @@ class App extends Component {
     this.responseFacebook = this._responseFacebook.bind(this);
     this.handleSearch = this._handleSearch.bind(this);
     this.handleMenu = this._handleMenu.bind(this);
-    this.handleCloseForm = this._handleCloseForm.bind(this);
+    this.handleCloseSellDialog = this._handleCloseSellDialog.bind(this);
     this.showSelling = this._showSelling.bind(this);
     this.showFavorites = this._showFavorites.bind(this);
     this.sellBook = this._sellBook.bind(this);
+    this.handleCloseListingDialog = this._handleCloseListingDialog.bind(this);
+    this.showOffers = this._showOffers.bind(this);
+    this.handleOnOffer = this._handleOnOffer.bind(this);
+    this.handleCloseSnack = this._handleCloseSnack.bind(this);
     this.trimLabel = this._trimLabel.bind(this);
     this.retrieveNavBarHeight = this._retrieveNavBarHeight.bind(this);
 
@@ -109,8 +129,12 @@ class App extends Component {
     ));
   }
 
-  _handleCloseForm = () => {
+  _handleCloseSellDialog = () => {
     this.props.dispatch(userCancelSellDialog());
+  };
+
+  _handleCloseListingDialog = () => {
+    this.props.dispatch(closeListingDialog());
   };
 
   _showSelling() {
@@ -119,6 +143,38 @@ class App extends Component {
 
   _showFavorites() {
     this.props.dispatch(getUserFavoriteBooks(this.props.token));
+  }
+
+  _showOffers() {
+    this.props.dispatch(getUserOffers(this.props.token));
+  }
+
+  _handleOnOffer(token, listingId, price, userId) {
+    const offer = {
+      price,
+      buyer: userId,
+      listing: listingId,
+    };
+    this.props.dispatch(postOffer(token, offer));
+  }
+
+  _handleCloseSnack() {
+    this.props.dispatch(closeSnack());
+  }
+
+  getSnackMessage() {
+    if (this.props.notifySellerSnack) {
+      return 'Seller has been notified of your offer';
+    } else if (this.props.favoritedSnack) {
+      return 'Updated favorites';
+    } else if (this.props.sellBookSnack) {
+      return 'Book now marked as selling';
+    } else if (this.props.soldSnack) {
+      return 'Book marked as sold';
+    } else if (this.props.updateOfferSnack) {
+      return 'Offer updated';
+    }
+    return 'Updated!';
   }
 
   _trimLabel(label) {
@@ -131,11 +187,21 @@ class App extends Component {
 
   _retrieveNavBarHeight(height) {
     this.setState({ navBarHeight: height});
+
   }
 
   render() {
     const {
-      classes, isLoggedIn, showSellForm, sellingBook, windowSize, 
+      classes,
+      isLoggedIn,
+      showSellForm,
+      sellingBook,
+      showListingDialog,
+      listing,
+      user,
+      token,
+      openSnack,
+      windowSize, 
     } = this.props;
     const { courses, sidebarOpen, showResults, navBarHeight } = this.state;
     let isMobile = false;
@@ -143,13 +209,13 @@ class App extends Component {
       isMobile = true;
     }
     if (showResults) {
-      this.setState({showResults: false});
+      this.setState({ showResults: false });
     }
 
     return (
       <Router>
         <div className={classes.appFrame}>
-          { showResults ? <Redirect to='/' /> : '' }
+          { showResults ? <Redirect to="/" /> : '' }
           <Navbar
             isLoggedIn={isLoggedIn}
             responseFacebook={this.responseFacebook}
@@ -173,6 +239,7 @@ class App extends Component {
             sellBook={this.sellBook}
             showSelling={this.showSelling}
             showFavorites={this.showFavorites}
+            showOffers={this.showOffers}
             navBarHeight={navBarHeight}
           />
           <main
@@ -187,14 +254,48 @@ class App extends Component {
             <SellDialog
               className={classes.dialog}
               onSubmit={this.sellBook}
-              onClose={this.handleCloseForm}
+              onClose={this.handleCloseSellDialog}
               book={sellingBook}
               showForm={showSellForm}
+            />
+            <ListingDialog
+              listing={listing}
+              showForm={showListingDialog}
+              user={user}
+              loggedIn={isLoggedIn}
+              token={token}
+              onOffer={this.handleOnOffer}
+              onClose={this.handleCloseListingDialog}
             />
             <div className={classes.toolbar} />
             <Route exact path="/" component={BookListContainer} />
             <Route exact path="/about" component={About} />
+            <Route exact path="/offers" component={OffersContainer} />
           </main>
+          <Snackbar
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
+            }}
+            open={openSnack}
+            autoHideDuration={3000}
+            onClose={this.handleCloseSnack}
+            ContentProps={{
+              'aria-describedby': 'message-id',
+            }}
+            message={<span id="message-id">{this.getSnackMessage()}</span>}
+            action={[
+              <IconButton
+                key="close"
+                aria-label="Close"
+                color="inherit"
+                className={classes.close}
+                onClick={this.handleCloseSnack}
+              >
+                <CloseIcon />
+              </IconButton>,
+            ]}
+          />
         </div>
       </Router>
     );
@@ -205,6 +306,10 @@ const styles = theme => ({
   dialog: {
     width: '100%',
     height: '100%',
+  },
+  close: {
+    width: theme.spacing.unit * 4,
+    height: theme.spacing.unit * 4,
   },
   appFrame: {
     zIndex: 1,
@@ -261,6 +366,14 @@ const mapStateToProps = state => ({
   token: state.user.token,
   user: state.user.user,
   showSellForm: state.user.sellDialog.isSelling,
+  listing: state.listing.listing,
+  showListingDialog: state.listing.dialogOpen,
+  sellBookSnack: state.user.sellBookSnack,
+  soldSnack: state.user.soldSnack,
+  notifySellerSnack: state.user.notifySellerSnack,
+  updateOfferSnack: state.user.updateOfferSnack,
+  favoritedSnack: state.user.favoritedSnack,
+  openSnack: state.user.openSnack,
 });
 
 const mapDispatchToProps = dispatch => ({

@@ -3,7 +3,6 @@ const parseInclude = (req, res, next) => {
   const { include } = req.query;
   req.fields = [];
   req.fields = include ? include.split(',') : [];
-
   next();
 };
 

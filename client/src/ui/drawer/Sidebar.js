@@ -8,6 +8,7 @@ import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import InfoIcon from '@material-ui/icons/Info';
 import FavoriteIcon from '@material-ui/icons/Favorite';
+import AssignmentIcon from '@material-ui/icons/Assignment';
 import SearchIcon from '@material-ui/icons/Search';
 import Drawer from 'material-ui/Drawer';
 import Divider from 'material-ui/Divider';
@@ -25,6 +26,7 @@ class Sidebar extends Component {
     showSelling: PropTypes.func.isRequired,
     showFavorites: PropTypes.func.isRequired,
     showSearch: PropTypes.func.isRequired,
+    showOffers: PropTypes.func.isRequired,
     loggedIn: PropTypes.bool.isRequired,
     navBarHeight: PropTypes.number.isRequired,
   }
@@ -40,6 +42,7 @@ class Sidebar extends Component {
       showSearch,
       showSelling,
       showFavorites,
+      showOffers,
       loggedIn,
       navBarHeight,
     } = this.props;
@@ -92,6 +95,14 @@ class Sidebar extends Component {
                 <FavoriteIcon className={classes.icon}/>
               </ListItemIcon>
               <ListItemText primary="Favorites" classes={{primary: classes.text }} />
+            </ListItem> : ''
+          }
+          {loggedIn ?
+            <ListItem button component={Link} to="/offers" onClick={showOffers}>
+              <ListItemIcon>
+                <AssignmentIcon />
+              </ListItemIcon>
+              <ListItemText primary="Offers" />
             </ListItem> : ''
           }
         </List>
