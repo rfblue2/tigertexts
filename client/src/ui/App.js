@@ -249,7 +249,7 @@ class App extends Component {
               [classes['contentShift-down-loggedin']]: sidebarOpen && isMobile && isLoggedIn,
               [classes['contentShift-down-notloggedin']]: sidebarOpen && isMobile && !isLoggedIn,
             })}
-            style={{paddingTop: navBarHeight - 51}}
+            style={{paddingTop: navBarHeight - 51 + 15}}
           >
             <SellDialog
               className={classes.dialog}

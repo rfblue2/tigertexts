@@ -36,7 +36,7 @@ class Navbar extends Component {
     } = this.props;
 
     return (
-      <AppBar className={classes.appBar} position="static">
+      <AppBar className={classes.appBar} position="static" style={{boxShadow: "none"}}>
         <Toolbar className={classes.ToolbarRoot}>
           <IconButton
             color="inherit"
@@ -78,6 +78,7 @@ const styles = theme => ({
   flex: {
     flex: 1,
   },
+
   appBar: {
     position: 'fixed',
     transition: theme.transitions.create(['margin', 'width'], {

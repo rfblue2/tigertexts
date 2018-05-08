@@ -57,13 +57,13 @@ class Book extends Component {
     if (!loggedIn) return '';
     if (selling) {
       return (
-        <Button variant="raised" onClick={() => onMarkSoldClick(book.id)}>
+        <Button variant="raised" onClick={() => onMarkSoldClick(book.id)} style={{boxShadow: "none"}}>
           Mark Sold
         </Button>
       );
     }
     return (
-      <Button variant="raised" onClick={() => onSellClick(book)}>
+      <Button variant="raised" onClick={() => onSellClick(book)} style={{boxShadow: "none"}}>
         Sell this book
       </Button>
     );
@@ -74,7 +74,7 @@ class Book extends Component {
       classes, book, onFavoriteClick, onListingClick, favorite, loggedIn,
     } = this.props;
     return (
-      <Card className={classes.card} >
+      <Card className={classes.card} style={{boxShadow: "none"}}>
         <CardHeader
           className={classes.header}
           title={book.title}

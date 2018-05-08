@@ -1,7 +1,12 @@
 import React from 'react';
+import Typography from 'material-ui/Typography';
 
-const About = () => (<div>
-  Tigertexts is your one stop shop for all your coursebook needs!
-</div>);
+
+
+const About = () => (
+    <Typography>
+        Tigertexts is your one stop shop for all your coursebook needs!
+    </Typography>);
+
 
 export default About;

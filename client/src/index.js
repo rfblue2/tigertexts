@@ -17,18 +17,24 @@ const store = createStore(
 
 const theme = createMuiTheme({
   palette: {
-    secondary: {
-      main: grey[900],
-      light: grey[600],
-    },
     primary: {
       main: orange[800],
       light: orange[500],
     },
+    secondary: {
+      main: grey[900],
+      light: '#F0F0F0',
+    },
+    background: {
+      default: '#E0E0E0',
+    },
   },
+  
+  shadows: ['none'],
+
   typography: {
-    fontFamily: 'Lato'
-  }
+    fontFamily: 'Lato',
+  },
 });
 
 render(
