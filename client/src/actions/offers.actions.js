@@ -63,11 +63,12 @@ export const postOffer = (token, offerObj) => {
   };
 };
 
-export const declineOffer = (token, offerId) => {
-  const request = (tok, oid) => ({
+export const declineOffer = (token, offerId, action) => {
+  const request = (tok, oid, act) => ({
     type: DELETE_OFFER_REQ,
     token: tok,
     offerId: oid,
+    action: act,
   });
 
   const response = o => ({
@@ -76,9 +77,9 @@ export const declineOffer = (token, offerId) => {
   });
 
   return async (dispatch) => {
-    dispatch(request(token));
+    dispatch(request(token, offerId, action));
     try {
-      const offer = await deleteUserOffer(token, offerId);
+      const offer = await deleteUserOffer(token, offerId, action);
       dispatch(response(offer));
     } catch (err) {
       dispatch(offerError(err));

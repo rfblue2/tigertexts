@@ -18,6 +18,7 @@
     "@babel/preset-env": "^7.0.0-beta.44",
     "@babel/preset-stage-0": "^7.0.0-beta.44",
     "@babel/register": "^7.0.0-beta.44",
+    "@sendgrid/mail": "^6.2.1",
     "body-parser": "~1.18.2",
     "config": "^1.30.0",
     "cookie-parser": "~1.4.3",

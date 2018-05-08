@@ -6,4 +6,4 @@ data/
 package-lock.json
 scripts/scrapy_venv/
 *.pyc
-fb_script.py
+fb_script.pysendgrid.env

@@ -30,8 +30,8 @@ export const createUserOffer = async (token, offer) => {
   return deserializeOffer(newOffer);
 };
 
-export const deleteUserOffer = async (token, offerId) => {
-  const offer = await fetch(`api/users/offers/${offerId}`, {
+export const deleteUserOffer = async (token, offerId, action) => {
+  const offer = await fetch(`api/users/offers/${offerId}?action=${action}`, {
     headers: { 'x-auth-token': token },
     method: 'DELETE',
   });

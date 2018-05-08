@@ -45,8 +45,6 @@ const serializeListing = (listing, opts = { included: true }) => {
       included: opts.included,
       attributes: ['name', 'email'],
       ref: (listingself, seller) => {
-        console.log(JSON.stringify(listing, null, 2))
-        console.log(seller)
         if (!seller) return;
         // Direct mongo query returns mere id, otherwise object has id field
         if (Types.ObjectId.isValid(seller.toString())) {

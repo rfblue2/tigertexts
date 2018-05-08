@@ -4,6 +4,7 @@ import fetch from 'isomorphic-fetch';
 import jwt from 'jsonwebtoken';
 import expressJwt from 'express-jwt';
 import mongoose from 'mongoose';
+import sgMail from '@sendgrid/mail';
 import {
   serializeUser,
   deserializeUser,
@@ -68,6 +69,19 @@ router.get('/login', wrap(async (req, res) => {
       role: 'Member',
     });
     savedUser = await user.save();
+    const welcomeMsg = {
+      to: email,
+      from: 'rfong@princeton.edu',
+      subject: 'Welcome to TigerTexts',
+      text: `Thank you for choosing TigerTexts as your one stop shop for all
+             your coursebook needs.  We are excited to have you!  Head over to 
+             tigertexts.herokuapp.com to start.`,
+      html: `<p>Thank you for choosing TigerTexts as your one stop shop for all
+             your coursebook needs.  We are excited to have you!  Head over to 
+             <a href="tigertexts.herokuapp.com">TigerTexts</a> to start.</p>`,
+    };
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    sgMail.send(welcomeMsg);
   } else {
     savedUser = await User.findOneAndUpdate({
       _id: user._id,
@@ -99,8 +113,8 @@ const authenticate = expressJwt({
 });
 
 const getCurrentUser = wrap(async (req, res, next) => {
-  req.query = User.findById(req.auth.id);
-  req.user = await req.query.exec();
+  req.q = User.findById(req.auth.id);
+  req.user = await req.q.exec();
   next();
 });
 
@@ -227,6 +241,24 @@ router.route('/offers')
     const data = await deserializeOffer(req.body);
     const offer = new Offer({ ...data });
     const newOffer = await offer.save();
+    const listing = await Listing.findById(data.listing)
+      .populate('seller')
+      .populate('book');
+    const buyer = await User.findById(data.buyer);
+    const offerMsg = {
+      to: listing.seller.email,
+      from: 'rfong@princeton.edu',
+      subject: 'Someone is interested in purchasing your books!',
+      text: `${buyer.name} has offered to purchase ${listing.book.title}
+             for $${data.price}. Go to tigertexts.herokuapp.com to view
+             the offer. Buyer can be contacted at ${buyer.email}.`,
+      html: `<p>${buyer.name} has offered to purchase ${listing.book.title}
+             for $${data.price}. Buyer can be contacted at ${buyer.email}.
+             <a href="tigertexts.herokuapp.com">View the offer</a>.
+             </p>`,
+    };
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    sgMail.send(offerMsg);
     res.status(201).json(serializeOffer(newOffer));
   }));
 
@@ -234,6 +266,40 @@ router.route('/offers/:id')
 
   .delete(authenticate, getCurrentUser, wrap(async (req, res) => {
     const offer = await Offer.findByIdAndRemove(req.params.id);
+    const buyer = await User.findById(offer.buyer);
+    const listing = await Listing.findById(offer.listing)
+      .populate('seller')
+      .populate('book');
+    if (req.query.action === 'accept') {
+      const offerMsg = {
+        to: buyer.email,
+        from: 'rfong@princeton.edu',
+        subject: 'Your TigerTexts offer has been updated',
+        text: `${listing.seller.name} has accepted your offer to purchase
+             ${listing.book.title} for $${offer.price}! Contact the seller
+             at ${listing.seller.email}`,
+        html: `<p>${listing.seller.name} has accepted your offer to purchase
+             ${listing.book.title} for $${offer.price}! Contact the seller
+             at ${listing.seller.email}.
+             </p>`,
+      };
+      sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+      sgMail.send(offerMsg);
+    } else if (req.query.action === 'decline') {
+      const offerMsg = {
+        to: buyer.email,
+        from: 'rfong@princeton.edu',
+        subject: 'Your TigerTexts offer has been updated',
+        text: `${listing.seller.name} has declined your offer to purchase
+             ${listing.book.title} for $${offer.price}.`,
+        html: `<p>${listing.seller.name} has declined your offer to purchase
+             ${listing.book.title} for $${offer.price}.
+             </p>`,
+      };
+      sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+      sgMail.send(offerMsg);
+
+    }
     res.json(serializeOffer(offer));
   }));
 

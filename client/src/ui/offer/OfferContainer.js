@@ -29,11 +29,11 @@ class OfferContainer extends Component {
   }
 
   onAcceptOffer(token, offer) {
-    this.props.dispatch(declineOffer(token, offer.id));
+    this.props.dispatch(declineOffer(token, offer.id, 'accept'));
   }
 
   onDeclineOffer(token, offer) {
-    this.props.dispatch(declineOffer(token, offer.id));
+    this.props.dispatch(declineOffer(token, offer.id, 'decline'));
   }
 
   render() {
