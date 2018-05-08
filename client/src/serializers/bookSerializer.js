@@ -23,11 +23,20 @@ const serializeBook = (book, opts = { included: true }) => (new Serializer('book
   },
 })).serialize(book);
 
-const deserializeBook = book => (new Deserializer({
-  class: {
-    valueForRelationship: relationship => relationship.id,
-  },
-})).deserialize(book);
+const deserializeBook = (book, opts = { included: true }) => {
+  let deserializer = new Deserializer({
+    keyForAttribute: 'snake_case',
+    class: {
+      valueForRelationship: relationship => relationship.id,
+    },
+  });
+  if (opts && opts.included) {
+    deserializer = new Deserializer({
+      keyForAttribute: 'snake_case',
+    });
+  }
+  return deserializer.deserialize(book);
+};
 
 export {
   serializeBook,

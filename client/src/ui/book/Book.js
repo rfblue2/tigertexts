@@ -38,15 +38,12 @@ class Book extends Component {
 
   generateAuthorString = (authors) => {
     const numAuthors = authors ? authors.length : 0;
-    if (numAuthors === 0) {
-      return ('');
-    } else if (numAuthors === 1) {
-      return (authors[0]);
-    } else if (numAuthors === 2) {
-      return (`${authors[0]}; ${authors[1]}`);
-    }
+    if (numAuthors < 3) return authors.join(' ,');
+    return (`${authors[0]}, ${authors[1]}, ...`);
+  }
 
-    return (`${authors[0]}; ${authors[1]}; ...`);
+  generateClassString = (classes) => {
+    return classes ? classes.join(', ') : '';
   }
 
   // if user is logged in, either mark sold or sell
@@ -57,13 +54,13 @@ class Book extends Component {
     if (!loggedIn) return '';
     if (selling) {
       return (
-        <Button variant="raised" onClick={() => onMarkSoldClick(book.id)} style={{boxShadow: "none"}}>
+        <Button variant="raised" onClick={() => onMarkSoldClick(book.id)} style={{ boxShadow: 'none' }}>
           Mark Sold
         </Button>
       );
     }
     return (
-      <Button variant="raised" onClick={() => onSellClick(book)} style={{boxShadow: "none"}}>
+      <Button variant="raised" onClick={() => onSellClick(book)} style={{ boxShadow: 'none' }}>
         Sell this book
       </Button>
     );
@@ -73,8 +70,9 @@ class Book extends Component {
     const {
       classes, book, onFavoriteClick, onListingClick, favorite, loggedIn,
     } = this.props;
+    console.log(JSON.stringify(book, null, 2))
     return (
-      <Card className={classes.card} style={{boxShadow: "none"}}>
+      <Card className={classes.card} style={{ boxShadow: 'none' }}>
         <CardHeader
           className={classes.header}
           title={book.title}
@@ -114,6 +112,10 @@ class Book extends Component {
                   <img className={classes.bookpic} src={book.image} alt="book" />
                 </Grid>
                 <Grid item xs={12} md={9}>
+
+                  <Subheader className={classes.subheader}>Classes</Subheader>
+                  <Typography className={classes.description}> { this.generateClassString(
+            book.classes.filter(cl => cl).map(c => c ? c.numbers.join('/') : null)) } </Typography>
                   <Subheader className={classes.subheader}>Book Description</Subheader>
                   <Typography className={classes.description}> {book.description} </Typography>
                 </Grid>

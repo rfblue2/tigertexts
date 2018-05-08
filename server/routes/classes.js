@@ -46,7 +46,7 @@ router.route('/:id')
 router.route('/:id/books')
 
   .get(wrap(async (req, res) => {
-    const books = await Book.find({ classes: req.params.id });
+    const books = await Book.find({ classes: req.params.id }).populate('classes');
     if (!books) throw new APIError('No books associated with class', 404);
     res.json(serializeBook(books));
   }));
