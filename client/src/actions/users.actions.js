@@ -18,6 +18,7 @@ import {
   USER_DELETE_FAV_REQ,
   USER_DELETE_FAV_RES,
   CLOSE_SNACK,
+  SHOW_OVERFLOW_SNACK,
 } from '../constants/users.constants';
 import {
   handleFbResponse,
@@ -32,6 +33,10 @@ import { deserializeBook } from '../serializers/bookSerializer';
 
 export const closeSnack = () => ({
   type: CLOSE_SNACK,
+});
+
+export const showOverflowSnack = () => ({
+  type: SHOW_OVERFLOW_SNACK,
 });
 
 export const getUserInfo = (tok, fields) => {

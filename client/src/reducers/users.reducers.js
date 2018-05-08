@@ -18,6 +18,7 @@ import {
   USER_POST_FAV_RES,
   USER_POST_FAV_REQ,
   CLOSE_SNACK,
+  SHOW_OVERFLOW_SNACK,
 } from '../constants/users.constants';
 import { GET_USER_FAVORITES_RES, GET_USER_SELLING_RES } from '../constants/books.constants';
 import { DELETE_OFFER_RES, POST_OFFER_RES } from '../constants/offers.constants';
@@ -40,6 +41,7 @@ const userReducer = (state = {
   notifySellerSnack: false,
   updateOfferSnack: false,
   favoritedSnack: false,
+  showOverflowSnack: false,
   openSnack: false,
 }, action) => {
   const {
@@ -151,6 +153,10 @@ const userReducer = (state = {
       return {
         ...state, token: '', user: defaultuser, error: null, loggedIn: false,
       };
+    case SHOW_OVERFLOW_SNACK:
+      return {
+        ...state, error: null, showOverflowSnack: true, openSnack: true,
+      };
     case CLOSE_SNACK:
       return {
         ...state,
@@ -160,6 +166,7 @@ const userReducer = (state = {
         soldSnack: false,
         notifySellerSnack: false,
         updateOfferSnack: false,
+        showOverflowSnack: false,
         openSnack: false,
       };
     case USER_ERROR:

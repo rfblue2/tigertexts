@@ -172,7 +172,10 @@ class IntegrationReactSelect extends Component {
   };
 
   handleChange = (value) => {
-    if (value.length > 10) return; // limit to only 10 items
+    if (value.length > 10) {
+      this.props.handleOverflow();
+      return;
+    }
     this.setState({
       selectedItems: value,
     });

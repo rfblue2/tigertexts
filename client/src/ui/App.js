@@ -15,7 +15,11 @@ import CloseIcon from '@material-ui/icons/Close';
 import {
   getJwt,
   removeJwt,
-  facebookResponse, userPostSellBooks, userCancelSellDialog, closeSnack,
+  facebookResponse,
+  userPostSellBooks,
+  userCancelSellDialog,
+  closeSnack,
+  showOverflowSnack,
 } from '../actions/users.actions';
 import {
   getBooksForClasses,
@@ -61,6 +65,7 @@ class App extends Component {
     updateOfferSnack: PropTypes.bool.isRequired,
     favoritedSnack: PropTypes.bool.isRequired,
     openSnack: PropTypes.bool.isRequired,
+    showOverflowSnack: PropTypes.bool.isRequired,
     windowSize: PropTypes.object.isRequired,
   }
 
@@ -77,6 +82,7 @@ class App extends Component {
     this.handleLogout = this._handleLogout.bind(this);
     this.responseFacebook = this._responseFacebook.bind(this);
     this.handleSearch = this._handleSearch.bind(this);
+    this.handleOverflow = this._handleOverflow.bind(this);
     this.handleMenu = this._handleMenu.bind(this);
     this.handleCloseSellDialog = this._handleCloseSellDialog.bind(this);
     this.showSelling = this._showSelling.bind(this);
@@ -115,6 +121,10 @@ class App extends Component {
   _handleSearch(items) {
     this.props.dispatch(getBooksForClasses(items.map(i => i.id)));
     this.setState({ showResults: true });
+  }
+
+  _handleOverflow() {
+    this.props.dispatch(showOverflowSnack());
   }
 
   _handleMenu() {
@@ -173,21 +183,22 @@ class App extends Component {
       return 'Book marked as sold';
     } else if (this.props.updateOfferSnack) {
       return 'Offer updated';
+    } else if (this.props.showOverflowSnack) {
+      return 'Only 10 courses can be searched at a time';
     }
     return 'Updated!';
   }
 
   _trimLabel(label) {
     const { windowSize } = this.props;
-    var maxLength = Math.floor(windowSize.windowWidth / 8);
-    if (label.length < maxLength) { return(label); }
+    const maxLength = Math.floor(windowSize.windowWidth / 8);
+    if (label.length < maxLength) { return (label); }
 
-    return(label.substring(0,maxLength - 3) + "...");
+    return (`${label.substring(0, maxLength - 3)}...`);
   }
 
   _retrieveNavBarHeight(height) {
-    this.setState({ navBarHeight: height});
-
+    this.setState({ navBarHeight: height });
   }
 
   render() {
@@ -201,9 +212,11 @@ class App extends Component {
       user,
       token,
       openSnack,
-      windowSize, 
+      windowSize,
     } = this.props;
-    const { courses, sidebarOpen, showResults, navBarHeight } = this.state;
+    const {
+      courses, sidebarOpen, showResults, navBarHeight,
+    } = this.state;
     let isMobile = false;
     if (windowSize.windowWidth < 600) {
       isMobile = true;
@@ -225,6 +238,7 @@ class App extends Component {
           >
             <AutoComplete
               executeSearch={this.handleSearch}
+              handleOverflow={this.handleOverflow}
               courseList={courses.map(course => ({
                             value: course,
                             label: this.trimLabel(`${course.numbers.join('/')} - ${course.title}`),
@@ -249,7 +263,7 @@ class App extends Component {
               [classes['contentShift-down-loggedin']]: sidebarOpen && isMobile && isLoggedIn,
               [classes['contentShift-down-notloggedin']]: sidebarOpen && isMobile && !isLoggedIn,
             })}
-            style={{paddingTop: navBarHeight - 51 + 15}}
+            style={{ paddingTop: navBarHeight - 51 + 15 }}
           >
             <SellDialog
               className={classes.dialog}
@@ -275,7 +289,7 @@ class App extends Component {
           <Snackbar
             anchorOrigin={{
               vertical: 'bottom',
-              horizontal: 'left',
+              horizontal: 'right',
             }}
             open={openSnack}
             autoHideDuration={3000}
@@ -373,6 +387,7 @@ const mapStateToProps = state => ({
   notifySellerSnack: state.user.notifySellerSnack,
   updateOfferSnack: state.user.updateOfferSnack,
   favoritedSnack: state.user.favoritedSnack,
+  showOverflowSnack: state.user.showOverflowSnack,
   openSnack: state.user.openSnack,
 });
 
