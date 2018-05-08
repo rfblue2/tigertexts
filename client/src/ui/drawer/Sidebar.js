@@ -10,8 +10,14 @@ import InfoIcon from '@material-ui/icons/Info';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import SearchIcon from '@material-ui/icons/Search';
 import Drawer from 'material-ui/Drawer';
+import Divider from 'material-ui/Divider';
 
 const drawerWidth = 240;
+const drawerColor = '#282828'
+const dividerColor = '#282828'
+const drawerLabelColor = '#F0F0F0'
+const drawerHighlightColor = '#434343'
+
 
 class Sidebar extends Component {
   static propTypes = {
@@ -56,36 +62,37 @@ class Sidebar extends Component {
         variant="persistent"
         anchor={toggle}
         open={open}
+        className={classes.drawer}
       > 
         <div className={classes.toolbar} />
         <div style={{paddingTop: navBarHeight - 51}} />
         <List component="nav">
-         <ListItem button component={Link} to="/about">
+         <ListItem button component={Link} to="/about" className={classes.button}>
            <ListItemIcon>
-             <InfoIcon />
+             <InfoIcon className={classes.icon}/>
            </ListItemIcon>
-           <ListItemText primary="About" />
+           <ListItemText primary="About" classes={{primary: classes.text }} />
          </ListItem>
-          <ListItem button component={Link} to="/" onClick={showSearch}>
+          <ListItem button component={Link} to="/" onClick={showSearch} className={classes.button}>
             <ListItemIcon>
-              <SearchIcon />
+              <SearchIcon className={classes.icon}/>
             </ListItemIcon>
-            <ListItemText primary="Search Results" />
+            <ListItemText primary="Search Results" classes={{primary: classes.text }} />
           </ListItem>
           {loggedIn ?
-            <ListItem button component={Link} to="/" onClick={showSelling}>
+            <ListItem button component={Link} to="/" onClick={showSelling} className={classes.button}>
               <ListItemIcon>
-                <LibraryBooksIcon />
+                <LibraryBooksIcon className={classes.icon}/>
               </ListItemIcon>
-              <ListItemText primary="Selling" />
+              <ListItemText primary="Selling" classes={{primary: classes.text }} />
             </ListItem> : ''
           }
           {loggedIn ?
-            <ListItem button component={Link} to="/" onClick={showFavorites}>
+            <ListItem button component={Link} to="/" onClick={showFavorites} className={classes.button}>
               <ListItemIcon>
-                <FavoriteIcon />
+                <FavoriteIcon className={classes.icon}/>
               </ListItemIcon>
-              <ListItemText primary="Favorites" />
+              <ListItemText primary="Favorites" classes={{primary: classes.text }} />
             </ListItem> : ''
           }
         </List>
@@ -95,15 +102,30 @@ class Sidebar extends Component {
 }
 
 const styles = theme => ({
+  divider: {
+    background: dividerColor,
+  },
+  button: {
+    '&:hover': {
+      background: drawerHighlightColor,
+    }
+  },
+  icon: {
+    color: drawerLabelColor,
+  },
+  text: {
+    color: drawerLabelColor,
+  },
+
   drawerPaper: {
     position: 'fixed',
     width: drawerWidth,
-    background: '#EEEEEE',
+    background: drawerColor,
   },
   drawerPaperMobile: {
     position: 'fixed',
     width: '100%',
-    background: '#EEEEEE',
+    background: drawerColor,
   },
   toolbar: theme.mixins.toolbar,
 });
