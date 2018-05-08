@@ -42,7 +42,7 @@ class ListingDialog extends Component {
   }
 
   onPriceChange = (e) => {
-    this.setState({ price: e.target.value });
+    this.setState({ price: Math.min(999, Math.max(0, e.target.value)) });
   }
 
   render() {

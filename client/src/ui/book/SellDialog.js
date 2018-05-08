@@ -33,7 +33,7 @@ class SellDialog extends Component {
   }
 
   onPriceChange = (e) => {
-    this.setState({ price: e.target.value });
+    this.setState({ price: Math.min(999, Math.max(0, e.target.value)) });
   }
 
   onCommentChange = (e) => {
@@ -57,6 +57,7 @@ class SellDialog extends Component {
     const {
       classes, book, showForm, onClose,
     } = this.props;
+    const { price } = this.state;
 
     return (
       <Dialog
@@ -73,7 +74,7 @@ class SellDialog extends Component {
             <InputLabel htmlFor={`price-${book.id}`}>Price (optional)</InputLabel>
             <Input
               id={`price-${book.id}`}
-              value={book.price}
+              value={price}
               type="number"
               startAdornment={<InputAdornment position="start">$</InputAdornment>}
               onChange={this.onPriceChange.bind(this)}
