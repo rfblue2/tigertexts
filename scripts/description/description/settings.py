@@ -28,6 +28,8 @@ CONCURRENT_REQUESTS = 8
 # See http://scrapy.readthedocs.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
 DOWNLOAD_DELAY = 2
+# Force utf-8 encoding so you don't get unicode stuff like \u2014 in the output
+FEED_EXPORT_ENCODING = 'utf-8'
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
 #CONCURRENT_REQUESTS_PER_IP = 16

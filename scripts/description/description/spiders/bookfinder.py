@@ -20,7 +20,7 @@ class BookfinderSpider(scrapy.Spider):
 
     def parse(self, response):
 
-        description = response.xpath('//div[not(@*)]//text()').extract_first()
+        description = "".join(response.xpath('//div[not(@*)]//text()').extract())
         descriptionItem = DescriptionItem()
         descriptionItem['isbn'] = response.request.url[37:]
         descriptionItem['description'] = description

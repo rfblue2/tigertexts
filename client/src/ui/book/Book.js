@@ -114,7 +114,7 @@ class Book extends Component {
                 </Grid>
                 <Grid item xs={12} md={9}>
                   <Subheader className={classes.subheader}>Book Description</Subheader>
-                  <Typography className={classes.description}> {book.detail} </Typography>
+                  <Typography className={classes.description}> {book.description} </Typography>
                 </Grid>
                 <Grid item xs={12}>
                   <Subheader className={classes.subheader}>Book Prices</Subheader>
