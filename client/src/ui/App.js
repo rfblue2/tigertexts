@@ -175,6 +175,7 @@ class App extends Component {
       return 'Offer updated';
     }
     return 'Updated!';
+  }
 
   _trimLabel(label) {
     const { windowSize } = this.props;
