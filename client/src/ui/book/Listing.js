@@ -5,11 +5,12 @@ import { ListItem, ListItemText } from 'material-ui/List';
 import formatNumber from 'simple-format-number';
 import Grid from 'material-ui/Grid';
 import Paper from 'material-ui/Paper';
-
+import Divider from 'material-ui/Divider';
 
 const Listing = ({ classes, listing }) => (
   <Paper className={classes.paper} elevation={1} square>
-    <ListItem button component="a" href={listing.url} target="_blank" disableGutters>
+    <Divider />
+    <ListItem button component="a" href={listing.url} target="_blank" disableGutters className={classes.listitem}>
       <Grid container>
         <Grid item xs={6} md={6}>
           <ListItemText
@@ -28,6 +29,7 @@ const Listing = ({ classes, listing }) => (
         </Grid>
       </Grid>
     </ListItem>
+    
   </Paper>
 );
 
@@ -37,6 +39,10 @@ Listing.propTypes = {
 };
 
 const styles = {
+  listitem: {
+    padding: '0px',
+    boxShadow: "none",
+  },
   paper: {
     width: '100%',
     maxWidth: '100%',

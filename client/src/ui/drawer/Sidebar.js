@@ -52,6 +52,7 @@ class Sidebar extends Component {
             [classes.drawerPaper]: !isMobile,
             [classes.drawerPaperMobile]: isMobile,
         })}}
+        classNames={classes.drawer}
         variant="persistent"
         anchor={toggle}
         open={open}
@@ -97,10 +98,12 @@ const styles = theme => ({
   drawerPaper: {
     position: 'fixed',
     width: drawerWidth,
+    background: '#EEEEEE',
   },
   drawerPaperMobile: {
     position: 'fixed',
     width: '100%',
+    background: '#EEEEEE',
   },
   toolbar: theme.mixins.toolbar,
 });

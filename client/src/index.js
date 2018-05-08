@@ -3,6 +3,7 @@ import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
+import blue from 'material-ui/colors/blue';
 import orange from 'material-ui/colors/orange';
 import grey from 'material-ui/colors/grey';
 import thunk from 'redux-thunk';
@@ -26,13 +27,15 @@ const theme = createMuiTheme({
       light: grey[500],
     },
     background: {
-      default: grey[300]
+      default: grey[300],
     },
   },
   
+  shadows: ['none'],
+
   typography: {
-    fontFamily: 'Lato'
-  }
+    fontFamily: 'Lato',
+  },
 });
 
 render(
