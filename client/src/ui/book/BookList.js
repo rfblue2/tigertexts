@@ -12,6 +12,7 @@ class BookList extends Component {
     loggedIn: PropTypes.bool.isRequired,
     markSold: PropTypes.func.isRequired,
     sellBook: PropTypes.func.isRequired,
+    onListingClick: PropTypes.func.isRequired,
     onFavorite: PropTypes.func.isRequired,
     selling: PropTypes.arrayOf(PropTypes.object),
     favorites: PropTypes.arrayOf(PropTypes.object),
@@ -27,7 +28,15 @@ class BookList extends Component {
 
   render() {
     const {
-      classes, books, selling, favorites, markSold, sellBook, loggedIn, onFavorite,
+      classes,
+      books,
+      selling,
+      favorites,
+      markSold,
+      sellBook,
+      loggedIn,
+      onFavorite,
+      onListingClick,
     } = this.props;
 
     if (!books || books.length === 0) {
@@ -39,8 +48,8 @@ class BookList extends Component {
         <GridList className={classes.list} cellHeight="100%" cols={1} >
           {
             books.map((b, i) => (
-              <Grow in style={{ transitionDelay: i * 75 }}>
-                <GridListTile key={b.id}>
+              <Grow key={b.id} in style={{ transitionDelay: i * 75 }}>
+                <GridListTile>
                   <Book
                     book={b}
                     loggedIn={loggedIn}
@@ -49,6 +58,7 @@ class BookList extends Component {
                     onMarkSoldClick={markSold}
                     onSellClick={sellBook}
                     onFavoriteClick={onFavorite}
+                    onListingClick={onListingClick}
                   />
                 </GridListTile>
               </Grow>

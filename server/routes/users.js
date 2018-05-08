@@ -3,7 +3,7 @@ import express from 'express';
 import fetch from 'isomorphic-fetch';
 import jwt from 'jsonwebtoken';
 import expressJwt from 'express-jwt';
-import { serializeTransaction } from '../utils/serializers/transactionSerializer';
+import mongoose from 'mongoose';
 import {
   serializeUser,
   deserializeUser,
@@ -12,9 +12,10 @@ import { serializeBook } from '../utils/serializers/bookSerializer';
 import User from '../models/user';
 import Book from '../models/book';
 import Listing from '../models/listing';
-import Transaction from '../models/transaction';
+import Offer from '../models/offer';
 import wrap from '../utils/wrap';
 import { parseInclude, populateQuery } from '../utils/queryparse';
+import { deserializeOffer, serializeOffer } from '../utils/serializers/offerSerializer';
 
 const router = express.Router();
 
@@ -114,22 +115,7 @@ router.route('/me')
 
 /**
  * API Routes
- * TODO Secure all these API routes with jwt so that the correct user can access them
- * TODO currently checks query param for mongo id
  */
-
-router.route('/activity')
-
-  .get(authenticate, getCurrentUser, wrap(async (req, res) => {
-    const id = req.user._id;
-    const activity = await Transaction.find({
-      $or: [
-        { seller: id },
-        { buyer: id },
-      ],
-    });
-    res.json(serializeTransaction(activity));
-  }));
 
 // Convenience method for viewing (get) and adding (post) favorites
 router.route('/favorites')
@@ -143,8 +129,8 @@ router.route('/favorites')
     const data = await deserializeUser(req.body);
     await User.findOneAndUpdate({
       _id: req.user._id,
-    }, { $push: { favorite: { $each: data.favorite.map(f => f.id) } } }, { new: true });
-    const books = await Book.find({ _id: { $in: data.favorite.map(f => f.id) } });
+    }, { $push: { favorite: { $each: data.favorite } } }, { new: true });
+    const books = await Book.find({ _id: { $in: data.favorite } });
     res.json(serializeBook(books));
   }));
 
@@ -169,11 +155,12 @@ router.route('/selling')
   }))
 
   .post(authenticate, getCurrentUser, wrap(async (req, res) => {
-    const data = await deserializeUser(req.body);
+    const data = await deserializeUser(req.body, { included: true });
     await User.findOneAndUpdate({
       _id: req.user._id,
     }, { $push: { selling: { $each: data.selling.map(s => s.id) } } }, { new: true });
     await Promise.all(data.selling.map(async (s) => {
+      // create a new listing
       const listingObj = {
         kind: 'platform',
         title: `Seller: ${req.user.name}`,
@@ -183,7 +170,7 @@ router.route('/selling')
       if (s.price && s.price !== '') listingObj.price = s.price;
       if (s.comment && s.comment !== '') listingObj.detail = s.comment;
       const listing = new Listing(listingObj);
-      listing.save();
+      await listing.save();
     }));
     const books = await Book.find({ _id: { $in: data.selling.map(s => s.id) } });
     res.json(serializeBook(books));
@@ -198,8 +185,56 @@ router.route('/selling/:id')
     await User.findOneAndUpdate({
       _id: req.user._id,
     }, { selling: user.selling }, { new: true });
-    await Listing.findOneAndRemove({ seller: req.user._id, book: req.params.id });
+    const listing = await Listing.findOneAndRemove({ seller: req.user._id, book: req.params.id });
+    await Offer.remove({ listing: mongoose.Types.ObjectId(listing._id) });
     res.json(serializeBook(book));
+  }));
+
+// Convenience method for getting and adding (post) offers for buying books
+// When retrieving offers, retrieves both user initiated and interested user offers
+router.route('/offers')
+  .get(parseInclude, authenticate, getCurrentUser, wrap(async (req, res) => {
+    const userOffersQuery = Offer.find({
+      buyer: mongoose.Types.ObjectId(req.user._id.toString()),
+    });
+    req.fields.forEach((f) => {
+      if (f.includes('.')) {
+        const [field, sub] = f.split('.');
+        userOffersQuery.populate(field, sub);
+      } else {
+        userOffersQuery.populate(f);
+      }
+    });
+    const userOffers = await userOffersQuery.exec();
+    const listings = await Listing.find({ seller: req.user._id });
+    let otherOffers = await Promise.all(listings.map(async (l) => {
+      const otherOfferQuery = Offer.find({ listing: l._id });
+      req.fields.forEach((f) => {
+        if (f.includes('.')) {
+          const [field, sub] = f.split('.');
+          otherOfferQuery.populate(field, sub);
+        } else {
+          otherOfferQuery.populate(f);
+        }
+      });
+      return otherOfferQuery.exec();
+    }));
+    otherOffers = otherOffers.reduce((a, b) => a.concat(b), []);
+    res.json(serializeOffer([...userOffers, ...otherOffers]));
+  }))
+
+  .post(authenticate, getCurrentUser, wrap(async (req, res) => {
+    const data = await deserializeOffer(req.body);
+    const offer = new Offer({ ...data });
+    const newOffer = await offer.save();
+    res.status(201).json(serializeOffer(newOffer));
+  }));
+
+router.route('/offers/:id')
+
+  .delete(authenticate, getCurrentUser, wrap(async (req, res) => {
+    const offer = await Offer.findByIdAndRemove(req.params.id);
+    res.json(serializeOffer(offer));
   }));
 
 export default router;

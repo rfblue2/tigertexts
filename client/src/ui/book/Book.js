@@ -25,6 +25,7 @@ class Book extends Component {
     onMarkSoldClick: PropTypes.func.isRequired,
     onSellClick: PropTypes.func.isRequired,
     onFavoriteClick: PropTypes.func.isRequired,
+    onListingClick: PropTypes.func.isRequired,
   }
 
   state = {
@@ -38,7 +39,7 @@ class Book extends Component {
   generateAuthorString = (authors) => {
     const numAuthors = authors ? authors.length : 0;
     if (numAuthors === 0) {
-      return("");
+      return ('');
     } else if (numAuthors === 1) {
       return (authors[0]);
     } else if (numAuthors === 2) {
@@ -70,7 +71,7 @@ class Book extends Component {
 
   render() {
     const {
-      classes, book, onFavoriteClick, favorite, loggedIn,
+      classes, book, onFavoriteClick, onListingClick, favorite, loggedIn,
     } = this.props;
     return (
       <Card className={classes.card} >
@@ -118,7 +119,13 @@ class Book extends Component {
                 </Grid>
                 <Grid item xs={12}>
                   <Subheader className={classes.subheader}>Book Prices</Subheader>
-                  { book.listings.map(l => <Listing key={l.id} listing={l} />)}
+                  {
+                    book.listings.map(l => (<Listing
+                      key={l.id}
+                      listing={l}
+                      onClick={onListingClick}
+                    />))
+                  }
                 </Grid>
               </Grid>
             </div>
