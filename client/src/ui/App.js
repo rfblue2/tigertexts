@@ -169,7 +169,6 @@ class App extends Component {
           <Sidebar
             open={sidebarOpen}
             loggedIn={isLoggedIn}
-            showProfile={() => ''}
             showSearch={this.showSearch}
             sellBook={this.sellBook}
             showSelling={this.showSelling}

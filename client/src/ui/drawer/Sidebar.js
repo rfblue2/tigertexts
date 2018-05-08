@@ -2,14 +2,12 @@ import React, { Component } from 'react';
 import { withWindowSizeListener } from 'react-window-size-listener';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import className from 'classnames';
 import { Link } from 'react-router-dom';
 import { withStyles } from 'material-ui/styles';
 import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import InfoIcon from '@material-ui/icons/Info';
 import FavoriteIcon from '@material-ui/icons/Favorite';
-import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import SearchIcon from '@material-ui/icons/Search';
 import Drawer from 'material-ui/Drawer';
 
@@ -19,7 +17,6 @@ class Sidebar extends Component {
   static propTypes = {
     classes: PropTypes.object.isRequired,
     open: PropTypes.bool.isRequired,
-    showProfile: PropTypes.func.isRequired,
     showSelling: PropTypes.func.isRequired,
     showFavorites: PropTypes.func.isRequired,
     showSearch: PropTypes.func.isRequired,
@@ -36,7 +33,6 @@ class Sidebar extends Component {
       classes,
       open,
       showSearch,
-      showProfile,
       showSelling,
       showFavorites,
       loggedIn,
@@ -60,8 +56,8 @@ class Sidebar extends Component {
         anchor={toggle}
         open={open}
       > 
-      <div style={{paddingTop: navBarHeight - 51}} />
         <div className={classes.toolbar} />
+        <div style={{paddingTop: navBarHeight - 51}} />
         <List component="nav">
          <ListItem button component={Link} to="/about">
            <ListItemIcon>
@@ -75,14 +71,6 @@ class Sidebar extends Component {
             </ListItemIcon>
             <ListItemText primary="Search Results" />
           </ListItem>
-          {/*{ loggedIn ?*/}
-            {/*<ListItem button onClick={showProfile}>*/}
-              {/*<ListItemIcon>*/}
-                {/*<AccountCircleIcon />*/}
-              {/*</ListItemIcon>*/}
-              {/*<ListItemText primary="Profile" />*/}
-            {/*</ListItem> : ''*/}
-          {/*}*/}
           {loggedIn ?
             <ListItem button component={Link} to="/" onClick={showSelling}>
               <ListItemIcon>
