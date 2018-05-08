@@ -35,6 +35,7 @@ class App extends Component {
     courses: [],
     sidebarOpen: true,
     showResults: false,
+    navBarHeight: 51,
   }
 
   static propTypes = {
@@ -45,6 +46,7 @@ class App extends Component {
     user: PropTypes.object,
     token: PropTypes.string,
     showSellForm: PropTypes.bool.isRequired,
+    windowSize: PropTypes.object.isRequired,
   }
 
   static defaultProps = {
@@ -64,6 +66,8 @@ class App extends Component {
     this.showSelling = this._showSelling.bind(this);
     this.showFavorites = this._showFavorites.bind(this);
     this.sellBook = this._sellBook.bind(this);
+    this.trimLabel = this._trimLabel.bind(this);
+    this.retrieveNavBarHeight = this._retrieveNavBarHeight.bind(this);
 
     // TODO move this into redux (maybe)
     const cres = await fetch('/api/classes');
@@ -117,13 +121,25 @@ class App extends Component {
     this.props.dispatch(getUserFavoriteBooks(this.props.token));
   }
 
+  _trimLabel(label) {
+    const { windowSize } = this.props;
+    var maxLength = Math.floor(windowSize.windowWidth / 8);
+    if (label.length < maxLength) { return(label); }
+
+    return(label.substring(0,maxLength - 3) + "...");
+  }
+
+  _retrieveNavBarHeight(height) {
+    this.setState({ navBarHeight: height});
+  }
+
   render() {
     const {
-      classes, isLoggedIn, showSellForm, sellingBook,
+      classes, isLoggedIn, showSellForm, sellingBook, windowSize, 
     } = this.props;
-    const { courses, sidebarOpen, showResults } = this.state;
+    const { courses, sidebarOpen, showResults, navBarHeight } = this.state;
     let isMobile = false;
-    if (this.props.windowSize.windowWidth < 600) {
+    if (windowSize.windowWidth < 600) {
       isMobile = true;
     }
     if (showResults) {
@@ -139,23 +155,25 @@ class App extends Component {
             responseFacebook={this.responseFacebook}
             handleLogout={this.handleLogout}
             handleMenu={this.handleMenu}
+            retrieveNavBarHeight={this.retrieveNavBarHeight}
           >
             <AutoComplete
               executeSearch={this.handleSearch}
               courseList={courses.map(course => ({
                             value: course,
-                            label: `${course.numbers.join('/')} - ${course.title}`,
+                            label: this.trimLabel(`${course.numbers.join('/')} - ${course.title}`),
+                            labelnum: `${course.numbers.join('/')}`,
                           }))}
             />
           </Navbar>
           <Sidebar
             open={sidebarOpen}
             loggedIn={isLoggedIn}
-            showProfile={() => ''}
             showSearch={this.showSearch}
             sellBook={this.sellBook}
             showSelling={this.showSelling}
             showFavorites={this.showFavorites}
+            navBarHeight={navBarHeight}
           />
           <main
             className={classNames(classes.content, classes['content-left'], {
@@ -164,6 +182,7 @@ class App extends Component {
               [classes['contentShift-down-loggedin']]: sidebarOpen && isMobile && isLoggedIn,
               [classes['contentShift-down-notloggedin']]: sidebarOpen && isMobile && !isLoggedIn,
             })}
+            style={{paddingTop: navBarHeight - 51}}
           >
             <SellDialog
               className={classes.dialog}
@@ -231,7 +250,7 @@ const styles = theme => ({
     marginTop: 215, // hard coded
   },
   'contentShift-down-notloggedin': {
-    marginTop: 75, // hard coded
+    marginTop: 110, // hard coded
   },
   toolbar: theme.mixins.toolbar,
 });
