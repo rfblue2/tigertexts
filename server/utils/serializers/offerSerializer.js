@@ -27,6 +27,7 @@ const serializeOffer = (offer, opts = { included: true }) => (new Serializer('of
     included: opts.included,
     attributes: ['name', 'email'],
     ref: (offerself, buyer) => {
+      if (!buyer) return;
       // Direct mongo query returns mere id, otherwise object has id field
       if (Types.ObjectId.isValid(buyer.toString())) {
         return buyer;
