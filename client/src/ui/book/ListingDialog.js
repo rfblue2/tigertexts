@@ -42,8 +42,14 @@ class ListingDialog extends Component {
   }
 
   onPriceChange = (e) => {
-    if (e.target.value === '') this.setState({ price: '' });
-    else this.setState({ price: Math.min(999, Math.max(0, e.target.value)) });
+    if (e.target.value === '') {
+      this.setState({ price: '' });
+    }
+    else {
+      if (e.target.value <= 999.99 && e.target.value >= 0) {
+        this.setState({ price: Math.round(e.target.value * 100) / 100});
+      }
+    }
   }
 
   render() {
