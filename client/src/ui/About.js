@@ -63,22 +63,22 @@ const About = ({ classes }) => (
     <br />
     <div className={classes.gridroot}>
       <Grid container spacing={24} justify="center">
-        <Grid item xs={6} sm={3}>
+        <Grid item xs={6} md={3}>
           <Avatar alt="David Fan" src="/david.png" className={classes.avatar} />
           <br />
           <Typography variant="body" className={classes.caption}>David Fan '19</Typography>
         </Grid>
-        <Grid item xs={6} sm={3}>
+        <Grid item xs={6} md={3}>
           <Avatar alt="Roland Fong" src="/roland.jpg" className={classes.avatar} />
           <br />
           <Typography variant="body" className={classes.caption} >Roland Fong '19</Typography>
         </Grid>
-        <Grid item xs={6} sm={3}>
+        <Grid item xs={6} md={3}>
           <Avatar alt="Nathanael Ji" src="/nathanael.jpg" className={classes.avatar} />
           <br />
           <Typography variant="body" className={classes.caption} >Nathanael Ji '18</Typography>
         </Grid>
-        <Grid item xs={6} sm={3}>
+        <Grid item xs={6} md={3}>
           <Avatar alt="Kyle Xiao" src="/kyle.jpg" className={classes.avatar} />
           <br />
           <Typography variant="body" className={classes.caption} >Kyle Xiao '19</Typography>
@@ -102,8 +102,9 @@ const styles = {
     justify: 'center',
   },
   avatar: {
-    width: '80%',
-    height: '80%',
+    margin: '0 auto',
+    width: '120px',
+    height: '120px',
   },
 };
 
