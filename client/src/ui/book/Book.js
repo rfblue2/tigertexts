@@ -70,7 +70,6 @@ class Book extends Component {
     const {
       classes, book, onFavoriteClick, onListingClick, favorite, loggedIn,
     } = this.props;
-    console.log(JSON.stringify(book, null, 2))
     return (
       <Card className={classes.card} style={{ boxShadow: 'none' }}>
         <CardHeader
