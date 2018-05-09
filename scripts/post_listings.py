@@ -73,7 +73,7 @@ def post_listings():
           for price_type in price_types:
             if price_type in labyrinth_dict[book['ISBN']].keys():
               listing_attributes = dict()
-              if price_type == 'newPrice' or price_type == 'likeNewPrice':
+              if price_type == 'newPrice':
                 listing_attributes = {'title': book['title'], 'kind': 'labyrinth', 'price': float(labyrinth_dict[book['ISBN']][price_type].replace(',', '')), 'price_type': 'new', 'url': "http://www.labyrinthbooks.com/all_detail.aspx?isbn=" + book['ISBN']}
               else:
                 listing_attributes = {'title': book['title'], 'kind': 'labyrinth', 'price': float(labyrinth_dict[book['ISBN']][price_type].replace(',', '')), 'price_type': 'used', 'url': "http://www.labyrinthbooks.com/all_detail.aspx?isbn=" + book['ISBN']}
