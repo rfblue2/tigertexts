@@ -3,15 +3,12 @@ import Typography from 'material-ui/Typography';
 
 const About = () => (
   <div style={{ textAlign: 'center' }}>
-    <div style={{ marginTop: '5%' }} />
-    <Typography style={{ fontSize: '30px' }} >
-            Tigertexts - The one stop shop for all your Princeton coursebook needs!
-    </Typography>
     <br />
-    <img src="logo.png" alt="LOGO" style={{ maxWidth: '40%' }} />
+    <img src="logo.png" alt="LOGO" style={{ maxWidth: '50%' }} />
+    <br />
     <br />
     <Typography style={{ fontSize: '24px' }} >
-            Enter your courses in the searchbar above to get started!
+            The one-stop-shop for all your Princeton coursebook needs!
     </Typography>
     <div style={{ marginBottom: '5%' }} />
   </div>
