@@ -38,7 +38,7 @@ class Book extends Component {
 
   generateAuthorString = (authors) => {
     const numAuthors = authors ? authors.length : 0;
-    if (numAuthors < 3) return authors.join(' ,');
+    if (numAuthors < 3) return authors.join(', ');
     return (`${authors[0]}, ${authors[1]}, ...`);
   }
 
