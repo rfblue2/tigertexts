@@ -65,6 +65,7 @@ const userReducer = (state = {
     case GET_USER_REQ:
       return { ...state, error: null };
     case GET_USER_RES:
+      console.log("Got user: " + JSON.stringify(user, null, 2));
       return {
         ...state, user: user || defaultuser, error: null,
       };
