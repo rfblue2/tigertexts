@@ -25,36 +25,21 @@ const About = ({ classes }) => (
     <Typography variant="subheading" align="left">
       <ol>
         <li>
-          Start typing course names or numbers into the search bar to see
-          what books each course requires.
+          <b>Search</b> for books by typing course titles or numbers into the search bar
         </li>
         <li>
-          Click on the down arrow to see
-          more information about each book as well as listings on Amazon,
-          Labyrinth, or from your fellow classmates.
+          <b>View</b> book details and listings for Amazon, Labyrinth and other user sellers by clicking the dropdown
         </li>
         <li>
-          Log in (via Facebook)
-          to favorite books and buy and sell books.
+          <b>Sell</b> books by logging in and pressing the "Sell this book" button
         </li>
         <li>
-          To sell a book, press the 'Mark Sold' button
-          on each book you wish to sell.  You may optionally specify a price.
-        </li>
-        <li>
-          Interested buyers can then view the listings on each book record and
-          make offers (optionally specifying a price they are willing to pay) to
-          sellers.
-        </li>
-        <li>
-          The buyer will be notified by email if a user is interested
-          in buying their book, and can view all the offers in the Offers page.
-        </li>
-        <li>
-          The seller can choose to accept or decline the offer and the offerer
-          will be notified accordingly via email.
+          <b>Buy</b> books by clicking on a listing when looking at book details 
         </li>
       </ol>
+      An email is sent to a seller each time a buyer expresses interest in a book,
+      and an email is sent to a buyer each time the seller accepts or declines
+      the offer.
     </Typography>
     <br />
     <Typography variant="display1" align="left">
