@@ -22,6 +22,7 @@ const router = express.Router();
 
 /**
  * Auth Routes
+ * TODO hack of populating classes - ideally use ?include query param
  */
 
 const APP_ID = '1949273201750772';
@@ -137,7 +138,7 @@ router.route('/me')
 router.route('/favorites')
 
   .get(authenticate, getCurrentUser, wrap(async (req, res) => {
-    const favorites = await Book.find({ _id: { $in: req.user.toObject().favorite } });
+    const favorites = await Book.find({ _id: { $in: req.user.toObject().favorite } }).populate('classes');
     res.json(serializeBook(favorites));
   }))
 
@@ -166,7 +167,7 @@ router.route('/favorites/:id')
 router.route('/selling')
 
   .get(authenticate, getCurrentUser, wrap(async (req, res) => {
-    const selling = await Book.find({ _id: { $in: req.user.toObject().selling } });
+    const selling = await Book.find({ _id: { $in: req.user.toObject().selling } }).populate('classes');
     res.json(serializeBook(selling));
   }))
 
