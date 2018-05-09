@@ -33,7 +33,8 @@ class SellDialog extends Component {
   }
 
   onPriceChange = (e) => {
-    this.setState({ price: Math.min(999, Math.max(0, e.target.value)) });
+    if (e.target.value === '') this.setState({ price: '' });
+    else this.setState({ price: Math.min(999, Math.max(0, e.target.value)) });
   }
 
   onCommentChange = (e) => {
