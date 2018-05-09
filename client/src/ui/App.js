@@ -33,6 +33,7 @@ import Sidebar from './drawer/Sidebar';
 import Navbar from './nav/Navbar';
 import { deserializeClass } from '../serializers/classSerializer';
 import About from './About';
+import Home from './Home';
 import SellDialog from './book/SellDialog';
 import { closeListingDialog } from '../actions/listings.actions';
 import ListingDialog from './book/ListingDialog';
@@ -286,7 +287,8 @@ class App extends Component {
               onClose={this.handleCloseListingDialog}
             />
             <div className={classes.toolbar} />
-            <Route exact path="/" component={About} />
+            <Route exact path="/" component={Home} />
+            <Route exact path="/about" component={About} />
             <Route exact path="/books" component={BookListContainer} />
             <Route exact path="/offers" component={OffersContainer} />
           </main>

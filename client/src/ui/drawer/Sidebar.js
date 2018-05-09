@@ -69,7 +69,7 @@ class Sidebar extends Component {
         <div className={classes.toolbar} />
         <div style={{paddingTop: navBarHeight - 51}} />
         <List component="nav">
-         <ListItem button component={Link} to="/" className={classes.button}>
+         <ListItem button component={Link} to="/about" className={classes.button}>
            <ListItemIcon>
              <InfoIcon className={classes.icon}/>
            </ListItemIcon>
