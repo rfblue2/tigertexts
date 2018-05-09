@@ -71,7 +71,7 @@ router.get('/login', wrap(async (req, res) => {
     savedUser = await user.save();
     const welcomeMsg = {
       to: email,
-      from: 'rfong@princeton.edu',
+      from: 'team@tigertexts.io',
       subject: 'Welcome to TigerTexts',
       text: `Thank you for choosing TigerTexts as your one stop shop for all
              your coursebook needs.  We are excited to have you!  Head over to 
@@ -247,7 +247,7 @@ router.route('/offers')
     const buyer = await User.findById(data.buyer);
     const offerMsg = {
       to: listing.seller.email,
-      from: 'rfong@princeton.edu',
+      from: 'team@tigertexts.io',
       subject: 'Someone is interested in purchasing your books!',
       text: `${buyer.name} has offered to purchase ${listing.book.title}
              for $${data.price}. Go to tigertexts.herokuapp.com to view
@@ -273,7 +273,7 @@ router.route('/offers/:id')
     if (req.query.action === 'accept') {
       const offerMsg = {
         to: buyer.email,
-        from: 'rfong@princeton.edu',
+        from: 'team@tigertexts.io',
         subject: 'Your TigerTexts offer has been updated',
         text: `${listing.seller.name} has accepted your offer to purchase
              ${listing.book.title} for $${offer.price}! Contact the seller
@@ -288,7 +288,7 @@ router.route('/offers/:id')
     } else if (req.query.action === 'decline') {
       const offerMsg = {
         to: buyer.email,
-        from: 'rfong@princeton.edu',
+        from: 'team@tigertexts.io',
         subject: 'Your TigerTexts offer has been updated',
         text: `${listing.seller.name} has declined your offer to purchase
              ${listing.book.title} for $${offer.price}.`,
