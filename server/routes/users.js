@@ -28,9 +28,11 @@ const APP_ID = '1949273201750772';
 const APP_SECRET = process.env.FACEBOOK_APP_SECRET;
 
 const verifyToken = async (token, userId) => {
+  if (!token || token === 'undefined' ||
+    !userId || userId === 'undefined') return false;
   let tokenRes = await fetch(`https://graph.facebook.com/debug_token?input_token=${token}&access_token=${APP_ID}|${APP_SECRET}`);
   tokenRes = await tokenRes.json();
-  return tokenRes.user_id === userId;
+  return tokenRes.data.user_id === userId;
 };
 
 // Exchange short term token for long lived token
@@ -45,7 +47,8 @@ router.get('/login', wrap(async (req, res) => {
     token, userId, name, email,
   } = req.query;
 
-  if (!verifyToken(token, userId)) {
+  const verifyRes = await verifyToken(token, userId);
+  if (!verifyRes) {
     res.status(401).end();
     return;
   }
@@ -75,10 +78,10 @@ router.get('/login', wrap(async (req, res) => {
       subject: 'Welcome to TigerTexts',
       text: `Thank you for choosing TigerTexts as your one stop shop for all
              your coursebook needs.  We are excited to have you!  Head over to 
-             tigertexts.herokuapp.com to start.`,
+             tigertexts.io to start.`,
       html: `<p>Thank you for choosing TigerTexts as your one stop shop for all
              your coursebook needs.  We are excited to have you!  Head over to 
-             <a href="tigertexts.herokuapp.com">TigerTexts</a> to start.</p>`,
+             <a href="tigertexts.io">TigerTexts</a> to start.</p>`,
     };
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
     sgMail.send(welcomeMsg);
@@ -250,11 +253,11 @@ router.route('/offers')
       from: 'team@tigertexts.io',
       subject: 'Someone is interested in purchasing your books!',
       text: `${buyer.name} has offered to purchase ${listing.book.title}
-             for $${data.price}. Go to tigertexts.herokuapp.com to view
+             for $${data.price}. Go to tigertexts.io to view
              the offer. Buyer can be contacted at ${buyer.email}.`,
       html: `<p>${buyer.name} has offered to purchase ${listing.book.title}
              for $${data.price}. Buyer can be contacted at ${buyer.email}.
-             <a href="tigertexts.herokuapp.com">View the offer</a>.
+             <a href="tigertexts.io">View the offer</a>.
              </p>`,
     };
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
