@@ -56,8 +56,6 @@ class ListingDialog extends Component {
     const {
       classes, token, loggedIn, listing, user, showForm, onClose, onOffer,
     } = this.props;
-    console.log(JSON.stringify(listing, null, 2));
-    console.log(JSON.stringify(user, null, 2));
     const { price } = this.state;
     let userIsSeller = false;
     if (listing.seller && user.id) {
