@@ -80,7 +80,7 @@ export const getJwt = () => {
 
   return async (dispatch) => {
     const token = await getAndVerifyJwt();
-    console.log(token);
+    // console.log(token);
     dispatch(success(token));
     dispatch(getUserInfo(token));
   };
