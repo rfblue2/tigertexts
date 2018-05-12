@@ -8,3 +8,5 @@ scripts/scrapy_venv/
 *.pyc
 fb_script.py
 sendgrid.env
+key.pem
+cert.pem
