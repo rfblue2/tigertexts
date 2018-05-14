@@ -12,12 +12,6 @@ var http = require('http');
 var https = require('https');
 var fs = require('fs');
 
-var sslOptions = {
-  key: fs.readFileSync('key.pem'),
-  cert: fs.readFileSync('cert.pem'),
-  passphrase: 'pass',
-};
-
 /**
  * Get port from environment and store in Express.
  */
@@ -30,6 +24,11 @@ app.set('port', port);
  */
 var server;
 if (process.env.NODE_ENV === 'development') {
+  var sslOptions = {
+    key: fs.readFileSync('key.pem'),
+    cert: fs.readFileSync('cert.pem'),
+    passphrase: 'pass',
+  };
   server = https.createServer(sslOptions, app);
 } else {
   server = http.createServer(app);
