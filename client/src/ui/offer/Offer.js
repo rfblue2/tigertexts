@@ -27,7 +27,7 @@ class Offer extends Component {
     }
     display += offer.book ? ` "${offer.book.title}"` : '';
     if (offer.price) {
-      display += ` for $${offer.price}`;
+      display += ` for $${parseFloat(offer.price).toFixed(2)}`;
     }
     return display;
   }
