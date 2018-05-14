@@ -72,7 +72,10 @@ const About = ({ classes }) => (
     </div>
     <br />
     <Typography variant="subheading" align="left">
-      This app was developed as a COS333 project in Spring 2018.
+      This app was developed as a COS333 project in Spring 2018. 
+      View our <a href="/public/guide.pdf">Product Guide
+      </a>, <a href="/public/report.pdf">Final Report</a>,
+      and <a href="/public/presentation.pdf">Final Presentation</a>.
     </Typography>
     <div style={{ marginBottom: '5%' }} />
   </div>
