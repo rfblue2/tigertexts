@@ -4,7 +4,7 @@ const OfferSchema = new mongoose.Schema({
   createdAt: Date,
   updatedAt: Date,
   price: Number,
-  buyer: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  buyer: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   listing: { type: mongoose.Schema.Types.ObjectId, ref: 'Listing', required: true },
 });
 
