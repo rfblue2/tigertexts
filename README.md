@@ -13,7 +13,7 @@ yarn install
 cd client && yarn install
 cd ..
 ```
-You will also have to install MongoDB
+You will also have to install MongoDB.
 
 ## Testing in Development
 To test locally, you can run the server and clients separately.  The server runs on port 3001 by default and the client
