@@ -30,7 +30,7 @@
     "jade": "~1.11.0",
     "jsonapi-serializer": "^3.5.6",
     "jsonwebtoken": "^8.2.1",
-    "mongoose": "^5.0.11",
+    "mongoose": "^5.7.5",
     "mongoose-express-error-handler": "^1.0.6",
     "morgan": "~1.9.0",
     "node-cmd": "~3.0.0",
